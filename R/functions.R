@@ -135,3 +135,81 @@ pooled_values <- function(values) {
     mutate(G1_PCT = G1_M / G1_A, REST_PCT = REST_M / REST_A, D_PCT = G1_PCT - REST_PCT) %>%
     arrange(LEAGUE)
 }
+
+# ---- Question 4: per-game profiles (twin of python/profilelib.py) ----
+
+PROFILE_NEEDED <- c("FGA", "FTA", "OREB", "DREB", "TOV", "PF", "AST", "FGM", "FG3A", "MIN")
+PROFILE_METRICS <- c("PF100", "TOV100", "ORTG", "FTR", "AST_RATE", "OREB_PCT", "PACE", "FG3A_RATE", "FG3_PCT")
+
+profile_sample <- function(team_games, coverage) {
+  ok <- Reduce(`&`, lapply(PROFILE_NEEDED, function(c) coverage[[c]] == 1))
+  complete <- coverage[ok, c("LEAGUE", "SEASON")]
+  team_games %>% inner_join(complete, by = c("LEAGUE", "SEASON")) %>% filter(N_GAMES >= 2)
+}
+
+team_game_metrics <- function(games) {
+  games %>% mutate(
+    P = ((FGA + 0.44 * FTA - OREB + TOV) + (OPP_FGA + 0.44 * OPP_FTA - OPP_OREB + OPP_TOV)) / 2,
+    REG = ifelse(LEAGUE == 0, 48, 40),
+    PF100 = safe_ratio(100 * PF, P), TOV100 = safe_ratio(100 * TOV, P), ORTG = safe_ratio(100 * PTS, P),
+    FTR = safe_ratio(FTA, FGA), AST_RATE = safe_ratio(AST, FGM),
+    OREB_PCT = safe_ratio(OREB, OREB + OPP_DREB),
+    PACE = safe_ratio(P * REG, MIN / 5),
+    FG3A_RATE = safe_ratio(FG3A, FGA), FG3_PCT = safe_ratio(FG3M, FG3A)) %>%
+    select(-REG)
+}
+
+# mean() of an all-NA vector with na.rm is NaN; the design wants blank.
+mean_or_na <- function(x) if (all(is.na(x))) NA_real_ else mean(x, na.rm = TRUE)
+
+game_deviations <- function(tm) {
+  tm %>% group_by(LEAGUE, SEASON, SERIES_KEY, TEAM_ID) %>%
+    mutate(across(all_of(PROFILE_METRICS), ~ .x - mean_or_na(.x))) %>%
+    group_by(LEAGUE, SEASON, SERIES_KEY, GAME_NO) %>%
+    summarise(N_GAMES = first(N_GAMES), WINS_NEEDED = first(WINS_NEEDED),
+              across(all_of(PROFILE_METRICS), mean_or_na), .groups = "drop") %>%
+    arrange(LEAGUE, SEASON, SERIES_KEY, GAME_NO)
+}
+
+profile_summary <- function(dev) {
+  panels <- list(all = function(d) rep(TRUE, nrow(d)),
+                 full_length = function(d) d$N_GAMES == 2 * d$WINS_NEEDED - 1)
+  rows <- list()
+  for (league in sort(unique(dev$LEAGUE))) {
+    for (panel in names(panels)) {
+      lv <- dev[dev$LEAGUE == league, ]
+      pv <- lv[panels[[panel]](lv), ]
+      for (g in sort(unique(pv$GAME_NO))) {
+        gv <- pv[pv$GAME_NO == g, ]
+        for (m in PROFILE_METRICS) {
+          rows[[length(rows) + 1]] <- as_tibble(c(list(LEAGUE = league, PANEL = panel, GAME_NO = g, METRIC = m),
+                                                  describe_values(gv[[m]])))
+        }
+      }
+    }
+  }
+  bind_rows(rows)
+}
+
+series_state <- function(tm) {
+  t <- tm %>% group_by(LEAGUE, SEASON, SERIES_KEY, TEAM_ID) %>% arrange(GAME_NO, .by_group = TRUE) %>%
+    mutate(DEV = FG3A_RATE - mean_or_na(FG3A_RATE),
+           WINS_BEFORE = cumsum(WL == "W") - (WL == "W")) %>% ungroup()
+  opp <- t %>% transmute(LEAGUE, SEASON, SERIES_KEY, GAME_NO, OPP_ID = TEAM_ID,
+                         OPP_WINS_BEFORE = WINS_BEFORE, OPP_DEV = DEV)
+  j <- t %>% filter(GAME_NO >= 2) %>%
+    inner_join(opp, by = c("LEAGUE", "SEASON", "SERIES_KEY", "GAME_NO", "OPP_ID"))
+  games <- j %>% filter(WINS_BEFORE < OPP_WINS_BEFORE) %>%
+    transmute(LEAGUE, SEASON, SERIES_KEY, GAME_NO, TRAIL_MINUS_LEAD = DEV - OPP_DEV) %>%
+    arrange(LEAGUE, SEASON, SERIES_KEY, GAME_NO)
+  tied <- j %>% filter(WINS_BEFORE == OPP_WINS_BEFORE, TEAM_ID < OPP_ID) %>% count(LEAGUE, name = "TIED_GAMES")
+  list(games = games, tied = tied)
+}
+
+state_summary <- function(state) {
+  bind_rows(lapply(sort(unique(state$games$LEAGUE)), function(league) {
+    v <- state$games$TRAIL_MINUS_LEAD[state$games$LEAGUE == league]
+    tied <- state$tied$TIED_GAMES[state$tied$LEAGUE == league]
+    as_tibble(c(list(LEAGUE = league, TIED_GAMES = if (length(tied)) tied else 0L), describe_values(v)))
+  }))
+}

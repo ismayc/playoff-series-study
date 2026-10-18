@@ -92,3 +92,68 @@ test_that("summaries and pooled totals", {
   p <- pooled_values(s)
   expect_equal(c(p$G1_M, p$G1_A, p$REST_M, p$REST_A), c(5, 20, 14, 30))
 })
+
+# ---- Question 4 (fixture tests/fixtures/profile_games.csv; working in
+# tests/python/test_profilelib.py) ----
+
+load_tm <- function() {
+  team_game_metrics(read_csv(file.path(fix, "profile_games.csv"), show_col_types = FALSE,
+                             col_types = cols(SERIES_KEY = col_character(), .default = col_guess())))
+}
+
+test_that("profile rates", {
+  a <- load_tm() %>% filter(TEAM_ID == 1) %>% arrange(GAME_NO)
+  expect_equal(a$P, c(90, 100, 110))
+  expect_equal(a$PF100, c(20, 20, 20))
+  expect_equal(a$PACE, c(90, 100, 110 * 48 / 53))
+  expect_equal(a$OREB_PCT, rep(0.25, 3))
+  expect_equal(a$FTR, c(25 / 80, 25 / 90, 25 / 100))
+  expect_equal(a$ORTG, c(100 * 100 / 90, 100, 100 * 100 / 110))
+  expect_equal(a$TOV100, c(10, 9, 900 / 110))
+})
+
+test_that("game deviations", {
+  d <- game_deviations(load_tm()) %>% arrange(GAME_NO)
+  expect_equal(d$PF100, c(10 / 3, -5 / 3, -5 / 3))
+  pace <- c(90, 100, 110 * 48 / 53)
+  expect_equal(d$PACE, pace - mean(pace))
+  a <- c(0.25, 1 / 3, 0.4); b <- c(0.5, 0.3, 0.3)
+  expect_equal(d$FG3A_RATE, ((a - mean(a)) + (b - mean(b))) / 2)
+})
+
+test_that("a blank team drops from the game mean", {
+  tm <- load_tm() %>% mutate(FG3_PCT = ifelse(TEAM_ID == 2 & GAME_NO == 3, NA, FG3_PCT))
+  d <- game_deviations(tm) %>% arrange(GAME_NO)
+  a <- c(5 / 20, 10 / 30, 20 / 40); b <- c(10 / 40, 9 / 27)
+  expect_equal(d$FG3_PCT[3], a[3] - mean(a))
+  expect_equal(d$FG3_PCT[1], ((a[1] - mean(a)) + (b[1] - mean(b))) / 2)
+})
+
+test_that("profile panels", {
+  p <- profile_summary(game_deviations(load_tm()))
+  expect_setequal(unique(p$PANEL), c("all", "full_length"))
+  row <- p %>% filter(PANEL == "all", GAME_NO == 1, METRIC == "PF100")
+  expect_equal(row$N, 1)
+  expect_equal(row$MEAN, 10 / 3)
+  short <- game_deviations(load_tm()) %>% mutate(WINS_NEEDED = 4)
+  expect_equal(unique(profile_summary(short)$PANEL), "all")
+})
+
+test_that("series state", {
+  s <- series_state(load_tm())
+  expect_equal(nrow(s$games), 1)
+  expect_equal(s$games$GAME_NO, 2)
+  a <- c(0.25, 1 / 3, 0.4); b <- c(0.5, 0.3, 0.3)
+  expect_equal(s$games$TRAIL_MINUS_LEAD, (b[2] - mean(b)) - (a[2] - mean(a)))
+  ss <- state_summary(s)
+  expect_equal(ss$TIED_GAMES, 1)
+  expect_equal(ss$N, 1)
+})
+
+test_that("profile sample needs every count", {
+  tg <- tibble(LEAGUE = c(0, 0), SEASON = c(1984, 1985), N_GAMES = c(4, 4))
+  cov <- tibble(LEAGUE = c(0, 0), SEASON = c(1984, 1985))
+  for (c in PROFILE_NEEDED) cov[[c]] <- c(1, 1)
+  cov$TOV <- c(0.16, 1)
+  expect_equal(profile_sample(tg, cov)$SEASON, 1985)
+})

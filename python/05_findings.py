@@ -113,11 +113,75 @@ def pooled_region(pooled: pl.DataFrame) -> str:
     return "\n".join(lines)
 
 
+PROFILE_LABELS = {
+    "PF100": ("Fouls per 100 possessions", 1), "FTR": ("Free-throw rate (FTA / FGA, x100)", 100),
+    "TOV100": ("Turnovers per 100 possessions", 1), "PACE": ("Pace (possessions per regulation game)", 1),
+    "ORTG": ("Points per 100 possessions", 1), "OREB_PCT": ("Offensive rebound % (x100)", 100),
+    "AST_RATE": ("Assists per made field goal (x100)", 100),
+    "FG3A_RATE": ("Three-point attempt rate (x100)", 100), "FG3_PCT": ("Three-point % (x100)", 100),
+}
+
+
+def profile_table(prof: pl.DataFrame, league: int, panel: str) -> list[str]:
+    sub = prof.filter((pl.col("LEAGUE") == league) & (pl.col("PANEL") == panel))
+    games = sorted(sub["GAME_NO"].unique().to_list())
+    n = {g: sub.filter((pl.col("GAME_NO") == g) & (pl.col("METRIC") == "PF100"))["N"].item() for g in games}
+    lines = ["| Rate, deviation from the series mean | " + " | ".join(f"G{g}" for g in games) + " |",
+             "|---|" + "---|" * len(games),
+             "| Games | " + " | ".join(str(n[g]) for g in games) + " |"]
+    for m, (label, k) in PROFILE_LABELS.items():
+        cells = []
+        for g in games:
+            r = get_profile(sub, g, m)
+            text = f"{r['MEAN'] * k:+.2f}"
+            cells.append(f"**{text}**" if r["LO"] is not None and excludes_zero(r) else text)
+        lines.append(f"| {label} | " + " | ".join(cells) + " |")
+    return lines
+
+
+def get_profile(sub: pl.DataFrame, game: int, metric: str) -> dict:
+    r = sub.filter((pl.col("GAME_NO") == game) & (pl.col("METRIC") == metric))
+    if r.height != 1:
+        raise KeyError(f"expected one profile row for game {game} {metric}, found {r.height}")
+    return r.row(0, named=True)
+
+
+def profiles_region(prof: pl.DataFrame) -> str:
+    out = []
+    for lg, name in LEAGUES.items():
+        out += [f"**{name}, every series.**", ""] + profile_table(prof, lg, "all") + [""]
+        out += [f"**{name}, full-length series only** (same series in every column).", ""]
+        out += profile_table(prof, lg, "full_length") + [""]
+    out.append("Bold: the 95% interval excludes zero. Each cell is the mean over games of the "
+               "two teams' deviations from their own series means.")
+    return "\n".join(out)
+
+
+def state_region(state: pl.DataFrame) -> str:
+    lines = ["| League | Games with a series leader | Trailing minus leading team | Tied games left out |",
+             "|---|---|---|---|"]
+    for r in state.sort("LEAGUE").iter_rows(named=True):
+        lines.append(f"| {LEAGUES[r['LEAGUE']]} | {r['N']} | {cell(r)} | {r['TIED_GAMES']} |")
+    lines += ["", "Three-point attempt rate, each team relative to its own series mean, percentage points."]
+    verdicts = []
+    for r in state.sort("LEAGUE").iter_rows(named=True):
+        name = LEAGUES[r["LEAGUE"]]
+        if excludes_zero(r):
+            verdicts.append(f"{name}: the team behind in the series takes relatively "
+                            f"{'fewer' if r['MEAN'] < 0 else 'more'} threes than the leader.")
+        else:
+            verdicts.append(f"{name}: no difference between trailing and leading teams.")
+    return "\n".join(lines + ["", "**Reading.** " + " ".join(verdicts)])
+
+
 def regions() -> dict[str, str]:
     summary = pl.read_csv(ROOT / "output" / "game1_summary.csv")
     pooled = pl.read_csv(ROOT / "output" / "game1_pooled.csv")
+    prof = pl.read_csv(ROOT / "output" / "profile_summary.csv")
+    state = pl.read_csv(ROOT / "output" / "profile_state.csv")
     return {"headline": headline(summary), "rate": rate(summary),
-            "baseline": baseline(summary), "pooled": pooled_region(pooled)}
+            "baseline": baseline(summary), "pooled": pooled_region(pooled),
+            "profiles": profiles_region(prof), "state": state_region(state)}
 
 
 def render(text: str, new: dict[str, str]) -> str:

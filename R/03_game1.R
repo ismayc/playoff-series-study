@@ -11,11 +11,13 @@ source(file.path(here, "functions.R"))
 out <- file.path(root, "output", "r")
 dir.create(out, showWarnings = FALSE, recursive = TRUE)
 
-tg <- read_csv(file.path(root, "data", "team_games.csv"),
-               col_types = cols(GAME_ID = col_character(), SERIES_KEY = col_character(),
+tg <- read_csv(file.path(root, "data", "team_games.csv"), guess_max = Inf,
+               col_types = cols(LEAGUE = col_integer(), GAME_ID = col_character(), SERIES_KEY = col_character(),
                                 HOME = col_logical(), .default = col_guess()))
-ts <- read_csv(file.path(root, "data", "team_seasons.csv"), show_col_types = FALSE)
-cov <- read_csv(file.path(root, "output", "coverage.csv"), show_col_types = FALSE)
+ts <- read_csv(file.path(root, "data", "team_seasons.csv"), show_col_types = FALSE, guess_max = Inf,
+               col_types = cols(LEAGUE = col_integer(), .default = col_guess()))
+cov <- read_csv(file.path(root, "output", "coverage.csv"), show_col_types = FALSE,
+                col_types = cols(LEAGUE = col_integer(), .default = col_guess()))
 
 games <- add_expected(sample_games(tg, cov), ts)
 series <- series_values(games)

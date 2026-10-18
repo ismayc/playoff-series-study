@@ -105,7 +105,7 @@ def build_season(league: str, year: int):
                .with_columns(pl.int_range(1, pl.len() + 1).over("TEAM_ID").alias("TEAM_SERIES_NO")))
     s = (s.join(starts.select("SERIES_KEY", "TEAM_ID", "TEAM_SERIES_NO"), on=["SERIES_KEY", "TEAM_ID"])
           .with_columns(pl.col("SERIES_KEY").is_in(finals).alias("FINALS"),
-                        pl.lit(league).alias("LEAGUE"), pl.lit(year).alias("SEASON")))
+                        pl.lit(int(league)).alias("LEAGUE"), pl.lit(year).alias("SEASON")))
 
     v = pslib.validate_series(s)
     per_series = s.select("SERIES_KEY", "ROUND", "FINALS", "WINS_NEEDED").unique()
@@ -114,11 +114,11 @@ def build_season(league: str, year: int):
           .join(fmt, on="SERIES_KEY", how="left")
           .with_columns(pl.coalesce("INVALID_REASON", "FORMAT_REASON").alias("INVALID_REASON"))
           .with_columns(pl.col("INVALID_REASON").is_null().alias("VALID"),
-                        pl.lit(league).alias("LEAGUE"), pl.lit(year).alias("SEASON"))
+                        pl.lit(int(league)).alias("LEAGUE"), pl.lit(year).alias("SEASON"))
           .drop("FORMAT_REASON"))
 
     cov = po.select([pl.col(c).is_not_null().mean().alias(c) for c in pslib.STATS]).with_columns(
-        pl.lit(league).alias("LEAGUE"), pl.lit(year).alias("SEASON"), pl.lit(po.height).alias("ROWS"))
+        pl.lit(int(league)).alias("LEAGUE"), pl.lit(year).alias("SEASON"), pl.lit(po.height).alias("ROWS"))
 
     base = None
     if rs.height:
@@ -131,7 +131,7 @@ def build_season(league: str, year: int):
                     *[full(c, f"RS_{c}") for c in ("FG3M", "FG3A", "FGA", "PF", "TOV")],
                     *[full(f"OPP_{c}", f"RS_OPP_{c}") for c in ("FG3M", "FG3A", "FGA")],
                     full("POSS", "RS_POSS"))
-                 .with_columns(pl.lit(league).alias("LEAGUE"), pl.lit(year).alias("SEASON")))
+                 .with_columns(pl.lit(int(league)).alias("LEAGUE"), pl.lit(year).alias("SEASON")))
     return s, v, clash, cov, base
 
 

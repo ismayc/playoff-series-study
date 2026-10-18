@@ -1,12 +1,14 @@
-"""Gate: the R and Python implementations of question 1 must agree.
+"""Gate: the R and Python implementations of questions 1 and 4 must agree.
 
 Compares output/<table>.csv (Python) with output/r/<table>.csv (R) for every
-table 03 writes. In each table the key rows must match exactly, every
+table 03 and 06 write. In each table the key rows must match exactly, every
 shared column must exist on both sides, numbers must agree within TOL
 (blank on one side means blank on the other), and text and flags must be
 equal. An empty table or a missing file fails; nothing is skipped quietly.
 
-    python python/03_game1.py && Rscript R/03_game1.R && python python/04_reconcile.py
+    python python/03_game1.py && Rscript R/03_game1.R
+    python python/06_profiles.py && Rscript R/06_profiles.R
+    python python/04_reconcile.py
 """
 
 from __future__ import annotations
@@ -25,6 +27,9 @@ TABLES = {
     "game1_team.csv": ["LEAGUE", "SEASON", "SERIES_KEY", "TEAM_ID"],
     "game1_summary.csv": ["LEAGUE", "PANEL", "METRIC"],
     "game1_pooled.csv": ["LEAGUE"],
+    "profile_games.csv": ["LEAGUE", "SEASON", "SERIES_KEY", "GAME_NO"],
+    "profile_summary.csv": ["LEAGUE", "PANEL", "GAME_NO", "METRIC"],
+    "profile_state.csv": ["LEAGUE"],
 }
 
 

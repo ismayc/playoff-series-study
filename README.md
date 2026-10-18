@@ -54,10 +54,9 @@ NBA by decade, Game 1 minus Games 2+:
 | 2020s | 105 | -0.30 (-1.14 to +0.54) | +0.15 (-1.08 to +1.37) |
 <!-- /gen:rate -->
 
-Exploratory, not the pre-specified test. Why volume moves is not settled
-here: adjustment between games, more trailing (and so more threes) in
-later games, or both. Question 4's per-game profiles are where that gets
-looked at.
+Exploratory, not the pre-specified test. Question 4 below follows the
+attempt rate through every game of the series and tests one explanation
+for it.
 
 ### Against the regular-season baseline
 
@@ -91,11 +90,107 @@ neutral sites and are left out of the home and road rows only.
 Every three-pointer in every Game 1 against every one after it, no intervals.
 <!-- /gen:pooled -->
 
+## Question 4: how the box score moves through a series
+
+Exploratory: estimates and intervals, no significance claims. Every rate
+is measured against the same team's average over the same series, so
+team strength cancels, and the game is the unit. Overtime is removed from
+pace, and every count is a rate per possession or per attempt. The
+full-length tables hold only series that went the distance, so a trend
+there is not a change in which series are present.
+
+<!-- gen:profiles -->
+**NBA, every series.**
+
+| Rate, deviation from the series mean | G1 | G2 | G3 | G4 | G5 | G6 | G7 |
+|---|---|---|---|---|---|---|---|
+| Games | 630 | 630 | 630 | 583 | 448 | 266 | 109 |
+| Fouls per 100 possessions | **-1.05** | +0.20 | **+0.38** | **+0.64** | +0.06 | **-0.43** | +0.06 |
+| Free-throw rate (FTA / FGA, x100) | **-2.23** | **+0.65** | **+0.73** | **+1.10** | +0.29 | -0.63 | -0.62 |
+| Turnovers per 100 possessions | -0.04 | +0.10 | +0.12 | +0.09 | -0.10 | -0.08 | **-0.91** |
+| Pace (possessions per regulation game) | **+0.60** | +0.18 | -0.17 | -0.09 | -0.09 | -0.42 | **-1.68** |
+| Points per 100 possessions | -0.53 | +0.48 | +0.06 | -0.25 | +0.43 | -0.24 | +0.09 |
+| Offensive rebound % (x100) | -0.14 | -0.00 | +0.19 | -0.11 | +0.05 | +0.10 | -0.15 |
+| Assists per made field goal (x100) | +0.03 | +0.20 | -0.22 | -0.13 | +0.29 | -0.21 | -0.04 |
+| Three-point attempt rate (x100) | **-1.07** | -0.06 | +0.22 | **+0.27** | **+0.36** | **+0.53** | **+1.01** |
+| Three-point % (x100) | -0.26 | +0.57 | +0.04 | -0.10 | -0.16 | +0.05 | -0.38 |
+
+**NBA, full-length series only** (same series in every column).
+
+| Rate, deviation from the series mean | G1 | G2 | G3 | G4 | G5 | G6 | G7 |
+|---|---|---|---|---|---|---|---|
+| Games | 155 | 155 | 155 | 155 | 155 | 109 | 109 |
+| Fouls per 100 possessions | **-1.15** | **+0.48** | +0.27 | **+0.63** | +0.11 | **-0.55** | +0.06 |
+| Free-throw rate (FTA / FGA, x100) | **-2.20** | **+1.78** | -0.05 | +0.55 | +0.56 | -0.30 | -0.62 |
+| Turnovers per 100 possessions | +0.16 | +0.32 | +0.16 | +0.15 | -0.22 | +0.11 | **-0.91** |
+| Pace (possessions per regulation game) | **+1.30** | +0.45 | -0.33 | -0.15 | -0.26 | +0.25 | **-1.68** |
+| Points per 100 possessions | -0.79 | **+1.24** | +0.11 | -0.50 | +0.91 | **-1.45** | +0.09 |
+| Offensive rebound % (x100) | -0.61 | +0.10 | +0.58 | +0.10 | +0.28 | -0.51 | -0.15 |
+| Assists per made field goal (x100) | -0.43 | +0.01 | +0.54 | +0.24 | +0.29 | -0.87 | -0.04 |
+| Three-point attempt rate (x100) | **-1.35** | -0.05 | -0.07 | +0.15 | +0.41 | +0.29 | **+1.01** |
+| Three-point % (x100) | -0.27 | +1.05 | -0.31 | -0.28 | +0.21 | -0.06 | -0.38 |
+
+**WNBA, every series.**
+
+| Rate, deviation from the series mean | G1 | G2 | G3 | G4 | G5 |
+|---|---|---|---|---|---|
+| Games | 170 | 170 | 109 | 28 | 15 |
+| Fouls per 100 possessions | **-1.00** | **+0.63** | +0.33 | +0.66 | +0.69 |
+| Free-throw rate (FTA / FGA, x100) | **-1.80** | **+1.64** | -0.35 | +1.63 | +1.24 |
+| Turnovers per 100 possessions | -0.10 | +0.31 | -0.42 | +0.01 | +0.61 |
+| Pace (possessions per regulation game) | +0.08 | +0.31 | **-0.64** | +0.65 | -0.97 |
+| Points per 100 possessions | -0.30 | +0.24 | +0.27 | -0.40 | -0.52 |
+| Offensive rebound % (x100) | -0.42 | +0.49 | +0.16 | -1.94 | +1.59 |
+| Assists per made field goal (x100) | -0.48 | +0.29 | +0.18 | -1.02 | +2.68 |
+| Three-point attempt rate (x100) | -0.16 | +0.17 | -0.05 | -0.13 | +0.52 |
+| Three-point % (x100) | +0.01 | -0.61 | +0.34 | **+3.14** | -1.52 |
+
+**WNBA, full-length series only** (same series in every column).
+
+| Rate, deviation from the series mean | G1 | G2 | G3 | G4 | G5 |
+|---|---|---|---|---|---|
+| Games | 81 | 81 | 81 | 15 | 15 |
+| Fouls per 100 possessions | **-0.78** | +0.15 | +0.44 | +0.35 | +0.69 |
+| Free-throw rate (FTA / FGA, x100) | -1.26 | +1.00 | -0.18 | +1.18 | +1.24 |
+| Turnovers per 100 possessions | +0.04 | +0.45 | **-0.61** | +0.01 | +0.61 |
+| Pace (possessions per regulation game) | +0.24 | +0.48 | **-0.58** | +0.26 | -0.97 |
+| Points per 100 possessions | -0.37 | -0.48 | +0.84 | +0.55 | -0.52 |
+| Offensive rebound % (x100) | -0.02 | +0.06 | +0.13 | -2.50 | +1.59 |
+| Assists per made field goal (x100) | +0.19 | +0.16 | -0.44 | -2.21 | +2.68 |
+| Three-point attempt rate (x100) | +0.07 | -0.21 | +0.03 | +0.11 | +0.52 |
+| Three-point % (x100) | -0.35 | -0.14 | +0.15 | +3.39 | -1.52 |
+
+Bold: the 95% interval excludes zero. Each cell is the mean over games of the two teams' deviations from their own series means.
+<!-- /gen:profiles -->
+
+### Does falling behind in a series bring more threes?
+
+One explanation for rising three-point volume is that the team behind in
+the series shoots its way back. This compares the two teams in the same
+game, from Game 2 on, whenever one leads the series.
+
+<!-- gen:state -->
+| League | Games with a series leader | Trailing minus leading team | Tied games left out |
+|---|---|---|---|
+| NBA | 2077 | -1.07 (-1.35 to -0.80) | 589 |
+| WNBA | 220 | -2.34 (-3.24 to -1.44) | 102 |
+
+Three-point attempt rate, each team relative to its own series mean, percentage points.
+
+**Reading.** NBA: the team behind in the series takes relatively fewer threes than the leader. WNBA: the team behind in the series takes relatively fewer threes than the leader.
+<!-- /gen:state -->
+
 ## What this design cannot claim
 
 - **Causes.** A difference between Game 1 and later games mixes rest, scouting
   adjustment, officiating, and game script; this compares, it does not
   separate them.
+- **Intent, from series state.** A team trails a series because it lost
+  games, so trailing and leading teams differ in recent results as well as
+  in what is at stake. The comparison sorts teams by series position; it
+  does not show that trailing teams choose to shoot fewer threes.
+- **Officiating, from fouls.** Fewer fouls in a game can mean fewer called
+  or fewer committed; box scores cannot tell the two apart.
 - **Before 1984-85 in the NBA.** Three-point attempts are missing from most
   box scores before then (`output/coverage.csv`).
 - **The 2026 WNBA Finals,** in progress at harvest and excluded until it

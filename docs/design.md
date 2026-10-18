@@ -2,7 +2,8 @@
 
 Started October 18, 2026. Status: **question 1 run on October 18, 2026,
 after the analysis below was fixed; results are in the README's generated
-regions. Questions 2 to 4 are not built yet.** The analysis was specified
+regions. Question 4 run the same day, after its definitions below were
+fixed. Questions 2 and 3 are not built yet.** The analysis was specified
 before any outcome was looked at, the same discipline as the contract-year
 study: the metric, the sample, and the baseline do not change without a
 dated amendment that says why. Every claim about the data was
@@ -153,3 +154,40 @@ not the comparison.
   the team-game value minus that team's own series mean, averaged by game
   number with a 95% interval. Possessions: FGA + 0.44 FTA - OREB + TOV,
   averaged over both teams.
+
+### Question 4, fixed October 18, 2026 before any profile was computed
+
+Implemented in `python/profilelib.py` and `R/functions.R`, run by
+`python/06_profiles.py` and `R/06_profiles.R`, reconciled by 04.
+
+- **Sample.** Valid series of two or more games in league-seasons whose
+  playoff rows all carry FGA, FTA, OREB, DREB, TOV, PF, AST, FGM, FG3A,
+  and MIN: NBA 1984-85 on, every WNBA season with a multi-game series.
+- **Metrics, per team-game.** Possessions P = the mean of both teams'
+  FGA + 0.44 FTA - OREB + TOV, so one game has one P.
+  - PF100 = 100 PF / P; TOV100 = 100 TOV / P; ORTG = 100 PTS / P.
+  - FTR = FTA / FGA; AST_RATE = AST / FGM; OREB_PCT = OREB / (OREB +
+    opponent DREB).
+  - PACE = P per regulation game: P times (regulation minutes / game
+    minutes), where game minutes are team MIN / 5 and regulation is 48
+    (NBA) or 40 (WNBA). This removes overtime.
+  - FG3A_RATE = FG3A / FGA and FG3_PCT = FG3M / FG3A, for continuity
+    with question 1.
+- **Deviation.** Each team-game value minus the mean of that team's values
+  over the series (an unweighted mean over its games). A game's deviation
+  is the mean of its two teams' deviations, so the game is the unit (for
+  PACE the two teams are identical by construction). A blank value (no
+  attempts) drops that team from the game's mean; a game with both blank
+  drops, and is counted.
+- **Profile.** Mean deviation by league and game number with the 95%
+  interval of question 1 (mean plus or minus 1.96 sd / sqrt(n)).
+- **Composition.** Game 7 exists only in long series, so a second profile
+  uses only full-length series (N_GAMES = 2 x WINS_NEEDED - 1). Its
+  game-number mix is constant, so a trend in it is not a change in which
+  series are present.
+- **Series state, for the three-point volume question.** For Game 2 on,
+  in games where one team leads the series: the trailing team's FG3A_RATE
+  deviation minus the leading team's. Positive means the team behind in the
+  series takes relatively more threes. Reported per league with the same
+  interval, plus the count of games tied in the series (left out).
+- Exploratory throughout: estimates and intervals, no significance claims.
