@@ -28,6 +28,7 @@ TABLES = {
     "game1_team.csv": ["LEAGUE", "SEASON", "SERIES_KEY", "TEAM_ID"],
     "game1_summary.csv": ["LEAGUE", "PANEL", "METRIC"],
     "game1_pooled.csv": ["LEAGUE"],
+    "game1_season.csv": ["LEAGUE", "SEASON"],
     "profile_games.csv": ["LEAGUE", "SEASON", "SERIES_KEY", "GAME_NO"],
     "profile_summary.csv": ["LEAGUE", "PANEL", "GAME_NO", "METRIC"],
     "profile_state.csv": ["LEAGUE"],

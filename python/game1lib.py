@@ -162,3 +162,17 @@ def pooled(values: pl.DataFrame) -> pl.DataFrame:
                           (pl.col("REST_M") / pl.col("REST_A")).alias("REST_PCT"))
             .with_columns((pl.col("G1_PCT") - pl.col("REST_PCT")).alias("D_PCT"))
             .sort("LEAGUE"))
+
+
+def season_values(values: pl.DataFrame) -> pl.DataFrame:
+    """Attempt-weighted totals per league and season: the level of Game 1 and
+    later-game shooting over time (exploratory, not in the pre-specification)."""
+    sums = [pl.col(f"{s}_{k}").sum().alias(f"{s}_{k}") for s in ("G1", "REST") for k in ("M", "A", "FGA")]
+    return (values.group_by("LEAGUE", "SEASON").agg(pl.len().alias("SERIES"), *sums)
+            .with_columns(ratio(pl.col("G1_M"), pl.col("G1_A")).alias("G1_PCT"),
+                          ratio(pl.col("REST_M"), pl.col("REST_A")).alias("REST_PCT"),
+                          ratio(pl.col("G1_A"), pl.col("G1_FGA")).alias("G1_RATE"),
+                          ratio(pl.col("REST_A"), pl.col("REST_FGA")).alias("REST_RATE"))
+            .with_columns((pl.col("G1_PCT") - pl.col("REST_PCT")).alias("D_PCT"),
+                          (pl.col("G1_RATE") - pl.col("REST_RATE")).alias("D_RATE"))
+            .sort("LEAGUE", "SEASON"))

@@ -9,6 +9,7 @@ output/ (or the directory given with --out):
 - game1_team.csv: one row per team per series, home or road in Game 1.
 - game1_summary.csv: mean, sd, and 95% interval per league, panel, metric.
 - game1_pooled.csv: attempt-weighted league totals.
+- game1_season.csv: attempt-weighted totals per league and season.
 
     python python/03_game1.py [--out DIR]
 """
@@ -56,6 +57,7 @@ def main() -> int:
     team.write_csv(args.out / "game1_team.csv")
     summary.write_csv(args.out / "game1_summary.csv")
     g1.pooled(series).write_csv(args.out / "game1_pooled.csv")
+    g1.season_values(series).write_csv(args.out / "game1_season.csv")
 
     print(f"game1: {series.height} series, {team.height} team-series, "
           f"{missing} team-game rows without an expected 3P%")

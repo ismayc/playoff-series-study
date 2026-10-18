@@ -93,6 +93,20 @@ test_that("summaries and pooled totals", {
   expect_equal(c(p$G1_M, p$G1_A, p$REST_M, p$REST_A), c(5, 20, 14, 30))
 })
 
+test_that("season totals pool attempts", {
+  s <- series_values(load_games())
+  s16 <- s %>% mutate(SEASON = 2016, G1_M = 0, G1_A = 0)
+  out <- season_values(bind_rows(s, s, s16))
+  a <- out %>% filter(SEASON == 2010)
+  expect_equal(c(a$SERIES, a$G1_M, a$G1_A, a$G1_FGA), c(2, 10, 40, 160))
+  expect_equal(a$G1_PCT, 0.25)
+  expect_equal(a$REST_PCT, 14 / 30)
+  expect_equal(a$D_RATE, 0.25 - 0.1875)
+  b <- out %>% filter(SEASON == 2016)
+  expect_true(is.na(b$G1_PCT) && is.na(b$D_PCT))
+  expect_equal(b$G1_RATE, 0)
+})
+
 # ---- Question 4 (fixture tests/fixtures/profile_games.csv; working in
 # tests/python/test_profilelib.py) ----
 

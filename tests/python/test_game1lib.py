@@ -123,3 +123,17 @@ def test_summarize_panels_and_pooled(games):
     p = g1.pooled(s).row(0, named=True)
     assert (p["G1_M"], p["G1_A"], p["REST_M"], p["REST_A"]) == (5, 20, 14, 30)
     assert p["D_PCT"] == pytest.approx(0.25 - 14 / 30)
+
+
+def test_season_values_pool_attempts(games):
+    # The fixture series twice in 2010 and once, with no Game 1 threes, in 2016.
+    s = g1.series_values(games)
+    s16 = s.with_columns(pl.lit(2016).cast(s["SEASON"].dtype).alias("SEASON"),
+                         (pl.col("G1_M") * 0).alias("G1_M"), (pl.col("G1_A") * 0).alias("G1_A"))
+    out = g1.season_values(pl.concat([s, s, s16]))
+    a = out.filter(pl.col("SEASON") == 2010).row(0, named=True)
+    assert (a["SERIES"], a["G1_M"], a["G1_A"], a["G1_FGA"]) == (2, 10, 40, 160)
+    assert a["G1_PCT"] == pytest.approx(0.25) and a["REST_PCT"] == pytest.approx(14 / 30)
+    assert a["G1_RATE"] == pytest.approx(0.25) and a["D_RATE"] == pytest.approx(0.25 - 0.1875)
+    b = out.filter(pl.col("SEASON") == 2016).row(0, named=True)
+    assert b["G1_PCT"] is None and b["D_PCT"] is None and b["G1_RATE"] == 0.0

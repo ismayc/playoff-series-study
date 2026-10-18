@@ -233,13 +233,63 @@ def rest_region(rs: pl.DataFrame) -> str:
     return "\n".join(lines + ["", "**Reading.** " + " ".join(readings)])
 
 
+def lower_run(rows: pl.DataFrame) -> tuple[int, int] | None:
+    """First and last season of the longest unbroken run of seasons whose
+    Game 1 attempt rate is below Games 2+, or None if there is no such season."""
+    best, start, prev = None, None, None
+    for season, d in rows.sort("SEASON").select("SEASON", "D_RATE").iter_rows():
+        if d is not None and d < 0:
+            start = season if start is None or prev != season - 1 else start
+            if best is None or season - start > best[1] - best[0]:
+                best = (start, season)
+        else:
+            start = None
+        prev = season
+    return best
+
+
+def eras_region(summary: pl.DataFrame, season: pl.DataFrame) -> str:
+    lines = ["| League | Decade | Series | Accuracy | Attempt rate |", "|---|---|---|---|---|"]
+    for lg, name in LEAGUES.items():
+        decades = sorted({p for p in summary.filter(pl.col("LEAGUE") == lg)["PANEL"].to_list()
+                          if re.fullmatch(r"\d{4}s", p)})
+        for p in decades:
+            a, r = get(summary, lg, p, "D_PCT"), get(summary, lg, p, "D_RATE")
+            lines.append(f"| {name} | {p} | {a['N']} | {cell(a)} | {cell(r)} |")
+    lines += ["", "Game 1 minus Games 2+, mean over series in percentage points with a 95% interval."]
+    lines += ["", "| League | Decade | Seasons | Game 1 3P% | Games 2+ 3P% | Game 1 3PA rate "
+              "| Games 2+ 3PA rate | Seasons with a lower Game 1 rate |", "|---|---|---|---|---|---|---|---|"]
+    runs = []
+    for lg, name in LEAGUES.items():
+        rows = season.filter(pl.col("LEAGUE") == lg).with_columns(((pl.col("SEASON") // 10) * 10).alias("DECADE"))
+        if rows.height == 0:
+            raise KeyError(f"no season rows for {name}")
+        dec = (rows.group_by("DECADE")
+                   .agg(pl.len().alias("SEASONS"), (pl.col("D_RATE") < 0).sum().alias("LOWER"),
+                        *[pl.col(c).sum() for s in ("G1", "REST") for c in (f"{s}_M", f"{s}_A", f"{s}_FGA")])
+                   .sort("DECADE"))
+        for d in dec.iter_rows(named=True):
+            lines.append(f"| {name} | {d['DECADE']}s | {d['SEASONS']} "
+                         f"| {d['G1_M'] / d['G1_A'] * 100:.1f} | {d['REST_M'] / d['REST_A'] * 100:.1f} "
+                         f"| {d['G1_A'] / d['G1_FGA'] * 100:.1f} | {d['REST_A'] / d['REST_FGA'] * 100:.1f} "
+                         f"| {d['LOWER']} of {d['SEASONS']} |")
+        run = lower_run(rows)
+        if run:
+            runs.append(f"{name}: the longest unbroken run of seasons with a lower Game 1 attempt rate "
+                        f"is {run[0]} to {run[1]}.")
+    lines += ["", "Every three in the decade's series pooled, so a season with more threes counts for more."]
+    return "\n".join(lines + ["", "**Reading.** " + " ".join(runs)])
+
+
 def regions() -> dict[str, str]:
     summary = pl.read_csv(ROOT / "output" / "game1_summary.csv")
     pooled = pl.read_csv(ROOT / "output" / "game1_pooled.csv")
+    season = pl.read_csv(ROOT / "output" / "game1_season.csv")
     prof = pl.read_csv(ROOT / "output" / "profile_summary.csv")
     state = pl.read_csv(ROOT / "output" / "profile_state.csv")
     return {"headline": headline(summary), "rate": rate(summary),
             "baseline": baseline(summary), "pooled": pooled_region(pooled),
+            "eras": eras_region(summary, season),
             "profiles": profiles_region(prof), "state": state_region(state),
             "stakes": stakes_region(pl.read_csv(ROOT / "output" / "stakes_summary.csv")),
             "rest": rest_region(pl.read_csv(ROOT / "output" / "rest_summary.csv"))}

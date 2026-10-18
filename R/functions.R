@@ -136,6 +136,17 @@ pooled_values <- function(values) {
     arrange(LEAGUE)
 }
 
+# Attempt-weighted totals per league and season (twin of game1lib.season_values).
+season_values <- function(values) {
+  values %>% group_by(LEAGUE, SEASON) %>%
+    summarise(SERIES = n(), G1_M = sum(G1_M), G1_A = sum(G1_A), G1_FGA = sum(G1_FGA),
+              REST_M = sum(REST_M), REST_A = sum(REST_A), REST_FGA = sum(REST_FGA), .groups = "drop") %>%
+    mutate(G1_PCT = safe_ratio(G1_M, G1_A), REST_PCT = safe_ratio(REST_M, REST_A),
+           G1_RATE = safe_ratio(G1_A, G1_FGA), REST_RATE = safe_ratio(REST_A, REST_FGA),
+           D_PCT = G1_PCT - REST_PCT, D_RATE = G1_RATE - REST_RATE) %>%
+    arrange(LEAGUE, SEASON)
+}
+
 # ---- Question 4: per-game profiles (twin of python/profilelib.py) ----
 
 PROFILE_NEEDED <- c("FGA", "FTA", "OREB", "DREB", "TOV", "PF", "AST", "FGM", "FG3A", "MIN")

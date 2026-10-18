@@ -74,6 +74,38 @@ rather than showing intent.
 Fewer fouls in Game 1 can mean fewer called or fewer committed; box scores
 cannot separate the two.
 
+<div class="eyebrow beat">Across eras</div>
+
+## The game changed around Game 1
+
+The NBA of 1984-85 barely used the three: in that season's Game 1s, 4.3% of
+shots came from beyond the arc. By 2025-26 it was 40.1%. Game 1 and later
+games rose together, and accuracy in Game 1 kept pace with accuracy later
+in the series the whole way. The lines cross back and forth from season to
+season in both leagues, and neither sits consistently below the other.
+
+{{fig:fig6_season_pct_py|Three-point percentage by season, every series pooled. Game 1 is solid, Games 2 on dashed. The two lines trade places from season to season in both leagues. WNBA seasons hold only a few multi-game series, so its lines jump more.}}
+
+Split by decade, the Game 1 accuracy gap includes zero in every NBA
+decade. The one WNBA decade that clears zero is the 1990s, at −6.55
+points, but that rests on just 6 series from the league's first two
+postseasons.
+
+{{fig:fig4_decade_accuracy_py|Game 1 minus Games 2 on, three-point percentage, by decade, with 95% intervals. Every NBA decade includes zero, from −1.16 in the 1980s to +0.82 in the 2010s. The WNBA's 1990s point comes from 6 series.}}
+
+Volume is where the eras differ. NBA teams took a smaller share of their
+shots from three in Game 1 than in the rest of the series in every season
+from 1984-85 through 2019-20. The gap was −1.43 points in the 1990s and
+−1.79 in both the 2000s and the 2010s. In the 2020s it shrinks to −0.30
+(−1.14 to +0.54), and some recent seasons reverse it. The decade is not
+over, so this is a narrowing to watch rather than a settled change. The
+WNBA shows no decade with a volume gap that holds up beyond its first
+two seasons.
+
+{{fig:fig7_season_rate_py|Share of field-goal attempts taken from three, by season, every series pooled. Game 1 is solid, Games 2 on dashed. The NBA's Game 1 line sits under its later-games line every season through 2019-20, and the two meet in the 2020s.}}
+
+{{fig:fig5_decade_volume_py|Game 1 minus Games 2 on, share of shots from three, by decade, with 95% intervals. The NBA gap is −1.79 points in the 2000s and 2010s and −0.30 in the 2020s, an interval that includes zero.}}
+
 <div class="eyebrow beat">Stakes and rest</div>
 
 ## Neither the round nor the layoff changes it

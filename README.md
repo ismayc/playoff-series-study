@@ -95,6 +95,45 @@ neutral sites and are left out of the home and road rows only.
 Every three-pointer in every Game 1 against every one after it, no intervals.
 <!-- /gen:pooled -->
 
+### Across eras
+
+Exploratory, not part of the pre-specified test. The first table splits
+the Game 1 gap by decade for both leagues. The second follows the level of
+three-point shooting itself, Game 1 against later games, so the gap can be
+read against how much the game changed around it.
+
+<!-- gen:eras -->
+| League | Decade | Series | Accuracy | Attempt rate |
+|---|---|---|---|---|
+| NBA | 1980s | 75 | -1.16 (-5.09 to +2.76) | -0.64 (-1.15 to -0.13) |
+| NBA | 1990s | 150 | +0.00 (-1.96 to +1.97) | -1.43 (-2.00 to -0.87) |
+| NBA | 2000s | 150 | -0.46 (-2.00 to +1.07) | -1.79 (-2.35 to -1.23) |
+| NBA | 2010s | 150 | +0.82 (-0.53 to +2.16) | -1.79 (-2.44 to -1.15) |
+| NBA | 2020s | 105 | +0.15 (-1.08 to +1.37) | -0.30 (-1.14 to +0.54) |
+| WNBA | 1990s | 6 | -6.55 (-10.99 to -2.10) | +2.14 (+0.20 to +4.08) |
+| WNBA | 2000s | 70 | +0.55 (-1.63 to +2.73) | -0.27 (-1.28 to +0.75) |
+| WNBA | 2010s | 54 | +1.13 (-1.70 to +3.95) | -0.94 (-1.97 to +0.09) |
+| WNBA | 2020s | 40 | -0.38 (-2.80 to +2.04) | +0.02 (-1.65 to +1.70) |
+
+Game 1 minus Games 2+, mean over series in percentage points with a 95% interval.
+
+| League | Decade | Seasons | Game 1 3P% | Games 2+ 3P% | Game 1 3PA rate | Games 2+ 3PA rate | Seasons with a lower Game 1 rate |
+|---|---|---|---|---|---|---|---|
+| NBA | 1980s | 5 | 31.0 | 30.7 | 6.2 | 6.8 | 5 of 5 |
+| NBA | 1990s | 10 | 34.7 | 34.4 | 15.3 | 16.7 | 10 of 10 |
+| NBA | 2000s | 10 | 34.6 | 35.0 | 20.0 | 22.0 | 10 of 10 |
+| NBA | 2010s | 10 | 35.7 | 34.7 | 28.1 | 29.8 | 10 of 10 |
+| NBA | 2020s | 7 | 35.6 | 35.4 | 40.3 | 40.6 | 5 of 7 |
+| WNBA | 1990s | 2 | 27.1 | 34.1 | 25.0 | 22.6 | 0 of 2 |
+| WNBA | 2000s | 10 | 35.3 | 34.7 | 23.6 | 24.0 | 7 of 10 |
+| WNBA | 2010s | 10 | 34.8 | 33.5 | 22.6 | 23.9 | 6 of 10 |
+| WNBA | 2020s | 7 | 35.0 | 34.9 | 33.3 | 32.4 | 4 of 7 |
+
+Every three in the decade's series pooled, so a season with more threes counts for more.
+
+**Reading.** NBA: the longest unbroken run of seasons with a lower Game 1 attempt rate is 1985 to 2020. WNBA: the longest unbroken run of seasons with a lower Game 1 attempt rate is 2007 to 2011.
+<!-- /gen:eras -->
+
 ## Question 3: stakes and layoffs
 
 Exploratory. Stage is distance from the Finals, read from each winner's

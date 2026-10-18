@@ -1,4 +1,4 @@
-# Question 1, R twin of python/03_game1.py. Writes the same four tables to
+# Question 1, R twin of python/03_game1.py. Writes the same five tables to
 # output/r/ for python/04_reconcile.py to compare.
 #
 #   Rscript R/03_game1.R
@@ -34,4 +34,5 @@ write_full(series, "game1_series.csv")
 write_full(team, "game1_team.csv")
 write_full(summary, "game1_summary.csv")
 write_full(pooled_values(series), "game1_pooled.csv")
+write_full(season_values(series), "game1_season.csv")
 cat(sprintf("game1 (R): %d series, %d team-series\n", nrow(series), nrow(team)))

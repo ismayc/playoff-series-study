@@ -236,3 +236,14 @@ Implemented in `python/profilelib.py` and `R/functions.R`, run by
   series takes relatively more threes. Reported per league with the same
   interval, plus the count of games tied in the series (left out).
 - Exploratory throughout: estimates and intervals, no significance claims.
+
+### Era and season breakdown, added October 18, 2026 (exploratory)
+
+Requested by Chester after question 1 was published; it changes nothing in
+the pre-specified analysis above. The decade panels of question 1 are
+reported for both leagues, and a new table, `output/game1_season.csv`
+(`game1lib.season_values`, R twin `season_values`), gives per league and
+season the attempt-weighted Game 1 and Games 2+ totals: 3P% = sum of 3PM /
+sum of 3PA, attempt rate = sum of 3PA / sum of FGA, over every series in the
+question 1 sample. These are levels with no intervals, read as description.
+The table holds season totals, not series or games, so it is committed.
