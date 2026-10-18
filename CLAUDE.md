@@ -49,6 +49,8 @@ icons and link preview, and probably a password like nba-shot-charts.
 Rscript R/03_game1.R                             # question 1 (R twin) -> output/r/
 ../.venv/bin/python python/06_profiles.py        # question 4 (Python) -> output/profile_*.csv
 Rscript R/06_profiles.R                          # question 4 (R twin) -> output/r/
+../.venv/bin/python python/08_stakes_rest.py     # question 3 (Python); fails if stage != encoded round
+Rscript R/08_stakes_rest.R                       # question 3 (R twin) -> output/r/
 ../.venv/bin/python python/04_reconcile.py       # every cell must agree within 1e-9
 ../.venv/bin/python python/05_findings.py        # README regions; --check is the drift gate
 ../.venv/bin/python python/07_review.py          # review page -> docs/review/ (data.json gitignored)
@@ -56,7 +58,7 @@ Rscript R/06_profiles.R                          # question 4 (R twin) -> output
 ./run_checks.sh                                  # all of the above except 01; non-zero on failure
 ```
 
-After any change to outputs: 03 and 06 with their R twins, 04, then 05 (without `--check`).
+After any change to outputs: 03, 06, and 08 with their R twins, 04, then 05 (without `--check`).
 `LEAGUE` is written as the integers 0 and 10; R reads it with `col_integer()`
 (as text "00", `"00" == 0` is FALSE in R, which once gave NBA games the
 WNBA's 40-minute pace).

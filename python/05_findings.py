@@ -174,6 +174,60 @@ def state_region(state: pl.DataFrame) -> str:
     return "\n".join(lines + ["", "**Reading.** " + " ".join(verdicts)])
 
 
+def stage_label(stage: int) -> str:
+    return "Finals" if stage == 0 else f"{stage} round{'s' if stage > 1 else ''} before the Finals"
+
+
+def stakes_region(st: pl.DataFrame) -> str:
+    lines = ["| League | Stage | Series | 3P%: Game 1 minus Games 2+ | 3P%: Game 1 minus Game 2 "
+             "| Attempt rate: Game 1 minus Games 2+ |", "|---|---|---|---|---|---|"]
+    both, rate_hits = [], []
+    for lg, name in LEAGUES.items():
+        for stage in sorted(st.filter(pl.col("LEAGUE") == lg)["STAGE"].unique().to_list()):
+            rows = {m: st.filter((pl.col("LEAGUE") == lg) & (pl.col("STAGE") == stage) & (pl.col("METRIC") == m)).row(0, named=True)
+                    for m in ("D_PCT", "D2_PCT", "D_RATE")}
+            d, d2, r = rows["D_PCT"], rows["D2_PCT"], rows["D_RATE"]
+            lines.append(f"| {name} | {stage_label(stage)} | {d['N']} | {cell(d)} | {cell(d2)} | {cell(r)} |")
+            if excludes_zero(d) and excludes_zero(d2) and (d["MEAN"] < 0) == (d2["MEAN"] < 0):
+                both.append(f"{name} {stage_label(stage)}")
+            if excludes_zero(r):
+                rate_hits.append((name, stage))
+    reading = ("No stage in either league shows a Game 1 accuracy gap that holds on both comparisons."
+               if not both else "Accuracy gaps holding on both comparisons: " + ", ".join(both) + ".")
+    for lg, name in LEAGUES.items():
+        n_stages = st.filter(pl.col("LEAGUE") == lg)["STAGE"].n_unique()
+        hits = [s for n, s in rate_hits if n == name]
+        reading += (f" {name}: the attempt-rate gap excludes zero at {len(hits)} of {n_stages} stages"
+                    + (f" ({', '.join(stage_label(s) for s in hits)})." if hits else "."))
+    return "\n".join(lines + ["", "**Reading.** " + reading])
+
+
+def rest_region(rs: pl.DataFrame) -> str:
+    lines = ["| League | Rest gap | Series | 3P% contrast | Attempt-rate contrast |", "|---|---|---|---|---|"]
+    readings = []
+    for lg, name in LEAGUES.items():
+        sub = rs.filter(pl.col("LEAGUE") == lg)
+        for b in ("1-2", "3-5", "6+", "any"):
+            p = sub.filter((pl.col("BIN") == b) & (pl.col("METRIC") == "CONTRAST_PCT")).row(0, named=True)
+            r = sub.filter((pl.col("BIN") == b) & (pl.col("METRIC") == "CONTRAST_RATE")).row(0, named=True)
+            label = "any gap" if b == "any" else f"{b} days"
+            lines.append(f"| {name} | {label} | {p['N']} | {cell(p)} | {cell(r)} |")
+        p = sub.filter((pl.col("BIN") == "any") & (pl.col("METRIC") == "CONTRAST_PCT")).row(0, named=True)
+        zero = p["ZERO_GAP_SERIES"]
+        bins_excl = [b for b in ("1-2", "3-5", "6+")
+                     if excludes_zero(sub.filter((pl.col("BIN") == b) & (pl.col("METRIC") == "CONTRAST_PCT")).row(0, named=True))]
+        if excludes_zero(p):
+            readings.append(f"{name}: across every nonzero gap the more-rested team's Game 1 three-point shooting "
+                            f"is relatively {'worse' if p['MEAN'] < 0 else 'better'}, but "
+                            + ("no single gap bin excludes zero" if not bins_excl else f"only the {', '.join(bins_excl)} bin excludes zero")
+                            + f", so it is a hint, not a finding ({zero} series with no gap left out).")
+        else:
+            readings.append(f"{name}: no rest-gap difference in Game 1 three-point shooting ({zero} series with no gap left out).")
+    lines += ["", "Each contrast is the more-rested team's own Game 1 minus own Games 2+, minus the same for "
+              "the less-rested team, in percentage points."]
+    return "\n".join(lines + ["", "**Reading.** " + " ".join(readings)])
+
+
 def regions() -> dict[str, str]:
     summary = pl.read_csv(ROOT / "output" / "game1_summary.csv")
     pooled = pl.read_csv(ROOT / "output" / "game1_pooled.csv")
@@ -181,7 +235,9 @@ def regions() -> dict[str, str]:
     state = pl.read_csv(ROOT / "output" / "profile_state.csv")
     return {"headline": headline(summary), "rate": rate(summary),
             "baseline": baseline(summary), "pooled": pooled_region(pooled),
-            "profiles": profiles_region(prof), "state": state_region(state)}
+            "profiles": profiles_region(prof), "state": state_region(state),
+            "stakes": stakes_region(pl.read_csv(ROOT / "output" / "stakes_summary.csv")),
+            "rest": rest_region(pl.read_csv(ROOT / "output" / "rest_summary.csv"))}
 
 
 def render(text: str, new: dict[str, str]) -> str:

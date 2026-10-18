@@ -1,13 +1,14 @@
-"""Gate: the R and Python implementations of questions 1 and 4 must agree.
+"""Gate: the R and Python implementations of questions 1, 3, and 4 must agree.
 
 Compares output/<table>.csv (Python) with output/r/<table>.csv (R) for every
-table 03 and 06 write. In each table the key rows must match exactly, every
+table 03, 06, and 08 write. In each table the key rows must match exactly, every
 shared column must exist on both sides, numbers must agree within TOL
 (blank on one side means blank on the other), and text and flags must be
 equal. An empty table or a missing file fails; nothing is skipped quietly.
 
     python python/03_game1.py && Rscript R/03_game1.R
     python python/06_profiles.py && Rscript R/06_profiles.R
+    python python/08_stakes_rest.py && Rscript R/08_stakes_rest.R
     python python/04_reconcile.py
 """
 
@@ -30,11 +31,15 @@ TABLES = {
     "profile_games.csv": ["LEAGUE", "SEASON", "SERIES_KEY", "GAME_NO"],
     "profile_summary.csv": ["LEAGUE", "PANEL", "GAME_NO", "METRIC"],
     "profile_state.csv": ["LEAGUE"],
+    "series_stage.csv": ["LEAGUE", "SEASON", "SERIES_KEY"],
+    "stakes_summary.csv": ["LEAGUE", "STAGE", "METRIC"],
+    "rest_series.csv": ["LEAGUE", "SEASON", "SERIES_KEY"],
+    "rest_summary.csv": ["LEAGUE", "BIN", "METRIC"],
 }
 
 
 def read(path: Path) -> pl.DataFrame:
-    return pl.read_csv(path, schema_overrides={"SERIES_KEY": pl.Utf8, "PANEL": pl.Utf8},
+    return pl.read_csv(path, schema_overrides={"SERIES_KEY": pl.Utf8, "PANEL": pl.Utf8, "BIN": pl.Utf8},
                        infer_schema_length=None)
 
 

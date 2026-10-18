@@ -90,6 +90,54 @@ neutral sites and are left out of the home and road rows only.
 Every three-pointer in every Game 1 against every one after it, no intervals.
 <!-- /gen:pooled -->
 
+## Question 3: stakes and layoffs
+
+Exploratory. Stage is distance from the Finals, read from each winner's
+path, so formats with byes and single-game rounds line up; it matches the
+round encoded in every game ID that has one. Every outcome is a
+within-series difference, so team strength cancels without a rating
+adjustment.
+
+### By stage
+
+<!-- gen:stakes -->
+| League | Stage | Series | 3P%: Game 1 minus Games 2+ | 3P%: Game 1 minus Game 2 | Attempt rate: Game 1 minus Games 2+ |
+|---|---|---|---|---|---|
+| NBA | Finals | 42 | +0.23 (-2.79 to +3.24) | -1.80 (-5.54 to +1.94) | -1.65 (-2.94 to -0.37) |
+| NBA | 1 round before the Finals | 84 | +0.26 (-1.92 to +2.44) | +0.60 (-1.89 to +3.09) | -1.56 (-2.28 to -0.84) |
+| NBA | 2 rounds before the Finals | 168 | -0.80 (-2.35 to +0.75) | -2.15 (-4.09 to -0.20) | -0.55 (-1.16 to +0.06) |
+| NBA | 3 rounds before the Finals | 336 | +0.25 (-0.96 to +1.46) | +0.56 (-0.95 to +2.06) | -1.60 (-1.98 to -1.23) |
+| WNBA | Finals | 28 | -1.52 (-5.67 to +2.64) | +0.20 (-4.28 to +4.68) | +0.77 (-0.83 to +2.38) |
+| WNBA | 1 round before the Finals | 56 | +0.35 (-1.84 to +2.54) | +0.71 (-1.53 to +2.94) | -0.67 (-1.78 to +0.45) |
+| WNBA | 2 rounds before the Finals | 80 | +0.76 (-1.33 to +2.85) | +0.91 (-1.39 to +3.22) | -0.44 (-1.39 to +0.50) |
+
+**Reading.** No stage in either league shows a Game 1 accuracy gap that holds on both comparisons. NBA: the attempt-rate gap excludes zero at 3 of 4 stages (Finals, 1 round before the Finals, 3 rounds before the Finals). WNBA: the attempt-rate gap excludes zero at 0 of 3 stages.
+<!-- /gen:stakes -->
+
+### By rest gap
+
+The two teams in a Game 1 often arrive with different rest: one swept its
+last series, the other went seven. Each team is measured against its own
+later games in the same series, then the more-rested team is compared with
+the less-rested one.
+
+<!-- gen:rest -->
+| League | Rest gap | Series | 3P% contrast | Attempt-rate contrast |
+|---|---|---|---|---|
+| NBA | 1-2 days | 184 | -2.69 (-6.31 to +0.92) | -0.68 (-1.86 to +0.49) |
+| NBA | 3-5 days | 131 | -2.86 (-6.39 to +0.68) | -0.32 (-1.68 to +1.03) |
+| NBA | 6+ days | 22 | +1.40 (-4.35 to +7.15) | -2.98 (-6.30 to +0.34) |
+| NBA | any gap | 337 | -2.49 (-4.92 to -0.06) | -0.69 (-1.55 to +0.16) |
+| WNBA | 1-2 days | 72 | -2.64 (-7.32 to +2.04) | -0.60 (-3.00 to +1.80) |
+| WNBA | 3-5 days | 17 | -0.11 (-11.71 to +11.49) | -0.44 (-5.56 to +4.68) |
+| WNBA | 6+ days | 8 | +1.59 (-11.85 to +15.03) | -5.08 (-11.11 to +0.96) |
+| WNBA | any gap | 97 | -1.85 (-5.98 to +2.29) | -0.94 (-2.99 to +1.11) |
+
+Each contrast is the more-rested team's own Game 1 minus own Games 2+, minus the same for the less-rested team, in percentage points.
+
+**Reading.** NBA: across every nonzero gap the more-rested team's Game 1 three-point shooting is relatively worse, but no single gap bin excludes zero, so it is a hint, not a finding (293 series with no gap left out). WNBA: no rest-gap difference in Game 1 three-point shooting (73 series with no gap left out).
+<!-- /gen:rest -->
+
 ## Question 4: how the box score moves through a series
 
 Exploratory: estimates and intervals, no significance claims. Every rate
@@ -189,6 +237,9 @@ Three-point attempt rate, each team relative to its own series mean, percentage 
   games, so trailing and leading teams differ in recent results as well as
   in what is at stake. The comparison sorts teams by series position; it
   does not show that trailing teams choose to shoot fewer threes.
+- **Rust, from the rest gap.** The more-rested team usually won its last
+  series faster, so rest arrives together with recent form and with
+  whatever let it finish early.
 - **Officiating, from fouls.** Fewer fouls in a game can mean fewer called
   or fewer committed; box scores cannot tell the two apart.
 - **Before 1984-85 in the NBA.** Three-point attempts are missing from most

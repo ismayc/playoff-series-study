@@ -3,8 +3,8 @@
 Started October 18, 2026. Status: **question 1 run on October 18, 2026,
 after the analysis below was fixed; results are in the README's generated
 regions. Question 4 run the same day, after its definitions below were
-fixed. Question 2 (the local review page, descriptive) built the same day.
-Question 3 is not built yet.** The analysis was specified
+fixed. Question 2 (the local review page, descriptive) and question 3 built
+the same day, question 3 after its definitions below were fixed.** The analysis was specified
 before any outcome was looked at, the same discipline as the contract-year
 study: the metric, the sample, and the baseline do not change without a
 dated amendment that says why. Every claim about the data was
@@ -155,6 +155,50 @@ not the comparison.
   the team-game value minus that team's own series mean, averaged by game
   number with a 95% interval. Possessions: FGA + 0.44 FTA - OREB + TOV,
   averaged over both teams.
+
+### Question 3, fixed October 18, 2026 before any of it was computed
+
+Implemented in `python/stagelib.py` and `R/functions.R`, run by
+`python/08_stakes_rest.py` and `R/08_stakes_rest.R`, reconciled by 04. This
+replaces the two looser bullets above.
+
+- **Stage, not round number.** Round numbers are not comparable across
+  formats (the WNBA has run two to four rounds, some single-game, with
+  byes), so a series' stage is its distance from the Finals: 0 for the
+  Finals, 1 for the round before, and so on. It comes from the winner's
+  path: a series' stage is one more than the stage of the next series its
+  winner played. This handles byes and needs no game ID. Check: wherever
+  the ID encodes a round (2002 on), stage must equal the season's highest
+  round minus the series' round, for every series; 08 fails otherwise. A
+  series whose winner's path does not reach a valid Finals (the 2026 WNBA
+  semifinals, while the Finals is excluded) has no stage and is counted.
+- **Stakes.** The question 1 sample and series values (D_PCT, D2_PCT,
+  D_RATE), summarized by league and stage with the question 1 interval.
+- **Opponent strength.** The backlog entry proposed adjusting for both
+  teams' regular-season ratings. Every outcome here is a within-series
+  difference (the same two teams in Game 1 and later), so team strength
+  cancels by construction and no rating adjustment is added.
+- **Rest gap** (decided October 17, 2026). For each Game 1, gap = the
+  difference in days of rest between the two teams, from each team's full
+  schedule including play-in games. When the gap is not zero, the contrast
+  is the more-rested team's own Game 1 minus own Games 2 on, minus the same
+  for the less-rested team, for three-point percentage and for attempt rate
+  (FG3A / FGA). Each team is measured against its own later games, so team
+  quality cancels; a positive contrast means extra rest goes with a
+  relatively better (or more three-heavy) Game 1. Summarized by league for
+  gaps of 1 to 2, 3 to 5, and 6 or more days, and for every nonzero gap,
+  with the count of zero-gap series reported. Sample: the question 1
+  sample, 2020 included (rest in the bubble was real). A team with no
+  three-point attempts in Game 1 or in Games 2 on drops from that contrast
+  and is counted.
+- Exploratory throughout: estimates and intervals, no significance claims.
+- **What the stage checks showed** (October 18, 2026, first run). Stage
+  equals the encoded round in all 543 series with one (2002 on, both
+  leagues, including the WNBA's bye and single-game years). Before 2002,
+  every NBA season from 1984-85 to 2000-01 has exactly 8, 4, 2, and 1
+  series at stages 3 to 0, the fixed 16-team bracket. The only series
+  without a stage are the six 2026 WNBA series, whose Finals is excluded;
+  08 fails if a series lacks a stage in any season that has a Finals.
 
 ### Question 4, fixed October 18, 2026 before any profile was computed
 

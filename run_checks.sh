@@ -30,6 +30,11 @@ $PY python/06_profiles.py
 Rscript R/06_profiles.R
 
 echo
+echo "=== question 3: Python, then R ==="
+$PY python/08_stakes_rest.py
+Rscript R/08_stakes_rest.R
+
+echo
 echo "=== reconciliation: R vs Python ==="
 $PY python/04_reconcile.py | tail -1
 

@@ -157,3 +157,65 @@ test_that("profile sample needs every count", {
   cov$TOV <- c(0.16, 1)
   expect_equal(profile_sample(tg, cov)$SEASON, 1985)
 })
+
+# ---- Question 3 (fixture tests/fixtures/stage_games.csv; working in
+# tests/python/test_stagelib.py) ----
+
+load_stage <- function() {
+  read_csv(file.path(fix, "stage_games.csv"), show_col_types = FALSE,
+           col_types = cols(SERIES_KEY = col_character(), GAME_DATE = col_character(),
+                            FINALS = col_logical(), .default = col_guess()))
+}
+
+test_that("stages", {
+  st <- stages(load_stage())
+  got <- setNames(st$STAGE, paste(st$SEASON, st$SERIES_KEY))
+  expect_equal(unname(got[c("2010 1-3", "2010 1-2", "2010 3-4")]), c(0, 1, 1))
+  expect_true(is.na(got[["2011 5-6"]]))
+})
+
+test_that("stage checks", {
+  tg <- load_stage(); st <- stages(tg)
+  expect_equal(nrow(stage_mismatches(tg, st)), 0)
+  bad <- tg %>% mutate(ROUND = ifelse(SERIES_KEY == "3-4", 2, ROUND))
+  expect_equal(stage_mismatches(bad, st)$SERIES_KEY, "3-4")
+  expect_equal(nrow(unexplained_missing_stages(tg, st)), 0)
+  broken <- st %>% mutate(STAGE = ifelse(SERIES_KEY == "1-2", NA, STAGE))
+  expect_equal(unexplained_missing_stages(tg, broken)$SERIES_KEY, "1-2")
+})
+
+test_that("stage follows byes", {
+  rows <- list()
+  add <- function(key, n, t1, t2, w, fin, day) {
+    for (i in seq_len(n)) for (p in list(c(t1, t2), c(t2, t1))) {
+      rows[[length(rows) + 1]] <<- tibble(LEAGUE = 10, SEASON = 1999, SERIES_KEY = key, TEAM_ID = p[1], OPP_ID = p[2],
+                                          GAME_DATE = sprintf("1999-08-%02d", day + i - 1), WINNER_ID = w, FINALS = fin)
+    }
+  }
+  add("2-3", 1, 2, 3, 2, FALSE, 1); add("1-2", 2, 1, 2, 1, FALSE, 5); add("1-4", 2, 1, 4, 1, TRUE, 20)
+  st <- stages(bind_rows(rows))
+  expect_equal(setNames(st$STAGE, st$SERIES_KEY)[c("1-4", "1-2", "2-3")], c(`1-4` = 0, `1-2` = 1, `2-3` = 2))
+})
+
+test_that("rest values and summary", {
+  rv <- rest_values(load_stage())
+  r <- function(k) rv[rv$SERIES_KEY == k, ]
+  expect_equal(c(r("1-2")$GAP, r("1-3")$GAP, r("3-4")$GAP), c(3, 3, 0))
+  a <- (10 / 30 - 12 / 30) - (6 / 20 - 9 / 20)
+  expect_equal(r("1-2")$CONTRAST_PCT, a)
+  expect_equal(r("1-2")$CONTRAST_RATE, 0 - (20 / 80 - 20 / 90))
+  expect_equal(r("1-3")$CONTRAST_PCT, -0.3)
+  expect_true(is.na(r("3-4")$CONTRAST_PCT))
+  s <- rest_summary(rv)
+  row <- s %>% filter(BIN == "3-5", METRIC == "CONTRAST_PCT")
+  expect_equal(row$N, 2)
+  expect_equal(row$MEAN, (a - 0.3) / 2)
+  expect_equal(row$ZERO_GAP_SERIES, 2)
+})
+
+test_that("stake summary", {
+  sv <- tibble(LEAGUE = 0, STAGE = c(0, 1, 1, NA), D_PCT = c(0.1, 0.2, 0.4, 9), D2_PCT = 0, D_RATE = 0)
+  s <- stake_summary(sv)
+  expect_equal(sort(unique(s$STAGE)), c(0, 1))
+  expect_equal((s %>% filter(STAGE == 1, METRIC == "D_PCT"))$MEAN, 0.3)
+})

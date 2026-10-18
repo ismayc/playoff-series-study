@@ -213,3 +213,96 @@ state_summary <- function(state) {
     as_tibble(c(list(LEAGUE = league, TIED_GAMES = if (length(tied)) tied else 0L), describe_values(v)))
   }))
 }
+
+# ---- Question 3: stakes and rest (twin of python/stagelib.py) ----
+
+REST_METRICS <- c("CONTRAST_PCT", "CONTRAST_RATE")
+STAKE_METRICS <- c("D_PCT", "D2_PCT", "D_RATE")
+
+stages <- function(tg) {
+  ts <- tg %>% group_by(LEAGUE, SEASON, SERIES_KEY, TEAM_ID) %>%
+    summarise(START = min(as.character(GAME_DATE)), .groups = "drop") %>%
+    arrange(LEAGUE, SEASON, TEAM_ID, START) %>%
+    group_by(LEAGUE, SEASON, TEAM_ID) %>% mutate(NEXT = lead(SERIES_KEY)) %>% ungroup()
+  info <- tg %>% group_by(LEAGUE, SEASON, SERIES_KEY) %>%
+    summarise(WINNER_ID = first(WINNER_ID), FINALS = first(FINALS), .groups = "drop")
+  nx <- info %>% left_join(ts %>% select(LEAGUE, SEASON, SERIES_KEY, WINNER_ID = TEAM_ID, NEXT),
+                           by = c("LEAGUE", "SEASON", "SERIES_KEY", "WINNER_ID"))
+  key <- paste(nx$LEAGUE, nx$SEASON, nx$SERIES_KEY)
+  nkey <- ifelse(is.na(nx$NEXT), NA, paste(nx$LEAGUE, nx$SEASON, nx$NEXT))
+  stage <- ifelse(nx$FINALS, 0L, NA_integer_)
+  names(stage) <- key
+  for (i in seq_along(key)) {
+    todo <- is.na(stage) & !is.na(nkey) & !is.na(stage[nkey])
+    todo[is.na(todo)] <- FALSE
+    if (!any(todo)) break
+    stage[todo] <- stage[nkey[todo]] + 1L
+  }
+  tibble(LEAGUE = nx$LEAGUE, SEASON = nx$SEASON, SERIES_KEY = nx$SERIES_KEY, STAGE = unname(stage)) %>%
+    arrange(LEAGUE, SEASON, SERIES_KEY)
+}
+
+stage_mismatches <- function(tg, st) {
+  tg %>% filter(!is.na(ROUND)) %>% group_by(LEAGUE, SEASON, SERIES_KEY) %>%
+    summarise(ROUND = first(ROUND), .groups = "drop") %>%
+    group_by(LEAGUE, SEASON) %>% mutate(MAX_ROUND = max(ROUND)) %>% ungroup() %>%
+    left_join(st, by = c("LEAGUE", "SEASON", "SERIES_KEY")) %>%
+    filter(!is.na(STAGE), STAGE != MAX_ROUND - ROUND)
+}
+
+unexplained_missing_stages <- function(tg, st) {
+  with_finals <- tg %>% filter(FINALS) %>% distinct(LEAGUE, SEASON)
+  st %>% filter(is.na(STAGE)) %>% inner_join(with_finals, by = c("LEAGUE", "SEASON"))
+}
+
+rest_values <- function(games) {
+  g1 <- games %>% filter(GAME_NO == 1) %>% group_by(LEAGUE, SEASON, SERIES_KEY, TEAM_ID) %>%
+    summarise(REST_DAYS = first(REST), M1 = sum(FG3M), A1 = sum(FG3A), F1 = sum(FGA), .groups = "drop")
+  rs <- games %>% filter(GAME_NO >= 2) %>% group_by(LEAGUE, SEASON, SERIES_KEY, TEAM_ID) %>%
+    summarise(MR = sum(FG3M), AR = sum(FG3A), FR = sum(FGA), .groups = "drop")
+  t <- g1 %>% inner_join(rs, by = c("LEAGUE", "SEASON", "SERIES_KEY", "TEAM_ID")) %>%
+    mutate(DP = safe_ratio(M1, A1) - safe_ratio(MR, AR), DR = safe_ratio(A1, F1) - safe_ratio(AR, FR)) %>%
+    arrange(LEAGUE, SEASON, SERIES_KEY, desc(REST_DAYS), TEAM_ID)
+  hi <- t %>% group_by(LEAGUE, SEASON, SERIES_KEY) %>% slice(1) %>% ungroup() %>%
+    transmute(LEAGUE, SEASON, SERIES_KEY, R_HI = REST_DAYS, DP_HI = DP, DR_HI = DR)
+  lo <- t %>% group_by(LEAGUE, SEASON, SERIES_KEY) %>% slice(n()) %>% ungroup() %>%
+    transmute(LEAGUE, SEASON, SERIES_KEY, R_LO = REST_DAYS, DP_LO = DP, DR_LO = DR)
+  hi %>% inner_join(lo, by = c("LEAGUE", "SEASON", "SERIES_KEY")) %>%
+    mutate(GAP = R_HI - R_LO,
+           CONTRAST_PCT = ifelse(GAP > 0, DP_HI - DP_LO, NA_real_),
+           CONTRAST_RATE = ifelse(GAP > 0, DR_HI - DR_LO, NA_real_)) %>%
+    select(LEAGUE, SEASON, SERIES_KEY, GAP, CONTRAST_PCT, CONTRAST_RATE) %>%
+    arrange(LEAGUE, SEASON, SERIES_KEY)
+}
+
+rest_summary <- function(rv) {
+  bins <- list(`1-2` = function(g) g >= 1 & g <= 2, `3-5` = function(g) g >= 3 & g <= 5,
+               `6+` = function(g) g >= 6, any = function(g) g >= 1)
+  rows <- list()
+  for (league in sort(unique(rv$LEAGUE))) {
+    lv <- rv[rv$LEAGUE == league, ]
+    zero <- sum(lv$GAP == 0)
+    for (b in names(bins)) {
+      bv <- lv[bins[[b]](lv$GAP), ]
+      for (m in REST_METRICS) {
+        rows[[length(rows) + 1]] <- as_tibble(c(list(LEAGUE = league, BIN = b, METRIC = m, ZERO_GAP_SERIES = zero),
+                                                describe_values(bv[[m]])))
+      }
+    }
+  }
+  bind_rows(rows)
+}
+
+stake_summary <- function(sv) {
+  rows <- list()
+  for (league in sort(unique(sv$LEAGUE))) {
+    lv <- sv[sv$LEAGUE == league, ]
+    for (s in sort(unique(lv$STAGE[!is.na(lv$STAGE)]))) {
+      st <- lv[!is.na(lv$STAGE) & lv$STAGE == s, ]
+      for (m in STAKE_METRICS) {
+        rows[[length(rows) + 1]] <- as_tibble(c(list(LEAGUE = league, STAGE = s, METRIC = m), describe_values(st[[m]])))
+      }
+    }
+  }
+  bind_rows(rows)
+}
