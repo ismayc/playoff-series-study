@@ -3,7 +3,8 @@
 Started October 18, 2026. Status: **question 1 run on October 18, 2026,
 after the analysis below was fixed; results are in the README's generated
 regions. Question 4 run the same day, after its definitions below were
-fixed. Questions 2 and 3 are not built yet.** The analysis was specified
+fixed. Question 2 (the local review page, descriptive) built the same day.
+Question 3 is not built yet.** The analysis was specified
 before any outcome was looked at, the same discipline as the contract-year
 study: the metric, the sample, and the baseline do not change without a
 dated amendment that says why. Every claim about the data was

@@ -36,3 +36,7 @@ $PY python/04_reconcile.py | tail -1
 echo
 echo "=== findings: README numbers regenerate from outputs ==="
 $PY python/05_findings.py --check
+
+echo
+echo "=== review page builds ==="
+$PY python/07_review.py

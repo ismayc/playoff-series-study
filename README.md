@@ -196,6 +196,17 @@ Three-point attempt rate, each team relative to its own series mean, percentage 
 - **The 2026 WNBA Finals,** in progress at harvest and excluded until it
   ends.
 
+## Question 2: the review page
+
+`docs/review/` is a local page with three views: every series game by game
+(three-point percentage and share of shots from three for both teams, plus
+fouls, free throws, turnovers, and pace), each franchise's Game 1 against
+the rest of its series over time, and the question 4 profiles by game
+number. It is descriptive; the estimates above are the analysis. Build it
+with `python/07_review.py` and serve the folder over HTTP. Its data file
+lists NBA.com box scores game by game, so it is gitignored and the page is
+not hosted.
+
 ## How to run
 
 ```

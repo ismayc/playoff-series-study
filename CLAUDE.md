@@ -36,7 +36,9 @@ and what loading the data showed are in `docs/design.md`; read it first.
 
 Data sources, licenses, and retrieval dates: see `DATA_SOURCES.md`. NBA.com
 terms allow private, non-commercial use; keep this repo private until
-Chester decides how a public page fits those terms.
+Chester decides how a public page fits those terms. The review page is
+local only (not hosted); if it is ever deployed it needs the web-page-meta
+icons and link preview, and probably a password like nba-shot-charts.
 
 ## Commands
 
@@ -49,6 +51,8 @@ Rscript R/03_game1.R                             # question 1 (R twin) -> output
 Rscript R/06_profiles.R                          # question 4 (R twin) -> output/r/
 ../.venv/bin/python python/04_reconcile.py       # every cell must agree within 1e-9
 ../.venv/bin/python python/05_findings.py        # README regions; --check is the drift gate
+../.venv/bin/python python/07_review.py          # review page -> docs/review/ (data.json gitignored)
+(cd docs/review && python3 -m http.server 8766)  # view at http://localhost:8766/
 ./run_checks.sh                                  # all of the above except 01; non-zero on failure
 ```
 

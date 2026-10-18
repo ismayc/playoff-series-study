@@ -39,3 +39,6 @@ data/raw/
 # game by game, so they stay local (see DATA_SOURCES.md).
 data/*.csv
 data/*.log
+
+# Review page data: game-by-game NBA.com box scores (see DATA_SOURCES.md).
+docs/review/data.json

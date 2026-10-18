@@ -23,7 +23,7 @@ STATS = ["MIN", "FGM", "FGA", "FG3M", "FG3A", "FTM", "FTA", "OREB", "DREB",
          "AST", "STL", "BLK", "TOV", "PF", "PTS"]
 
 LOG_SCHEMA = {"GAME_ID": pl.Utf8, "TEAM_ID": pl.Int64, "SEASON_ID": pl.Utf8,
-              "TEAM_ABBREVIATION": pl.Utf8, "GAME_DATE": pl.Utf8, "MATCHUP": pl.Utf8,
+              "TEAM_ABBREVIATION": pl.Utf8, "TEAM_NAME": pl.Utf8, "GAME_DATE": pl.Utf8, "MATCHUP": pl.Utf8,
               "WL": pl.Utf8, **{s: pl.Float64 for s in STATS}}
 
 
@@ -37,7 +37,7 @@ def read_log(path) -> pl.DataFrame:
     df = pl.read_csv(path, schema_overrides=LOG_SCHEMA, infer_schema_length=0, raise_if_empty=False)
     if df.height == 0:
         return pl.DataFrame(schema=LOG_SCHEMA)
-    keep = ["GAME_ID", "TEAM_ID", "TEAM_ABBREVIATION", "GAME_DATE", "MATCHUP", "WL", *STATS]
+    keep = ["GAME_ID", "TEAM_ID", "TEAM_ABBREVIATION", "TEAM_NAME", "GAME_DATE", "MATCHUP", "WL", *STATS]
     return (df.select(keep)
               .filter(pl.col("TEAM_ID").is_not_null())
               .with_columns(pl.col("GAME_DATE").str.to_date("%Y-%m-%d")))

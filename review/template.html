@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Playoff Series Review</title>
+<script>
+(function () {
+  try { var t = localStorage.getItem("family:theme"); if (t) document.documentElement.setAttribute("data-theme", t); } catch (e) {}
+})();
+</script>
+<style>
+/*FONT_FACE_CSS*/
+:root {
+  --ink: #161512; --ink-2: #52514e; --ink-3: #898781;
+  --surface: #faf9f6; --surface-2: #f2f1ea; --rule: #e1e0d9;
+  --accent: #eb6834; --accent-ink: #a83f12; --fig-surface: #fcfcfb;
+  --team-a: #2a78d6; --team-b: #eb6834; --grid: #e1e0d9; --axis: #c3c2b7;
+  --band: rgba(42, 120, 214, .16); --line: #2a78d6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #f5f3ec; --ink-2: #c3c2b7; --ink-3: #898781;
+    --surface: #0f0e0d; --surface-2: #1a1a19; --rule: #2c2c2a;
+    --accent: #d95926; --accent-ink: #ea9066; --fig-surface: #1a1a19;
+    --team-a: #3987e5; --team-b: #d95926; --grid: #2c2c2a; --axis: #52514e;
+    --band: rgba(57, 135, 229, .22); --line: #3987e5;
+  }
+}
+:root[data-theme="dark"] {
+  --ink: #f5f3ec; --ink-2: #c3c2b7; --ink-3: #898781;
+  --surface: #0f0e0d; --surface-2: #1a1a19; --rule: #2c2c2a;
+  --accent: #d95926; --accent-ink: #ea9066; --fig-surface: #1a1a19;
+  --team-a: #3987e5; --team-b: #d95926; --grid: #2c2c2a; --axis: #52514e;
+  --band: rgba(57, 135, 229, .22); --line: #3987e5;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--surface); color: var(--ink);
+  font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+h1, h2, h3, .display { font-family: "Barlow Condensed", system-ui, sans-serif; font-weight: 600; }
+.wrap { width: min(1200px, 100% - 32px); margin: 0 auto; }
+header.masthead { border-bottom: 1px solid var(--rule); }
+header.masthead .wrap { display: flex; align-items: baseline; gap: 1rem; padding: .8rem 0; flex-wrap: wrap; }
+.family { font-family: "Barlow Condensed", system-ui, sans-serif; text-transform: uppercase;
+  letter-spacing: .08em; font-weight: 600; }
+.masthead .grow { flex: 1; }
+.themebtn { background: none; border: 1px solid var(--rule); border-radius: 999px; color: var(--ink-2);
+  font-size: .95rem; line-height: 1; padding: .35rem .55rem; cursor: pointer; }
+.themebtn:hover { border-color: var(--accent); color: var(--ink); }
+h1 { font-size: clamp(2rem, 5vw, 3rem); margin: 1.2rem 0 .2rem; line-height: 1.05; }
+.lede { color: var(--ink-2); max-width: 46rem; margin: 0 0 1rem; }
+nav.tabs { display: flex; gap: .25rem; border-bottom: 1px solid var(--rule); margin: 1rem 0; overflow-x: auto; }
+nav.tabs button { background: none; border: none; border-bottom: 2px solid transparent; color: var(--ink-2);
+  font: 600 1.05rem "Barlow Condensed", system-ui, sans-serif; letter-spacing: .04em; text-transform: uppercase;
+  padding: .5rem .8rem; cursor: pointer; white-space: nowrap; }
+nav.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.controls { display: flex; gap: .75rem; flex-wrap: wrap; align-items: center; margin: 0 0 1rem; }
+.controls label { font-size: .85rem; color: var(--ink-2); display: flex; gap: .4rem; align-items: center; }
+select { font: inherit; font-size: .95rem; color: var(--ink); background: var(--surface-2);
+  border: 1px solid var(--rule); border-radius: 6px; padding: .3rem .5rem; max-width: 70vw; }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; }
+.seg button { background: none; border: none; color: var(--ink-2); font: inherit; font-size: .9rem;
+  padding: .3rem .8rem; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--surface-2); color: var(--ink); font-weight: 600; }
+.panel[hidden] { display: none; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 1.5rem; align-items: start; }
+@media (max-width: 860px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; background: var(--fig-surface); }
+table { border-collapse: collapse; width: 100%; font-size: .88rem; font-variant-numeric: tabular-nums; }
+th, td { padding: .38rem .55rem; text-align: right; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+th { color: var(--ink-2); font-weight: 600; background: var(--surface-2); position: sticky; top: 0; }
+th:first-child, td:first-child, th.l, td.l { text-align: left; }
+tbody tr:last-child td { border-bottom: none; }
+tr.pick { cursor: pointer; }
+tr.pick:hover td { background: var(--surface-2); }
+tr.pick[aria-selected="true"] td { background: var(--surface-2); }
+tr.pick[aria-selected="true"] td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+tr.pick:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.sw { display: inline-block; width: .7rem; height: .7rem; border-radius: 50%; vertical-align: -.05rem; margin-right: .3rem; }
+.sw.a { background: var(--team-a); } .sw.b { background: var(--team-b); }
+.muted { color: var(--ink-3); }
+.card { border: 1px solid var(--rule); border-radius: 10px; background: var(--fig-surface); padding: 1rem 1.1rem; margin-bottom: 1rem; }
+.card h2 { margin: 0 0 .1rem; font-size: 1.7rem; line-height: 1.1; }
+.card h3 { margin: .9rem 0 .2rem; font-size: 1.15rem; letter-spacing: .02em; }
+.card .sub { color: var(--ink-2); font-size: .9rem; margin: 0 0 .4rem; }
+.legend { display: flex; gap: 1rem; flex-wrap: wrap; font-size: .85rem; color: var(--ink-2); margin: .2rem 0; }
+.legend .ring { display: inline-block; width: .7rem; height: .7rem; border-radius: 50%; border: 2px solid var(--line);
+  vertical-align: -.05rem; margin-right: .3rem; }
+.legend .dot { display: inline-block; width: .7rem; height: .7rem; border-radius: 50%; background: var(--line);
+  vertical-align: -.05rem; margin-right: .3rem; }
+.chart { position: relative; width: 100%; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { fill: var(--ink-3); font-size: 11px; font-family: system-ui, sans-serif; }
+.chart .gridline { stroke: var(--grid); stroke-width: 1; }
+.chart .zero { stroke: var(--axis); stroke-width: 1.5; }
+.chart .series-line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.chart .cross { stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 3 3; }
+.chart .dlabel { font-weight: 600; font-size: 12px; }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--surface); border-radius: 7px;
+  padding: .45rem .65rem; font-size: .8rem; line-height: 1.35; white-space: nowrap; z-index: 5;
+  box-shadow: 0 4px 14px rgba(0,0,0,.18); transform: translate(-50%, calc(-100% - 12px)); }
+.tip[hidden] { display: none; }
+.smalls { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
+.note { color: var(--ink-2); font-size: .88rem; max-width: 52rem; }
+footer { border-top: 1px solid var(--rule); margin-top: 2.5rem; color: var(--ink-3); font-size: .85rem; }
+footer .wrap { padding: 1rem 0 2rem; }
+.empty { color: var(--ink-3); font-style: italic; padding: 1rem 0; }
+</style>
+</head>
+<body>
+<header class="masthead">
+  <div class="wrap">
+    <span class="family">basketball-data-science</span>
+    <span class="muted">playoff series study</span>
+    <span class="grow"></span>
+    <button class="themebtn" type="button" aria-label="Toggle color theme">◐</button>
+  </div>
+</header>
+<main class="wrap">
+  <h1>Playoff series review</h1>
+  <p class="lede">Every NBA and WNBA playoff series of two or more games, game by game: how both teams
+  shot from three in Game 1 against the rest of the series, each franchise's Game 1s over time, and how
+  the box score moves from Game 1 to the last game. Data: NBA.com.</p>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="series" aria-selected="true">Series</button>
+    <button role="tab" data-tab="team" aria-selected="false">Teams</button>
+    <button role="tab" data-tab="flow" aria-selected="false">Through a series</button>
+  </nav>
+
+  <section class="panel" id="panel-series">
+    <div class="controls">
+      <span class="seg" data-league-seg></span>
+      <label>Season <select id="season"></select></label>
+    </div>
+    <div class="grid2">
+      <div>
+        <div class="tablewrap"><table id="series-table"></table></div>
+        <p class="note">Blue is the team at home in Game 1 (the higher seed); orange is its opponent. Gap
+        is Game 1 three-point percentage minus Games 2 on, both teams together. Blank before 1984-85 in
+        the NBA, when three-point attempts are missing from most box scores.</p>
+      </div>
+      <div id="series-detail"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-team" hidden>
+    <div class="controls">
+      <span class="seg" data-league-seg></span>
+      <label>Franchise <select id="franchise"></select></label>
+    </div>
+    <div id="team-detail"></div>
+  </section>
+
+  <section class="panel" id="panel-flow" hidden>
+    <div class="controls">
+      <label>Rate <select id="metric"></select></label>
+      <span class="seg" id="panel-seg">
+        <button type="button" data-panel="all" aria-pressed="true">Every series</button>
+        <button type="button" data-panel="full_length" aria-pressed="false">Full-length only</button>
+      </span>
+    </div>
+    <div class="smalls" id="flow-charts"></div>
+    <p class="note">Each point is the mean, over every game with that number, of both teams' deviation from
+    their own average for that series, so team strength cancels. The band is a 95% interval. Full-length
+    keeps only series that went the distance, so every game number holds the same series. Exploratory:
+    many rates on one dataset, so read the bands as estimates, not tests.</p>
+  </section>
+</main>
+<footer><div class="wrap">Data: NBA.com (stats.nba.com box scores), private, non-commercial use. Built by
+<code>python/07_review.py</code> in the playoff-series-study repo.</div></footer>
+
+<script>
+(function () {
+  "use strict";
+  var btn = document.querySelector(".themebtn");
+  btn.addEventListener("click", function () {
+    var root = document.documentElement;
+    var dark = root.getAttribute("data-theme") ? root.getAttribute("data-theme") === "dark"
+      : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var next = dark ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("family:theme", next); } catch (e) {}
+  });
+
+  var LEAGUES = { 0: "NBA", 10: "WNBA" };
+  var METRICS = [
+    ["FG3A_RATE", "Three-point attempt rate", 100, "pts of FGA"],
+    ["FG3_PCT", "Three-point percentage", 100, "pts"],
+    ["PF100", "Fouls per 100 possessions", 1, ""],
+    ["FTR", "Free-throw rate (FTA / FGA)", 100, "pts"],
+    ["TOV100", "Turnovers per 100 possessions", 1, ""],
+    ["PACE", "Pace (possessions per regulation game)", 1, ""],
+    ["ORTG", "Points per 100 possessions", 1, ""],
+    ["OREB_PCT", "Offensive rebound percentage", 100, "pts"],
+    ["AST_RATE", "Assists per made field goal", 100, "pts"]
+  ];
+  var state = { tab: "series", lg: 0, season: null, key: null, team: null, metric: "FG3A_RATE", panel: "all" };
+  var D = null, COL = {};
+
+  // ---------- helpers ----------
+  function el(tag, attrs, html) {
+    var e = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+    if (html != null) e.innerHTML = html;
+    return e;
+  }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function pct(m, a) { return a > 0 ? m / a : null; }
+  function f1(x) { return x == null ? "" : (x * 100).toFixed(1); }
+  function sg(x, k, d) { if (x == null) return ""; var v = x * (k || 100); return (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(d == null ? 1 : d); }
+  function g(row, name) { return row[COL[name]]; }
+  function seriesTitle(s) { return s.aAbbr + " vs " + s.bAbbr; }
+  function resultText(s) {
+    var w = s.winner === "a" ? s.aAbbr : s.bAbbr, hi = Math.max(s.wa, s.wb), lo = Math.min(s.wa, s.wb);
+    return w + " " + hi + "–" + lo;
+  }
+  function roundText(s) {
+    if (s.finals) return "Finals";
+    return s.round != null ? "Round " + s.round : "";
+  }
+
+  // ---------- charts ----------
+  var NS = "http://www.w3.org/2000/svg";
+  function svgEl(tag, attrs) { var e = document.createElementNS(NS, tag); Object.keys(attrs || {}).forEach(function (k) { e.setAttribute(k, attrs[k]); }); return e; }
+  function niceTicks(lo, hi, n) {
+    var span = hi - lo || 1, step = Math.pow(10, Math.floor(Math.log10(span / n))), err = span / n / step;
+    if (err >= 7.5) step *= 10; else if (err >= 3.5) step *= 5; else if (err >= 1.5) step *= 2;
+    var t = [], v = Math.ceil(lo / step) * step;
+    for (; v <= hi + 1e-9; v += step) t.push(+v.toFixed(10));
+    return t;
+  }
+
+  // opts: {xs:[...], xLabel(x), series:[{name, color, pts:[{x,y,lo,hi,tip}], band, hollow:fn}], yFmt, zero, height, mode:"line"|"dot"}
+  // Redraw a chart whenever its container's width changes from the width it
+  // was drawn at (a container measured before layout settles reads too wide).
+  var RO = window.ResizeObserver ? new ResizeObserver(function (entries) {
+    entries.forEach(function (en) {
+      var h = en.target, w = Math.round(en.contentRect.width);
+      if (h.__chartOpts && w > 0 && Math.abs(w - h.__chartW) > 1) chart(h, h.__chartOpts);
+    });
+  }) : null;
+  function chart(host, opts) {
+    host.innerHTML = "";
+    host.__chartOpts = opts;
+    if (RO && !host.__observed) { RO.observe(host); host.__observed = true; }
+    var wrap = el("div", { "class": "chart" });
+    host.appendChild(wrap);
+    var W = Math.max(280, wrap.clientWidth || host.clientWidth || 600), H = opts.height || 240;
+    host.__chartW = Math.round(host.clientWidth);
+    var m = { l: 44, r: opts.rightPad || 14, t: 12, b: 28 };
+    var all = [];
+    opts.series.forEach(function (s) { s.pts.forEach(function (p) { if (p.y != null) { all.push(p.y); if (p.lo != null) all.push(p.lo, p.hi); } }); });
+    if (!all.length) { host.innerHTML = '<p class="empty">No data for this view.</p>'; return; }
+    var ylo = Math.min.apply(null, all), yhi = Math.max.apply(null, all);
+    if (opts.zero) { ylo = Math.min(ylo, 0); yhi = Math.max(yhi, 0); }
+    var pad = (yhi - ylo) * .08 || .01; ylo -= pad; yhi += pad;
+    var xs = opts.xs, xlo = xs[0], xhi = xs[xs.length - 1];
+    var X = function (x) { return xhi === xlo ? m.l + (W - m.l - m.r) / 2 : m.l + (x - xlo) / (xhi - xlo) * (W - m.l - m.r); };
+    var Y = function (y) { return m.t + (yhi - y) / (yhi - ylo) * (H - m.t - m.b); };
+    var svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, role: "img", "aria-label": opts.aria || "chart" });
+    niceTicks(ylo, yhi, 4).forEach(function (t) {
+      svg.appendChild(svgEl("line", { x1: m.l, x2: W - m.r, y1: Y(t), y2: Y(t), "class": "gridline" }));
+      var tx = svgEl("text", { x: m.l - 6, y: Y(t) + 4, "text-anchor": "end" }); tx.textContent = opts.yFmt(t); svg.appendChild(tx);
+    });
+    if (opts.zero) svg.appendChild(svgEl("line", { x1: m.l, x2: W - m.r, y1: Y(0), y2: Y(0), "class": "zero" }));
+    var xt = opts.xTicks || xs;
+    xt.forEach(function (x) { var tx = svgEl("text", { x: X(x), y: H - 8, "text-anchor": "middle" }); tx.textContent = opts.xLabel(x); svg.appendChild(tx); });
+    opts.series.forEach(function (s) {
+      var pts = s.pts.filter(function (p) { return p.y != null; });
+      if (s.band) {
+        var bp = pts.filter(function (p) { return p.lo != null; });
+        if (bp.length > 1) {
+          var d = bp.map(function (p, i) { return (i ? "L" : "M") + X(p.x) + "," + Y(p.hi); }).join("") +
+            bp.slice().reverse().map(function (p) { return "L" + X(p.x) + "," + Y(p.lo); }).join("") + "Z";
+          svg.appendChild(svgEl("path", { d: d, fill: "var(--band)" }));
+        }
+      }
+      if (opts.mode !== "dot" && pts.length > 1) {
+        svg.appendChild(svgEl("path", { d: pts.map(function (p, i) { return (i ? "L" : "M") + X(p.x) + "," + Y(p.y); }).join(""),
+          "class": "series-line", stroke: s.color }));
+      }
+      pts.forEach(function (p) {
+        var hollow = s.hollow && s.hollow(p);
+        svg.appendChild(svgEl("circle", { cx: X(p.x), cy: Y(p.y), r: opts.mode === "dot" ? 5 : 4.5,
+          fill: hollow ? "var(--fig-surface)" : s.color, stroke: hollow ? s.color : "var(--fig-surface)", "stroke-width": 2 }));
+      });
+      if (s.label && pts.length) {
+        var last = pts[pts.length - 1];
+        var lt = svgEl("text", { x: X(last.x) + 8, y: Y(last.y) + 4, "class": "dlabel", fill: s.color });
+        lt.textContent = s.label; lt.style.fill = s.color; svg.appendChild(lt);
+      }
+    });
+    var cross = svgEl("line", { y1: m.t, y2: H - m.b, "class": "cross", visibility: "hidden" });
+    svg.appendChild(cross);
+    var hit = svgEl("rect", { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b, fill: "transparent" });
+    svg.appendChild(hit);
+    wrap.appendChild(svg);
+    var tip = el("div", { "class": "tip", hidden: "" }); wrap.appendChild(tip);
+    function show(evt) {
+      var r = svg.getBoundingClientRect(), sx = (evt.clientX - r.left) * W / r.width, sy = (evt.clientY - r.top) * H / r.height;
+      var best = null, bd = Infinity;
+      opts.series.forEach(function (s) { s.pts.forEach(function (p) {
+        if (p.y == null) return;
+        var dx = X(p.x) - sx, dy = opts.mode === "dot" ? Y(p.y) - sy : 0, d2 = dx * dx + dy * dy;
+        if (d2 < bd) { bd = d2; best = { p: p, s: s }; }
+      }); });
+      if (!best || (opts.mode === "dot" && bd > 900)) { tip.hidden = true; cross.setAttribute("visibility", "hidden"); return; }
+      var x = X(best.p.x);
+      if (opts.mode !== "dot") {
+        cross.setAttribute("x1", x); cross.setAttribute("x2", x); cross.setAttribute("visibility", "visible");
+        tip.innerHTML = opts.tipAt ? opts.tipAt(best.p.x) : best.p.tip;
+      } else tip.innerHTML = best.p.tip;
+      tip.hidden = false;
+      tip.style.left = (x * r.width / W) + "px";
+      tip.style.top = ((opts.mode === "dot" ? Y(best.p.y) : m.t + 10) * r.height / H) + "px";
+    }
+    hit.addEventListener("mousemove", show);
+    hit.addEventListener("mouseleave", function () { tip.hidden = true; cross.setAttribute("visibility", "hidden"); });
+    if (opts.onPick) {
+      hit.style.cursor = "pointer";
+      hit.addEventListener("click", function (evt) {
+        var r = svg.getBoundingClientRect(), sx = (evt.clientX - r.left) * W / r.width, sy = (evt.clientY - r.top) * H / r.height;
+        var best = null, bd = 900;
+        opts.series.forEach(function (s) { s.pts.forEach(function (p) {
+          if (p.y == null) return; var dx = X(p.x) - sx, dy = Y(p.y) - sy, d2 = dx * dx + dy * dy;
+          if (d2 < bd) { bd = d2; best = p; }
+        }); });
+        if (best) opts.onPick(best);
+      });
+    }
+  }
+
+  // ---------- league segmented controls ----------
+  function renderLeagueSegs() {
+    document.querySelectorAll("[data-league-seg]").forEach(function (seg) {
+      seg.innerHTML = "";
+      [0, 10].forEach(function (lg) {
+        var b = el("button", { type: "button", "aria-pressed": String(state.lg === lg) }, LEAGUES[lg]);
+        b.addEventListener("click", function () {
+          if (state.lg === lg) return;
+          state.lg = lg; state.season = null; state.key = null; state.team = null; render();
+        });
+        seg.appendChild(b);
+      });
+    });
+  }
+
+  // ---------- series tab ----------
+  function seasonsFor(lg) {
+    var seen = {}, out = [];
+    D.series.forEach(function (s) { if (s.lg === lg && !seen[s.s]) { seen[s.s] = 1; out.push(s); } });
+    return out.sort(function (a, b) { return b.s - a.s; });
+  }
+  function seriesFor(lg, season) {
+    return D.series.filter(function (s) { return s.lg === lg && s.s === season; }).sort(function (a, b) {
+      return (a.finals - b.finals) || ((a.round || 0) - (b.round || 0)) || (a.start < b.start ? -1 : a.start > b.start ? 1 : 0);
+    });
+  }
+  function renderSeries() {
+    var seasons = seasonsFor(state.lg);
+    if (state.season == null || !seasons.some(function (s) { return s.s === state.season; })) state.season = seasons[0].s;
+    var sel = document.getElementById("season");
+    sel.innerHTML = seasons.map(function (s) { return '<option value="' + s.s + '"' + (s.s === state.season ? " selected" : "") + ">" + s.label + "</option>"; }).join("");
+    sel.onchange = function () { state.season = +sel.value; state.key = null; render(); };
+    var list = seriesFor(state.lg, state.season);
+    if (!state.key || !list.some(function (s) { return s.k === state.key; })) state.key = list[list.length - 1].k;
+    var t = document.getElementById("series-table");
+    var rows = list.map(function (s) {
+      // In JS null + null is 0, so percentages only where every game records 3PA (s.has3).
+      var g1 = s.games[0], rest = s.games.slice(1);
+      var m1 = g(g1, "aFG3M") + g(g1, "bFG3M"), a1 = g(g1, "aFG3A") + g(g1, "bFG3A"), mr = 0, ar = 0;
+      rest.forEach(function (r) { mr += g(r, "aFG3M") + g(r, "bFG3M"); ar += g(r, "aFG3A") + g(r, "bFG3A"); });
+      var p1 = s.has3 ? pct(m1, a1) : null, pr = s.has3 ? pct(mr, ar) : null;
+      return '<tr class="pick" tabindex="0" data-k="' + s.k + '" aria-selected="' + (s.k === state.key) + '">' +
+        '<td class="l">' + esc(roundText(s)) + "</td>" +
+        '<td class="l"><span class="sw a"></span>' + esc(s.aAbbr) + ' <span class="muted">v</span> <span class="sw b"></span>' + esc(s.bAbbr) + "</td>" +
+        '<td class="l">' + esc(resultText(s)) + "</td>" +
+        "<td>" + f1(p1) + "</td><td>" + f1(pr) + "</td><td>" + (s.gap == null ? '<span class="muted">n/a</span>' : sg(s.gap)) + "</td></tr>";
+    }).join("");
+    t.innerHTML = '<thead><tr><th class="l">Round</th><th class="l">Series</th><th class="l">Result</th><th>G1 3P%</th><th>G2+ 3P%</th><th>Gap</th></tr></thead><tbody>' + rows + "</tbody>";
+    t.querySelectorAll("tr.pick").forEach(function (tr) {
+      var pick = function () { state.key = tr.getAttribute("data-k"); render(); };
+      tr.addEventListener("click", pick);
+      tr.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
+    });
+    renderSeriesDetail(list.filter(function (s) { return s.k === state.key; })[0]);
+  }
+  function renderSeriesDetail(s) {
+    var host = document.getElementById("series-detail");
+    var has3 = s.has3;
+    var ns = s.games.map(function (r) { return g(r, "no"); });
+    host.innerHTML = '<div class="card"><h2>' + esc(seriesTitle(s)) + '</h2><p class="sub">' + esc(s.label + " " + (roundText(s) || "playoffs")) +
+      " · " + esc(resultText(s)) + " · best of " + (2 * s.need - 1) + '</p>' +
+      '<div class="legend"><span><span class="sw a"></span>' + esc(s.aAbbr) + ' (home in Game 1)</span><span><span class="sw b"></span>' + esc(s.bAbbr) + "</span></div>" +
+      (has3 ? '<h3>Three-point percentage by game</h3><div id="c-pct"></div><h3>Share of shots from three</h3><div id="c-rate"></div>'
+            : '<p class="empty">No three-point attempts recorded for this series.</p>') +
+      '<h3>Games</h3><div class="tablewrap"><table id="games-table"></table></div></div>';
+    function line(key, side, color, fn) {
+      return { name: side === "a" ? s.aAbbr : s.bAbbr, label: side === "a" ? s.aAbbr : s.bAbbr, color: color,
+        pts: s.games.map(function (r) { return { x: g(r, "no"), y: fn(r, side) }; }) };
+    }
+    if (has3) {
+      var p = function (r, sd) { return pct(g(r, sd + "FG3M"), g(r, sd + "FG3A")); };
+      var rt = function (r, sd) { return pct(g(r, sd + "FG3A"), g(r, sd + "FGA")); };
+      var tipAt = function (fn, fmt) { return function (x) {
+        var r = s.games[x - 1];
+        return "<b>Game " + x + "</b> · " + esc(g(r, "date")) + "<br>" + esc(s.aAbbr) + " " + fmt(r, "a") + "<br>" + esc(s.bAbbr) + " " + fmt(r, "b");
+      }; };
+      chart(document.getElementById("c-pct"), { xs: ns, xLabel: function (x) { return "G" + x; }, yFmt: function (v) { return (v * 100).toFixed(0); },
+        series: [line("pct", "a", "var(--team-a)", p), line("pct", "b", "var(--team-b)", p)], rightPad: 46, height: 210,
+        aria: "Three-point percentage by game for both teams",
+        tipAt: tipAt(p, function (r, sd) { return g(r, sd + "FG3M") + "/" + g(r, sd + "FG3A") + " (" + f1(p(r, sd)) + "%)"; }) });
+      chart(document.getElementById("c-rate"), { xs: ns, xLabel: function (x) { return "G" + x; }, yFmt: function (v) { return (v * 100).toFixed(0); },
+        series: [line("rate", "a", "var(--team-a)", rt), line("rate", "b", "var(--team-b)", rt)], rightPad: 46, height: 180,
+        aria: "Three-point attempt share by game for both teams",
+        tipAt: tipAt(rt, function (r, sd) { return f1(rt(r, sd)) + "% of " + g(r, sd + "FGA") + " FGA"; }) });
+    }
+    var gt = document.getElementById("games-table");
+    var head = '<thead><tr><th class="l">G</th><th class="l">Date</th><th class="l">Home</th><th>Score</th>' +
+      '<th>3P <span class="sw a"></span></th><th>3P <span class="sw b"></span></th><th>PF</th><th>FTA</th><th>TOV</th><th>Pace</th></tr></thead>';
+    var body = s.games.map(function (r) {
+      var home = g(r, "aHome") ? s.aAbbr : s.bAbbr;
+      var shot = function (sd) { var a = g(r, sd + "FG3A"); return a == null ? '<span class="muted">n/a</span>' : g(r, sd + "FG3M") + "/" + a; };
+      var pair = function (c) { var x = g(r, "a" + c), y = g(r, "b" + c); return x == null ? '<span class="muted">n/a</span>' : x + "–" + y; };
+      return "<tr><td class=\"l\">" + g(r, "no") + '</td><td class="l">' + esc(g(r, "date")) + '</td><td class="l">' + esc(home) +
+        "</td><td>" + g(r, "aPTS") + "–" + g(r, "bPTS") + "</td><td>" + shot("a") + "</td><td>" + shot("b") +
+        "</td><td>" + pair("PF") + "</td><td>" + pair("FTA") + "</td><td>" + pair("TOV") + "</td><td>" +
+        (g(r, "pace") == null ? "" : g(r, "pace").toFixed(1)) + "</td></tr>";
+    }).join("");
+    gt.innerHTML = head + "<tbody>" + body + "</tbody>";
+  }
+
+  // ---------- team tab ----------
+  function teamRows(id) {
+    var out = [];
+    D.series.forEach(function (s) {
+      if (s.a !== id && s.b !== id) return;
+      var sd = s.a === id ? "a" : "b", od = sd === "a" ? "b" : "a";
+      var g1 = s.games[0], m1 = g(g1, sd + "FG3M"), a1 = g(g1, sd + "FG3A"), mr = 0, ar = 0;
+      s.games.slice(1).forEach(function (r) { mr += g(r, sd + "FG3M"); ar += g(r, sd + "FG3A"); });
+      var p1 = s.has3 ? pct(m1, a1) : null, pr = s.has3 ? pct(mr, ar) : null;
+      out.push({ s: s, sd: sd, abbr: s[sd + "Abbr"], opp: s[od + "Abbr"], won: s.winner === sd,
+        home: sd === "a", p1: p1, pr: pr, d: p1 != null && pr != null ? p1 - pr : null });
+    });
+    return out.sort(function (a, b) { return a.s.start < b.s.start ? -1 : 1; });
+  }
+  function ownResult(r) {
+    var own = r.sd === "a" ? r.s.wa : r.s.wb, opp = r.sd === "a" ? r.s.wb : r.s.wa;
+    return (r.won ? "Won " : "Lost ") + own + "–" + opp;
+  }
+  function renderTeam() {
+    var ids = Object.keys(D.teams).filter(function (id) { return D.teams[id].lg === state.lg; })
+      .sort(function (a, b) { return D.teams[a].name < D.teams[b].name ? -1 : 1; });
+    if (!state.team || ids.indexOf(state.team) < 0) state.team = ids[0];
+    var sel = document.getElementById("franchise");
+    sel.innerHTML = ids.map(function (id) { return '<option value="' + id + '"' + (id === state.team ? " selected" : "") + ">" + esc(D.teams[id].name) + "</option>"; }).join("");
+    sel.onchange = function () { state.team = sel.value; render(); };
+    var rows = teamRows(state.team), host = document.getElementById("team-detail");
+    var withD = rows.filter(function (r) { return r.d != null; });
+    var mean = withD.length ? withD.reduce(function (a, r) { return a + r.d; }, 0) / withD.length : null;
+    var won = rows.filter(function (r) { return r.won; }).length;
+    host.innerHTML = '<div class="card"><h2>' + esc(D.teams[state.team].name) + '</h2><p class="sub">' + rows.length + " playoff series, " + won +
+      " won" + (withD.length ? " · average Game 1 minus rest of series, own three-point percentage: " + sg(mean) + " pts over " + withD.length + " series" : "") +
+      '</p><div class="legend"><span><span class="dot"></span>series won</span><span><span class="ring"></span>series lost</span></div>' +
+      '<h3>Own Game 1 three-point percentage minus own Games 2 on</h3><div id="c-team"></div>' +
+      '<p class="note">Click a point to open that series. Single series swing widely; the average over many is what the study tests.</p>' +
+      '<h3>Every series</h3><div class="tablewrap"><table id="team-table"></table></div></div>';
+    if (withD.length) {
+      var yrs = withD.map(function (r) { return r.s.s; }), lo = Math.min.apply(null, yrs), hi = Math.max.apply(null, yrs);
+      var ticks = niceTicks(lo, hi, 6).filter(function (t) { return t === Math.round(t); });
+      chart(document.getElementById("c-team"), { mode: "dot", zero: true, xs: [lo, hi], xTicks: ticks,
+        xLabel: function (x) { return String(x); }, yFmt: function (v) { return (v >= 0 ? "+" : "") + (v * 100).toFixed(0); }, height: 240,
+        aria: "Game 1 minus rest of series three-point percentage, by season",
+        series: [{ color: "var(--line)", hollow: function (p) { return !p.r.won; },
+          pts: withD.map(function (r) { return { x: r.s.s, y: r.d, r: r,
+            tip: "<b>" + esc(r.s.label) + " " + esc(roundText(r.s) || "playoffs") + "</b> vs " + esc(r.opp) + " (" + ownResult(r).toLowerCase() +
+              ")<br>Game 1 " + f1(r.p1) + "% · Games 2+ " + f1(r.pr) + "% · " + sg(r.d) + " pts" }; }) }],
+        onPick: function (p) { state.tab = "series"; state.season = p.r.s.s; state.key = p.r.s.k; render(); } });
+    } else {
+      document.getElementById("c-team").innerHTML = '<p class="empty">No series with three-point attempts recorded.</p>';
+    }
+    var tt = document.getElementById("team-table");
+    tt.innerHTML = '<thead><tr><th class="l">Season</th><th class="l">Round</th><th class="l">Opponent</th><th class="l">Result</th><th class="l">G1 at</th><th>G1 3P%</th><th>G2+ 3P%</th><th>Gap</th></tr></thead><tbody>' +
+      rows.slice().reverse().map(function (r) {
+        return '<tr class="pick" tabindex="0" data-s="' + r.s.s + '" data-k="' + r.s.k + '"><td class="l">' + esc(r.s.label) + '</td><td class="l">' + esc(roundText(r.s)) +
+          '</td><td class="l">' + esc(r.opp) + '</td><td class="l">' + ownResult(r) + '</td><td class="l">' + (r.home ? "home" : "road") +
+          "</td><td>" + f1(r.p1) + "</td><td>" + f1(r.pr) + "</td><td>" + (r.d == null ? '<span class="muted">n/a</span>' : sg(r.d)) + "</td></tr>";
+      }).join("") + "</tbody>";
+    tt.querySelectorAll("tr.pick").forEach(function (tr) {
+      var pick = function () { state.tab = "series"; state.season = +tr.getAttribute("data-s"); state.key = tr.getAttribute("data-k"); render(); };
+      tr.addEventListener("click", pick);
+      tr.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
+    });
+  }
+
+  // ---------- flow tab ----------
+  function renderFlow() {
+    var sel = document.getElementById("metric");
+    sel.innerHTML = METRICS.map(function (m) { return '<option value="' + m[0] + '"' + (m[0] === state.metric ? " selected" : "") + ">" + m[1] + "</option>"; }).join("");
+    sel.onchange = function () { state.metric = sel.value; render(); };
+    document.querySelectorAll("#panel-seg button").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.getAttribute("data-panel") === state.panel));
+      b.onclick = function () { state.panel = b.getAttribute("data-panel"); render(); };
+    });
+    var meta = METRICS.filter(function (m) { return m[0] === state.metric; })[0], k = meta[2];
+    var host = document.getElementById("flow-charts"); host.innerHTML = "";
+    // Append both cards before drawing: a chart measures its container, and the
+    // grid only splits into two columns once the second card exists.
+    var cards = [0, 10].map(function (lg) {
+      var card = el("div", { "class": "card" }, "<h3>" + LEAGUES[lg] + "</h3><p class=\"sub\">" + esc(meta[1]) + ", deviation from the series mean" + (meta[3] ? " (" + meta[3] + ")" : "") + "</p><div></div>");
+      host.appendChild(card);
+      return card;
+    });
+    [0, 10].forEach(function (lg, i) {
+      var rows = D.profiles.filter(function (p) { return p.lg === lg && p.panel === state.panel && p.m === state.metric; })
+        .sort(function (a, b) { return a.g - b.g; });
+      chart(cards[i].querySelector("div"), { zero: true, xs: rows.map(function (r) { return r.g; }), xLabel: function (x) { return "G" + x; },
+        yFmt: function (v) { var x = v * k; return (x > 0 ? "+" : "") + x.toFixed(k === 100 ? 1 : 1); }, height: 220,
+        aria: LEAGUES[lg] + " " + meta[1] + " by game number",
+        series: [{ color: "var(--line)", band: true, pts: rows.map(function (r) { return { x: r.g, y: r.mean, lo: r.lo, hi: r.hi,
+          tip: "<b>Game " + r.g + "</b> · " + r.n + " games<br>" + sg(r.mean, k, 2) + " (" + sg(r.lo, k, 2) + " to " + sg(r.hi, k, 2) + ")" }; }) }] });
+    });
+  }
+
+  // ---------- routing ----------
+  function writeHash() {
+    var h = state.tab === "series" ? ["series", state.lg, state.season, state.key]
+      : state.tab === "team" ? ["team", state.lg, state.team] : ["flow", state.metric, state.panel];
+    var s = "#" + h.join("/");
+    if (location.hash !== s) history.replaceState(null, "", s);
+  }
+  function readHash() {
+    var p = location.hash.replace(/^#/, "").split("/");
+    if (p[0] === "series") { state.tab = "series"; state.lg = +p[1] || 0; state.season = p[2] ? +p[2] : null; state.key = p[3] || null; }
+    else if (p[0] === "team") { state.tab = "team"; state.lg = +p[1] || 0; state.team = p[2] || null; }
+    else if (p[0] === "flow") { state.tab = "flow"; if (p[1]) state.metric = p[1]; if (p[2]) state.panel = p[2]; }
+    if (!(state.lg in LEAGUES)) state.lg = 0;
+    if (!METRICS.some(function (m) { return m[0] === state.metric; })) state.metric = "FG3A_RATE";
+    if (state.panel !== "all" && state.panel !== "full_length") state.panel = "all";
+  }
+  function render() {
+    document.querySelectorAll("nav.tabs button").forEach(function (b) { b.setAttribute("aria-selected", String(b.getAttribute("data-tab") === state.tab)); });
+    ["series", "team", "flow"].forEach(function (t) { document.getElementById("panel-" + t).hidden = t !== state.tab; });
+    renderLeagueSegs();
+    if (state.tab === "series") renderSeries(); else if (state.tab === "team") renderTeam(); else renderFlow();
+    writeHash();
+  }
+  document.querySelectorAll("nav.tabs button").forEach(function (b) {
+    b.addEventListener("click", function () { state.tab = b.getAttribute("data-tab"); render(); });
+  });
+  var rt;
+  window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(render, 150); });
+
+  fetch("data.json").then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
+    D = d; d.gameCols.forEach(function (c, i) { COL[c] = i; });
+    readHash(); render();
+  }).catch(function (e) {
+    document.querySelector("main").insertAdjacentHTML("beforeend", '<p class="empty">Could not load data.json (' + esc(e.message) +
+      "). Build it with python/07_review.py and serve this folder over HTTP.</p>");
+  });
+})();
+</script>
+</body>
+</html>
