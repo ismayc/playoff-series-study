@@ -69,6 +69,14 @@ after any output change: 05, then `glossary.py --sync`, then 09, then
 `report_builder.py --all`, then the family gates (`verify_numbers.py
 --check`, `glossary.py --check`, `check_family_brand.py`, tools pytest).
 
+Every number in `docs/story.md` is bound to one committed cell in
+basketball-analysis-tools `number_bindings/playoff-series-study__docs_story.md.json`
+(since October 18, 2026). `verify_numbers.py --check` fails on a number whose
+cell no longer displays the same, and on any new number with no binding.
+After adding or moving a story number, run `verify_numbers.py --propose
+playoff-series-study docs/story.md`, settle the open items in the
+`.proposals.json` it writes, and commit the bindings with the story.
+
 After any change to outputs: 03, 06, and 08 with their R twins, 04, then 05 (without `--check`).
 `LEAGUE` is written as the integers 0 and 10; R reads it with `col_integer()`
 (as text "00", `"00" == 0` is FALSE in R, which once gave NBA games the
