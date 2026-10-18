@@ -40,5 +40,13 @@ data/raw/
 data/*.csv
 data/*.log
 
-# Review page data: game-by-game NBA.com box scores (see DATA_SOURCES.md).
-docs/review/data.json
+# Review page build: game-by-game NBA.com box scores (see DATA_SOURCES.md).
+review/build/
+
+# Per-series and per-game outputs carry NBA.com statistics game by game, so
+# they stay local; the committed outputs are summaries (see DATA_SOURCES.md).
+output/game1_series.csv
+output/game1_team.csv
+output/profile_games.csv
+output/rest_series.csv
+output/r/

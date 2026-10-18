@@ -35,10 +35,12 @@ and what loading the data showed are in `docs/design.md`; read it first.
   large sum means stop and check before reporting.
 
 Data sources, licenses, and retrieval dates: see `DATA_SOURCES.md`. NBA.com
-terms allow private, non-commercial use; keep this repo private until
-Chester decides how a public page fits those terms. The review page is
-local only (not hosted); if it is ever deployed it needs the web-page-meta
-icons and link preview, and probably a password like nba-shot-charts.
+terms allow "legitimate news reporting or private, non-commercial purposes"
+and bar a public database of comprehensive statistics without consent. So
+the repo is public with summaries only (decided by Chester, October 18,
+2026): per-series and per-game outputs, `data/`, and the review page build
+are gitignored and must stay that way. Never commit a file that lists box
+scores game by game or series by series. The review page is local only.
 
 ## Commands
 
@@ -53,10 +55,19 @@ Rscript R/06_profiles.R                          # question 4 (R twin) -> output
 Rscript R/08_stakes_rest.R                       # question 3 (R twin) -> output/r/
 ../.venv/bin/python python/04_reconcile.py       # every cell must agree within 1e-9
 ../.venv/bin/python python/05_findings.py        # README regions; --check is the drift gate
-../.venv/bin/python python/07_review.py          # review page -> docs/review/ (data.json gitignored)
-(cd docs/review && python3 -m http.server 8766)  # view at http://localhost:8766/
+../.venv/bin/python python/07_review.py          # review page -> review/build/ (gitignored)
+(cd review/build && python3 -m http.server 8766) # view at http://localhost:8766/
 ./run_checks.sh                                  # all of the above except 01; non-zero on failure
 ```
+
+Family page (public, summaries only): `docs/story.md` plus
+`python/09_story_figures.py` (figures from the committed summary tables),
+built by `report_builder.build_study('playoff-series-study')` in
+basketball-analysis-tools into `docs/index.html`. Registered in that repo's
+`glossary.py`, `verify_numbers.py`, and the hub's `NEW_CARDS`. Regen order
+after any output change: 05, then `glossary.py --sync`, then 09, then
+`report_builder.py --all`, then the family gates (`verify_numbers.py
+--check`, `glossary.py --check`, `check_family_brand.py`, tools pytest).
 
 After any change to outputs: 03, 06, and 08 with their R twins, 04, then 05 (without `--check`).
 `LEAGUE` is written as the integers 0 and 10; R reads it with `col_integer()`

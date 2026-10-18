@@ -7,6 +7,8 @@ output/game1_pooled.csv; prose outside the regions carries no numbers
 
     python python/05_findings.py           # rewrite the regions
     python python/05_findings.py --check   # fail if README is out of date
+
+Run glossary.py --sync (basketball-analysis-tools) after a rewrite.
 """
 
 from __future__ import annotations
@@ -19,6 +21,9 @@ import polars as pl
 
 ROOT = Path(__file__).resolve().parents[1]
 README = ROOT / "README.md"
+# glossary.py --sync wraps terms in hover tags after this runs; strip them
+# before rendering and comparing, as the other studies' generators do.
+ABBR = re.compile(r'<abbr title="[^"]*">([^<]*)</abbr>')
 LEAGUES = {0: "NBA", 10: "WNBA"}
 
 
@@ -250,7 +255,7 @@ def render(text: str, new: dict[str, str]) -> str:
 
 
 def main() -> int:
-    text = README.read_text()
+    text = ABBR.sub(r"\1", README.read_text())
     out = render(text, regions())
     if "--check" in sys.argv:
         if out != text:

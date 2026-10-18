@@ -1,13 +1,13 @@
 """Build the series and team review page (question 2).
 
-Writes docs/review/data.json (gitignored: it lists NBA.com box scores game by
-game) and docs/review/index.html, which is review/template.html with the
+Writes review/build/data.json and index.html (gitignored: the data lists NBA.com box scores game by
+game; the page is review/template.html with the
 family display face inlined. Descriptive only: the page shows each series'
 games and each team's Game 1 against the rest of its series. Estimates come
 from 03 and 06 outputs; nothing here is a new analysis.
 
     python python/07_review.py
-    cd docs/review && python3 -m http.server 8766   # view at http://localhost:8766/
+    cd review/build && python3 -m http.server 8766   # view at http://localhost:8766/
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ FAMILY = ROOT.parent / "basketball-analysis-tools"
 sys.path.insert(0, str(FAMILY))
 from family_fonts import FONT_FACE_CSS  # noqa: E402
 
-OUT = ROOT / "docs" / "review"
+OUT = ROOT / "review" / "build"
 REGULATION = {0: 48.0, 10: 40.0}
 GAME_COLS = ["PTS", "FG3M", "FG3A", "FGA", "PF", "FTA", "TOV"]
 

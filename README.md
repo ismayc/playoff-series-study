@@ -7,8 +7,13 @@ series by series from stats.nba.com box scores. The analysis was fixed in
 its two amendments were made before any outcome was looked at, and both
 are recorded there with dates and reasons.
 
-Private, personal research in the basketball-data-science family. Data:
-NBA.com.
+Personal research in the basketball-data-science family. Data: NBA.com.
+
+<!-- terms -->
+> **Terms used in this analysis.** Dotted-underlined terms anywhere below repeat these definitions on hover ([full glossary](https://github.com/ismayc/basketball-data-science/blob/main/docs/glossary.md)).
+>
+> - **FGA**: Field-goal attempts.
+<!-- /terms -->
 
 ## Question 1: the Game 1 three-point dip
 
@@ -39,7 +44,7 @@ cold Game 1.
 | NBA | -1.32 (-1.61 to -1.03) | -1.02 (-1.37 to -0.67) |
 | WNBA | -0.33 (-0.99 to +0.34) | -0.33 (-1.09 to +0.42) |
 
-Three-point attempt rate (3PA / FGA), percentage points of field-goal attempts.
+Three-point attempt rate (3PA / <abbr title="Field-goal attempts.">FGA</abbr>), percentage points of field-goal attempts.
 
 **Reading.** NBA: a smaller share of shots from three in Game 1, on both comparisons. WNBA: no Game 1 difference in volume that holds on both comparisons.
 
@@ -154,7 +159,7 @@ there is not a change in which series are present.
 |---|---|---|---|---|---|---|---|
 | Games | 630 | 630 | 630 | 583 | 448 | 266 | 109 |
 | Fouls per 100 possessions | **-1.05** | +0.20 | **+0.38** | **+0.64** | +0.06 | **-0.43** | +0.06 |
-| Free-throw rate (FTA / FGA, x100) | **-2.23** | **+0.65** | **+0.73** | **+1.10** | +0.29 | -0.63 | -0.62 |
+| Free-throw rate (FTA / <abbr title="Field-goal attempts.">FGA</abbr>, x100) | **-2.23** | **+0.65** | **+0.73** | **+1.10** | +0.29 | -0.63 | -0.62 |
 | Turnovers per 100 possessions | -0.04 | +0.10 | +0.12 | +0.09 | -0.10 | -0.08 | **-0.91** |
 | Pace (possessions per regulation game) | **+0.60** | +0.18 | -0.17 | -0.09 | -0.09 | -0.42 | **-1.68** |
 | Points per 100 possessions | -0.53 | +0.48 | +0.06 | -0.25 | +0.43 | -0.24 | +0.09 |
@@ -169,7 +174,7 @@ there is not a change in which series are present.
 |---|---|---|---|---|---|---|---|
 | Games | 155 | 155 | 155 | 155 | 155 | 109 | 109 |
 | Fouls per 100 possessions | **-1.15** | **+0.48** | +0.27 | **+0.63** | +0.11 | **-0.55** | +0.06 |
-| Free-throw rate (FTA / FGA, x100) | **-2.20** | **+1.78** | -0.05 | +0.55 | +0.56 | -0.30 | -0.62 |
+| Free-throw rate (FTA / <abbr title="Field-goal attempts.">FGA</abbr>, x100) | **-2.20** | **+1.78** | -0.05 | +0.55 | +0.56 | -0.30 | -0.62 |
 | Turnovers per 100 possessions | +0.16 | +0.32 | +0.16 | +0.15 | -0.22 | +0.11 | **-0.91** |
 | Pace (possessions per regulation game) | **+1.30** | +0.45 | -0.33 | -0.15 | -0.26 | +0.25 | **-1.68** |
 | Points per 100 possessions | -0.79 | **+1.24** | +0.11 | -0.50 | +0.91 | **-1.45** | +0.09 |
@@ -184,7 +189,7 @@ there is not a change in which series are present.
 |---|---|---|---|---|---|
 | Games | 170 | 170 | 109 | 28 | 15 |
 | Fouls per 100 possessions | **-1.00** | **+0.63** | +0.33 | +0.66 | +0.69 |
-| Free-throw rate (FTA / FGA, x100) | **-1.80** | **+1.64** | -0.35 | +1.63 | +1.24 |
+| Free-throw rate (FTA / <abbr title="Field-goal attempts.">FGA</abbr>, x100) | **-1.80** | **+1.64** | -0.35 | +1.63 | +1.24 |
 | Turnovers per 100 possessions | -0.10 | +0.31 | -0.42 | +0.01 | +0.61 |
 | Pace (possessions per regulation game) | +0.08 | +0.31 | **-0.64** | +0.65 | -0.97 |
 | Points per 100 possessions | -0.30 | +0.24 | +0.27 | -0.40 | -0.52 |
@@ -199,7 +204,7 @@ there is not a change in which series are present.
 |---|---|---|---|---|---|
 | Games | 81 | 81 | 81 | 15 | 15 |
 | Fouls per 100 possessions | **-0.78** | +0.15 | +0.44 | +0.35 | +0.69 |
-| Free-throw rate (FTA / FGA, x100) | -1.26 | +1.00 | -0.18 | +1.18 | +1.24 |
+| Free-throw rate (FTA / <abbr title="Field-goal attempts.">FGA</abbr>, x100) | -1.26 | +1.00 | -0.18 | +1.18 | +1.24 |
 | Turnovers per 100 possessions | +0.04 | +0.45 | **-0.61** | +0.01 | +0.61 |
 | Pace (possessions per regulation game) | +0.24 | +0.48 | **-0.58** | +0.26 | -0.97 |
 | Points per 100 possessions | -0.37 | -0.48 | +0.84 | +0.55 | -0.52 |
@@ -249,14 +254,17 @@ Three-point attempt rate, each team relative to its own series mean, percentage 
 
 ## Question 2: the review page
 
-`docs/review/` is a local page with three views: every series game by game
+`review/` holds a local page with three views: every series game by game
 (three-point percentage and share of shots from three for both teams, plus
 fouls, free throws, turnovers, and pace), each franchise's Game 1 against
 the rest of its series over time, and the question 4 profiles by game
 number. It is descriptive; the estimates above are the analysis. Build it
-with `python/07_review.py` and serve the folder over HTTP. Its data file
-lists NBA.com box scores game by game, so it is gitignored and the page is
-not hosted.
+with `python/07_review.py` and serve `review/build/` over HTTP. Its data
+lists NBA.com box scores game by game, so the build stays local and is not
+published; this repository commits only summary tables (see
+`DATA_SOURCES.md`). For the same reason a fresh clone runs the tests and
+the README drift check but cannot rebuild the analysis until `01_harvest.py`
+has fetched the game logs.
 
 ## How to run
 
