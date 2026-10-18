@@ -122,12 +122,15 @@ def build_season(league: str, year: int):
 
     base = None
     if rs.height:
-        r = pslib.pair_games(rs)
+        r = pslib.pair_games(rs).with_columns(possessions().alias("POSS"))
+        # A total is blank unless every game behind it has the count
+        # (pslib.full_sum; found October 18, 2026).
+        full = pslib.full_sum
         base = (r.group_by("TEAM_ID").agg(
                     pl.len().alias("RS_GAMES"),
-                    *[pl.col(c).sum().alias(f"RS_{c}") for c in ("FG3M", "FG3A", "FGA", "PF", "TOV")],
-                    *[pl.col(f"OPP_{c}").sum().alias(f"RS_OPP_{c}") for c in ("FG3M", "FG3A", "FGA")],
-                    possessions().sum().alias("RS_POSS"))
+                    *[full(c, f"RS_{c}") for c in ("FG3M", "FG3A", "FGA", "PF", "TOV")],
+                    *[full(f"OPP_{c}", f"RS_OPP_{c}") for c in ("FG3M", "FG3A", "FGA")],
+                    full("POSS", "RS_POSS"))
                  .with_columns(pl.lit(league).alias("LEAGUE"), pl.lit(year).alias("SEASON")))
     return s, v, clash, cov, base
 

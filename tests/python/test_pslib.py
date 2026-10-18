@@ -148,6 +148,12 @@ def test_id_game_no(gid, league, year, expected):
     assert pslib.id_game_no(gid, league, year) == expected
 
 
+def test_full_sum_blanks_partial_totals():
+    df = pl.DataFrame({"T": [1, 1, 2, 2], "X": [90.0, None, 3.0, 4.0]})
+    got = dict(df.group_by("T").agg(pslib.full_sum("X", "S")).iter_rows())
+    assert got == {1: None, 2: 7.0}
+
+
 def series_rows(*rows):
     return pl.DataFrame(rows, schema=["SERIES_KEY", "ROUND", "FINALS", "WINS_NEEDED"], orient="row")
 

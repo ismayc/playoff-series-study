@@ -43,8 +43,14 @@ Chester decides how a public page fits those terms.
 ```
 ../.venv/bin/python python/01_harvest.py         # ~10 min, resumable, skips files on disk
 ../.venv/bin/python python/02_build_series.py    # data/team_games.csv and the checks
-./run_checks.sh                                  # every check; non-zero on failure
+../.venv/bin/python python/03_game1.py           # question 1 (Python) -> output/game1_*.csv
+Rscript R/03_game1.R                             # question 1 (R twin) -> output/r/
+../.venv/bin/python python/04_reconcile.py       # every cell must agree within 1e-9
+../.venv/bin/python python/05_findings.py        # README regions; --check is the drift gate
+./run_checks.sh                                  # all of the above except 01; non-zero on failure
 ```
+
+After any change to outputs: 03, R twin, 04, then 05 (without `--check`).
 
 The interpreter is the family venv (`~/repos/basketball-data-science/.venv`);
 `requirements.txt` pins the packages this repo imports from it.

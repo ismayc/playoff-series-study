@@ -12,5 +12,22 @@ echo "=== unit tests: Python (pytest) ==="
 $PY -m pytest tests/python -q
 
 echo
+echo "=== unit tests: R (testthat) ==="
+Rscript tests/R/run_tests.R | tail -1
+
+echo
 echo "=== series build and its checks ==="
 $PY python/02_build_series.py | tail -2
+
+echo
+echo "=== question 1: Python, then R ==="
+$PY python/03_game1.py
+Rscript R/03_game1.R
+
+echo
+echo "=== reconciliation: R vs Python ==="
+$PY python/04_reconcile.py | tail -1
+
+echo
+echo "=== findings: README numbers regenerate from outputs ==="
+$PY python/05_findings.py --check

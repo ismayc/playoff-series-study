@@ -1,10 +1,11 @@
 # Playoff series study: design notes
 
-Started October 18, 2026. Status: **data layer built; no Game 1 comparison
-has been computed.** The analysis below is specified before any outcome is
-looked at, the same discipline as the contract-year study: once the first
-comparison runs, the metric, the sample, and the baseline do not change
-without a dated amendment that says why. Every claim about the data was
+Started October 18, 2026. Status: **question 1 run on October 18, 2026,
+after the analysis below was fixed; results are in the README's generated
+regions. Questions 2 to 4 are not built yet.** The analysis was specified
+before any outcome was looked at, the same discipline as the contract-year
+study: the metric, the sample, and the baseline do not change without a
+dated amendment that says why. Every claim about the data was
 checked by loading it on October 18, 2026, unless marked UNVERIFIED.
 
 Origin: the backlog entry "the Game 1 effect, and how stats move through a
@@ -74,8 +75,9 @@ What loading it showed:
 
 ## Pre-specified analysis for question 1
 
-Fixed now, before any Game 1 number exists. Points marked PROPOSED wait on
-Chester's decision.
+Fixed before any Game 1 number existed. Implemented twice, in
+`python/03_game1.py` and `R/03_game1.R`, and `python/04_reconcile.py`
+fails unless every output cell agrees.
 
 - **Sample.** Every valid series with at least two games, in every
   league-season whose playoff rows all carry FG3M and FG3A: NBA 1984-85 to
@@ -99,13 +101,44 @@ Chester's decision.
   hot."
 - **Home and road.** Game 1 is at the higher seed. The team-level version
   of d (each team's own Game 1 minus its own later games) is split by
-  home and road in Game 1. The 2020 NBA bubble is neutral-site and is
-  reported in neither split.
+  home and road in Game 1. The 2020 seasons are neutral-site and are
+  reported in neither split (Amendment 1).
 - **Secondary outcome.** Three-point attempt rate (3PA / FGA), same
   structure. A lower Game 1 rate with unchanged accuracy is a different
   finding from a lower accuracy.
-- **Eras.** PROPOSED: one headline per league over every complete season,
-  plus decade panels.
+- **Eras.** One headline per league over every complete season, plus
+  decade panels (decided by Chester, October 18, 2026). A decade is the
+  season's end year rounded down to a multiple of 10, so the NBA's
+  1980s panel holds only 1984-85 to 1988-89.
+- **Undefined values.** A series with zero three-point attempts (both
+  teams) in Game 1, in Games 2 on, or in Game 2 drops from the estimates
+  that need that value, and the count dropped is reported with each one.
+  In the team-level split, a team with zero attempts on either side drops
+  the same way.
+- **Expected 3P%, exactly.** For team t against opponent o in season y:
+  e = t's regular-season 3PM / 3PA, plus o's regular-season 3PM / 3PA
+  allowed, minus the league's regular-season 3PM / 3PA. A series' Game 1
+  residual is (sum of 3PM minus sum of e times 3PA) / sum of 3PA over both
+  teams' Game 1 rows, and likewise for Games 2 on.
+
+### Amendment 1 (October 18, 2026, before any outcome was computed)
+
+The 2020 WNBA season was also played at a single neutral site (IMG Academy,
+Bradenton), like the 2020 NBA bubble. Both 2020 seasons are left out of the
+home and road split. They stay in every other estimate.
+
+### Amendment 2 (October 18, 2026, before any outcome was looked at)
+
+The 1984-85 NBA regular season records three-point attempts in 8.4% of its
+team-game rows (makes in all of them), so its regular-season 3P% cannot be
+computed: a plain sum gave the 1984-85 Lakers 90 makes on 6 attempts. The
+playoff rows that season are complete. Regular-season totals are now blank
+unless every game behind them carries the count, so 1984-85 has no
+expected 3P%. Its 15 series stay in the Game 1 versus later comparisons
+and drop from the two residual estimates, with the count dropped reported
+there. Found when the first run reported 3 team-games without a baseline,
+before the summary table was opened; it moved the expected-3P% definition,
+not the comparison.
 
 ## Questions 3 and 4 (exploratory, fixed definitions)
 

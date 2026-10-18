@@ -170,6 +170,16 @@ def validate_series(df: pl.DataFrame) -> pl.DataFrame:
              .sort("SERIES_KEY"))
 
 
+def full_sum(col: str, name: str) -> pl.Expr:
+    """Group sum that is blank unless every row has the value.
+
+    polars' sum skips nulls, so a season that records 3PA in 8% of its games
+    (the 1984-85 NBA regular season) would otherwise total to a 3P% like
+    90 / 6.
+    """
+    return pl.when(pl.col(col).null_count() == 0).then(pl.col(col).sum()).otherwise(None).alias(name)
+
+
 def rest_days(games: pl.DataFrame) -> pl.DataFrame:
     """Days since each team's previous game, from a team's full schedule.
 
