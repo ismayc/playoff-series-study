@@ -1,0 +1,7 @@
+nba_api==1.11.4
+numpy==2.5.1
+pandas==3.0.5
+polars==1.43.1
+pyarrow==25.0.0
+pytest==9.1.1
+requests==2.34.2

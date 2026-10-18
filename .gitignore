@@ -34,3 +34,8 @@ __pycache__/
 # Commit a download script and DATA_SOURCES.md instead of the files.
 data/raw/
 .pytest_cache/
+
+# Box-score tables rebuilt from data/raw by 02; they carry NBA.com statistics
+# game by game, so they stay local (see DATA_SOURCES.md).
+data/*.csv
+data/*.log

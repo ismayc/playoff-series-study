@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/*key*.pem)",
+      "Read(**/credentials.json)",
+      "Edit(/data/raw/**)"
+    ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "allowUnsandboxedCommands": false,
+    "filesystem": {
+      "denyRead": [
+        "~/.ssh",
+        "~/.aws",
+        "~/.config/gh",
+        "~/**/.env",
+        "~/**/*key*.pem"
+      ]
+    },
+    "network": {
+      "allowedDomains": [
+        "stats.nba.com",
+        "stats.wnba.com"
+      ]
+    }
+  }
+}
