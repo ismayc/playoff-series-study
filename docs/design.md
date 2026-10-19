@@ -359,3 +359,47 @@ differ at all.
 - **What stays local.** Per-game crews and per-official values name people
   next to game-level statistics, so they stay in gitignored files; the
   committed tables are the coverage counts and the summaries.
+
+## Follow-up 9, fixed October 19, 2026 before any of it was computed
+
+Chester asked on October 19, 2026 about experienced against inexperienced
+playoff teams, and chose both measures below, roster experience as the
+headline and franchise experience as the check. Exploratory, like 5 to 8;
+Python and R twins reconciled by 04.
+
+- **Question.** Does the less experienced team in a series have a different
+  Game 1, relative to its own later games, than the more experienced team?
+- **Roster experience** (headline). For team t in series s: each player who
+  appears for t in s, weighted by his minutes in s, contributes his career
+  playoff games before that postseason (earlier seasons only, so an earlier
+  round of the same postseason does not count; stage is question 3's
+  subject). ROSTER_EXP is the minutes-weighted mean. Source: player-mode
+  `LeagueGameLog` for every postseason in each league (NBA from 1946-47,
+  WNBA from 1997), one call per league-season, by
+  `python/13_harvest_players.py` into `data/raw/playerlogs/` (gitignored).
+  A probe on October 19, 2026 found minutes in every row for NBA 1975-76
+  and 1984-85 and WNBA 1998. A season with no player rows is counted and
+  reported; careers that began in one undercount, which is flagged, not
+  corrected.
+- **Franchise experience** (check). FRAN_EXP = playoff games the franchise
+  (TEAM_ID) played in the three previous postseasons, from the raw team
+  playoff logs, invalid series included (they were still played).
+- **Contrast.** Per series with unequal experience: the more experienced
+  team's (own Game 1 minus own Games 2 on) minus the same for the less
+  experienced team, for three-point percentage (CONTRAST_PCT), attempt rate
+  FG3A / FGA (CONTRAST_RATE), and fouls per 100 possessions (CONTRAST_PF,
+  with PF100 and possessions as in question 4, and Games 2 on as the mean of
+  the team's per-game PF100). A positive value means the more experienced
+  team's Game 1 is relatively higher. Pooled sums for the two shooting
+  rates, as in the rest-gap contrast; a team with no three-point attempts in
+  Game 1 or in Games 2 on drops from that contrast and is counted.
+- **Gap bins.** Per league and measure, the experience gap (more minus less)
+  is cut at its terciles over the sample (low, middle, high gap); the
+  terciles come from the gap alone, never from an outcome. Reported per bin
+  and for every nonzero gap, with the count of equal-experience series.
+- **Sample.** The question 1 sample (NBA 1984-85 on, WNBA 1998 on). Series
+  stay in the sample whatever their era; the 1980s roster figures lean on
+  pre-1975 careers, so the NBA 1984-85 to 1989-90 seasons are also reported
+  apart if any pre-1975-76 season lacks player rows.
+- **What stays local.** Per-player and per-series values; the committed
+  tables are the bin summaries and the harvest coverage counts.
