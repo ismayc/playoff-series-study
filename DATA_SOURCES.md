@@ -8,6 +8,7 @@ or preloaded for learners.
 | Dataset | URL | License (quoted) | Commercial use | Redistribution | Retrieved | Local file |
 |---|---|---|---|---|---|---|
 | NBA and WNBA team game logs (LeagueGameLog, team mode; Regular Season, Playoffs, PlayIn) | https://stats.nba.com/stats/leaguegamelog | NBA.com Terms of Use (https://www.nba.com/termsofuse, "LAST UPDATED: July 13, 2026"), section 9 (ii): "the NBA Statistics may only be used, displayed, or published for legitimate news reporting or private, non-commercial purposes;" (re-fetched October 18, 2026) | no | no public republishing of the raw tables; private, non-commercial use only | October 18, 2026 | data/raw/gamelogs/ |
+| NBA liveData box scores (team statistics, officials with their assignment), NBA 2019-20 on and WNBA 2022 on, as cached by the October 19, 2026 audit | https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/{NBA,WNBA}/liveData/boxscore/boxscore_<GAME_ID>.json (the URL in the audit script `pcheck.py`) | unverified: assumed to fall under the same NBA.com Terms of Use as the stats API; the feed carries no terms of its own that were checked | no | no; kept local in `data/raw/live/`, and the tables derived from it (`data/live_officials.csv`, `data/live_team_box.csv`) list games one by one, so they are gitignored too | on or before October 19, 2026 (the exact fetch time is not recorded; files copied from `../.audit-cache-2026-10-19/audit_contract_playoff/live/` on October 19, 2026, checksums identical); cannot be re-fetched from this machine (403) | data/raw/live/ |
 
 ## Notes
 

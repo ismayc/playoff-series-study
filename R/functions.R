@@ -413,6 +413,7 @@ profile_decade <- function(dev) {
 # ---- Follow-up 8: fouls and the officials (twin of python/officiallib.py) ----
 
 CREW_SIZE <- 3
+WORKING <- c("OFFICIAL1", "OFFICIAL2", "OFFICIAL3")  # liveData assignments; the fourth is ALTERNATE
 MIN_OTHER_GAMES <- 5
 MIN_SPLIT_GAMES <- 3
 MIN_HALF_GAMES <- 10
@@ -423,13 +424,30 @@ official_game_ids <- function(team_games) {
   team_games %>% distinct(LEAGUE, SEASON, SERIES_KEY, GAME_NO, GAME_ID) %>% arrange(LEAGUE, SEASON, SERIES_KEY, GAME_NO)
 }
 
-official_coverage <- function(dev, ids, crews, first) {
+# The October 19, 2026 amendment: a game listing more than three people takes
+# the three its liveData box marks OFFICIAL1 to OFFICIAL3, when exactly three
+# are marked and all are in the harvest list. Returns crews and resolved ids.
+working_crews <- function(crews, live) {
+  c <- crews %>% filter(!is.na(OFFICIAL_ID)) %>% distinct()
+  over <- c %>% count(GAME_ID, name = "N") %>% filter(N > CREW_SIZE) %>% select(GAME_ID)
+  work <- live %>% filter(ASSIGNMENT %in% WORKING) %>% distinct(GAME_ID, OFFICIAL_ID)
+  listed <- work %>% semi_join(c, by = c("GAME_ID", "OFFICIAL_ID"))
+  ok <- work %>% count(GAME_ID, name = "W") %>% inner_join(listed %>% count(GAME_ID, name = "L"), by = "GAME_ID") %>%
+    semi_join(over, by = "GAME_ID") %>% filter(W == CREW_SIZE, L == CREW_SIZE) %>% select(GAME_ID) %>% arrange(GAME_ID)
+  out <- bind_rows(crews %>% anti_join(ok, by = "GAME_ID"),
+                   listed %>% semi_join(ok, by = "GAME_ID") %>% select(all_of(names(crews)))) %>%
+    arrange(GAME_ID, OFFICIAL_ID)
+  list(crews = out, resolved = ok)
+}
+
+official_coverage <- function(dev, ids, crews, first, resolved) {
   keep <- rep(FALSE, nrow(dev))
   for (lg in names(first)) keep <- keep | (dev$LEAGUE == as.integer(lg) & dev$SEASON >= first[[lg]])
   n <- crews %>% group_by(GAME_ID) %>% summarise(N_OFF = n_distinct(OFFICIAL_ID[!is.na(OFFICIAL_ID)]), .groups = "drop")
   dev[keep, OFF_GAME_KEYS] %>% left_join(ids, by = OFF_GAME_KEYS) %>% left_join(n, by = "GAME_ID") %>%
     group_by(LEAGUE, SEASON) %>%
     summarise(GAMES = n(), HARVESTED = sum(!is.na(N_OFF)), WITH_CREW = sum(!is.na(N_OFF) & N_OFF == CREW_SIZE),
+              RESOLVED = sum(!is.na(N_OFF) & N_OFF == CREW_SIZE & GAME_ID %in% resolved$GAME_ID),
               .groups = "drop") %>%
     arrange(LEAGUE, SEASON)
 }

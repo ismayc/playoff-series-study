@@ -6,7 +6,9 @@ tests/fixtures/official_crews.csv.
 Inputs: the question 4 game table (profile_games.csv, one row per game with
 its PF100 deviation), the game ids from team_games.csv, and
 data/game_officials.csv (one row per game and listed official, flattened
-from the raw harvest by flatten_officials).
+from the raw harvest by flatten_officials), and data/live_officials.csv (the
+liveData box scores' assignments, flattened by livelib.officials), which
+working_crews uses to tell the three working officials from an alternate.
 """
 
 from __future__ import annotations
@@ -21,6 +23,7 @@ from game1lib import SERIES_KEYS, Z, describe
 
 GAME_KEYS = [*SERIES_KEYS, "GAME_NO"]
 CREW_SIZE = 3
+WORKING = ("OFFICIAL1", "OFFICIAL2", "OFFICIAL3")  # liveData assignments; the fourth is ALTERNATE
 MIN_OTHER_GAMES = 5    # 8b: games in other series behind an official's tendency
 MIN_SPLIT_GAMES = 3    # 8c: Game 1s and later games per official
 MIN_HALF_GAMES = 10    # 8d: games per official in each season half
@@ -38,26 +41,51 @@ def flatten_officials(raw_dir: Path) -> pl.DataFrame:
     return pl.DataFrame(rows, schema={"GAME_ID": pl.Utf8, "OFFICIAL_ID": pl.Int64})
 
 
+def working_crews(crews: pl.DataFrame, live: pl.DataFrame) -> tuple[pl.DataFrame, pl.DataFrame]:
+    """The amendment of October 19, 2026 (docs/design.md, follow-up 8): a
+    game whose harvest lists more than three people takes as its crew the
+    officials its liveData box marks OFFICIAL1 to OFFICIAL3, when there are
+    exactly three of them and all three are in the harvest list. Every other
+    game keeps its harvest list. Returns the crews (same columns) and the
+    GAME_IDs resolved this way."""
+    c = crews.drop_nulls("OFFICIAL_ID").unique()
+    over = c.group_by("GAME_ID").agg(pl.len().alias("N")).filter(pl.col("N") > CREW_SIZE).select("GAME_ID")
+    work = live.filter(pl.col("ASSIGNMENT").is_in(WORKING)).select("GAME_ID", "OFFICIAL_ID").unique()
+    listed = work.join(c, on=["GAME_ID", "OFFICIAL_ID"], how="semi")
+    n_work = work.group_by("GAME_ID").agg(pl.len().alias("W"))
+    n_listed = listed.group_by("GAME_ID").agg(pl.len().alias("L"))
+    ok = (n_work.join(n_listed, on="GAME_ID").join(over, on="GAME_ID", how="semi")
+                .filter((pl.col("W") == CREW_SIZE) & (pl.col("L") == CREW_SIZE))
+                .select("GAME_ID").sort("GAME_ID"))
+    out = pl.concat([crews.join(ok, on="GAME_ID", how="anti"),
+                     listed.join(ok, on="GAME_ID", how="semi").select(crews.columns)])
+    return out.sort("GAME_ID", "OFFICIAL_ID", nulls_last=True), ok
+
+
 def game_ids(team_games: pl.DataFrame) -> pl.DataFrame:
     return team_games.select(*GAME_KEYS, "GAME_ID").unique().sort(GAME_KEYS)
 
 
-def coverage(dev: pl.DataFrame, ids: pl.DataFrame, crews: pl.DataFrame, first: dict[int, int]) -> pl.DataFrame:
+def coverage(dev: pl.DataFrame, ids: pl.DataFrame, crews: pl.DataFrame, first: dict[int, int],
+             resolved: pl.DataFrame) -> pl.DataFrame:
     """Per league-season from the first officials season: question 4 games,
-    games harvested, and games listing exactly three officials."""
+    games harvested, games with a crew of three (after working_crews), and
+    how many of those working_crews resolved from a longer list."""
     keep = pl.lit(False)
     for league, season in first.items():
         keep = keep | ((pl.col("LEAGUE") == league) & (pl.col("SEASON") >= season))
     n = crews.group_by("GAME_ID").agg(pl.col("OFFICIAL_ID").drop_nulls().n_unique().alias("N_OFF"))
-    g = dev.filter(keep).select(GAME_KEYS).join(ids, on=GAME_KEYS, how="left").join(n, on="GAME_ID", how="left")
+    g = (dev.filter(keep).select(GAME_KEYS).join(ids, on=GAME_KEYS, how="left").join(n, on="GAME_ID", how="left")
+            .with_columns(pl.col("GAME_ID").is_in(resolved["GAME_ID"].implode()).alias("RES")))
     return (g.group_by("LEAGUE", "SEASON")
              .agg(pl.len().alias("GAMES"), pl.col("N_OFF").is_not_null().sum().alias("HARVESTED"),
-                  (pl.col("N_OFF") == CREW_SIZE).sum().alias("WITH_CREW"))
+                  (pl.col("N_OFF") == CREW_SIZE).sum().alias("WITH_CREW"),
+                  ((pl.col("N_OFF") == CREW_SIZE) & pl.col("RES")).sum().alias("RESOLVED"))
              .sort("LEAGUE", "SEASON"))
 
 
 def sample(dev: pl.DataFrame, ids: pl.DataFrame, crews: pl.DataFrame) -> tuple[pl.DataFrame, pl.DataFrame]:
-    """Games listing exactly three officials (with PF100 and RESID, the PF100
+    """Games with a crew of exactly three (from working_crews; with PF100 and RESID, the PF100
     deviation minus the league's mean at that game number in this sample),
     and the matching game-official rows."""
     c = crews.drop_nulls("OFFICIAL_ID").unique()

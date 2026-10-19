@@ -55,11 +55,46 @@ def test_flatten(tmp_path):
     assert f.rows() == [("g1", 7), ("g1", 8), ("g2", None)]
 
 
+NO_RESOLVED = pl.DataFrame({"GAME_ID": []}, schema={"GAME_ID": pl.Utf8})
+
+
 def test_coverage(parts):
     dev, ids, crews = parts
-    cov = ol.coverage(dev, ids, crews, {0: 2010})
-    assert cov.select("SEASON", "GAMES", "HARVESTED", "WITH_CREW").rows() == [(2010, 3, 3, 3), (2011, 4, 3, 2)]
-    assert ol.coverage(dev, ids, crews, {0: 2011})["SEASON"].to_list() == [2011]
+    cov = ol.coverage(dev, ids, crews, {0: 2010}, NO_RESOLVED)
+    assert cov.select("SEASON", "GAMES", "HARVESTED", "WITH_CREW", "RESOLVED").rows() == [
+        (2010, 3, 3, 3, 0), (2011, 4, 3, 2, 0)]
+    assert ol.coverage(dev, ids, crews, {0: 2011}, NO_RESOLVED)["SEASON"].to_list() == [2011]
+    res = pl.DataFrame({"GAME_ID": ["g11", "g31"]})  # g31 has two officials, so it is not a crew
+    assert ol.coverage(dev, ids, crews, {0: 2010}, res)["RESOLVED"].to_list() == [1, 0]
+
+
+# Working crews (same cases in tests/R/test_functions.R). a: alternate
+# flagged, resolved to 1-3. b: a working official the harvest does not list,
+# kept. c: no liveData box, kept. d: three listed, one flagged alternate, kept
+# (only longer lists are resolved). e: only two marked working, kept. f: an
+# empty harvest, kept. g: the fourth listed person absent from liveData,
+# resolved to 1-3 (as in game 0042500175).
+WC_CREWS = pl.DataFrame({"GAME_ID": [*"aaaa", *"bbbb", *"cccc", *"ddd", *"eeee", "f", *"gggg"],
+                         "OFFICIAL_ID": [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 1, 2, 3, 4, None, 1, 2, 3, 4]},
+                        schema={"GAME_ID": pl.Utf8, "OFFICIAL_ID": pl.Int64})
+WC_LIVE = pl.DataFrame({"GAME_ID": [*"aaaa", *"bbb", *"ddd", *"eee", *"ggg"],
+                        "OFFICIAL_ID": [1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 1, 2, 4, 1, 2, 3],
+                        "ASSIGNMENT": ["OFFICIAL1", "OFFICIAL2", "OFFICIAL3", "ALTERNATE",
+                                       "OFFICIAL1", "OFFICIAL2", "OFFICIAL3",
+                                       "OFFICIAL1", "OFFICIAL2", "ALTERNATE",
+                                       "OFFICIAL1", "OFFICIAL2", "ALTERNATE",
+                                       "OFFICIAL1", "OFFICIAL3", "OFFICIAL2"]})
+
+
+def test_working_crews():
+    out, res = ol.working_crews(WC_CREWS, WC_LIVE)
+    assert res["GAME_ID"].to_list() == ["a", "g"]
+    got = {g: sorted(x for x in v if x is not None)
+           for g, v in out.group_by("GAME_ID").agg(pl.col("OFFICIAL_ID")).rows()}
+    assert got == {"a": [1, 2, 3], "b": [1, 2, 3, 4], "c": [1, 2, 3, 4], "d": [1, 2, 3],
+                   "e": [1, 2, 3, 4], "f": [], "g": [1, 2, 3]}
+    assert out.filter(pl.col("GAME_ID") == "f")["OFFICIAL_ID"].to_list() == [None]
+    assert out.columns == WC_CREWS.columns
 
 
 def test_sample_and_resid(parts):

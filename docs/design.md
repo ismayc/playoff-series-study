@@ -356,6 +356,31 @@ differ at all.
   `assignment` field is blank), so the fourth is probably an alternate but
   that is unverified. Those games stay out as specified, which leaves the
   recent seasons thin; `output/officials_coverage.csv` gives the counts.
+- **Amendment, October 19, 2026: the alternate, from liveData.** An audit
+  on October 19, 2026 cached the NBA liveData box score of the games in
+  `data/team_games.csv` from 2019-20 on (NBA) and 2022 on (WNBA): 690
+  games, every one but five 2019-20 NBA games that are not in the cache
+  (why the fetch missed them is unverified). Each official there carries
+  an `assignment`: OFFICIAL1, OFFICIAL2, OFFICIAL3, or ALTERNATE. In all
+  361 games where both sources list four people, liveData lists the same
+  four and flags one as the alternate, which confirms the guess above for
+  those seasons. One more game (0042500175) lists four in the harvest and
+  three working officials in liveData, all among the four. The rule: a
+  game whose harvest lists more than three people takes as its crew the
+  officials its liveData box marks OFFICIAL1 to OFFICIAL3, when exactly
+  three are marked and all three are in the harvest list (`working_crews`
+  in both twins). The results before this amendment had been seen (they
+  are the October 19 README); the rule was written, and is kept, without
+  looking at results on the enlarged sample. Every other game, and every
+  other rule above, is unchanged: games the harvest lists with exactly
+  three stay as they were, including 0042000405, where liveData marks one
+  of the three as the alternate and only two as working (kept as listed,
+  since the rule only resolves longer lists). Four-official games before
+  2019-20 (NBA) and 2022 (WNBA) have no cached box and still drop. The
+  boxes cannot be re-fetched from this machine (403), so they are kept, as
+  downloaded, in `data/raw/live/` (gitignored); `python/12_officials.py`
+  flattens their assignments into `data/live_officials.csv`. `RESOLVED` in
+  `output/officials_coverage.csv` counts the games resolved this way.
 - **What stays local.** Per-game crews and per-official values name people
   next to game-level statistics, so they stay in gitignored files; the
   committed tables are the coverage counts and the summaries.

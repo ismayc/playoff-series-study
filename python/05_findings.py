@@ -399,12 +399,15 @@ def officials_region(cov: pl.DataFrame, prof: pl.DataFrame, within: pl.DataFrame
     lines = ["| League | Seasons | Games with a crew of three | Game 1 fouls per 100 possessions "
              "| Game 1 crew tendency | Same official: Game 1 minus later games | Officials agree with themselves "
              "(even vs odd seasons) |", "|---|---|---|---|---|---|---|"]
-    readings, thin = [], []
+    readings, thin, resolved = [], [], []
     for lg, name in LEAGUES.items():
         c = cov.filter(pl.col("LEAGUE") == lg)
         if c.height == 0:
             raise KeyError(f"no officials coverage rows for {name}")
         used = c.filter(pl.col("WITH_CREW") > 0)
+        res = c.filter(pl.col("RESOLVED") > 0)
+        if res.height:
+            resolved.append(f"{res['RESOLVED'].sum()} {name} games ({res['SEASON'].min()} to {res['SEASON'].max()})")
         thin += [f"{name} {s}" for s, g, w in c.select("SEASON", "GAMES", "WITH_CREW").iter_rows() if w < g / 2]
         pf = prof.filter((pl.col("LEAGUE") == lg) & (pl.col("PART") == "pf100") & (pl.col("GAME_NO") == 1)).row(0, named=True)
         cr = prof.filter((pl.col("LEAGUE") == lg) & (pl.col("PART") == "crew") & (pl.col("GAME_NO") == 1)).row(0, named=True)
@@ -427,8 +430,12 @@ def officials_region(cov: pl.DataFrame, prof: pl.DataFrame, within: pl.DataFrame
               "mean (question 4); the crew tendency is the mean, over a game's officials, of how far above or below "
               "the league each runs in other series, as a deviation from the series' average crew. Means with "
               "95% intervals; the split-half correlation has a Fisher interval."
-              + (f" Seasons where fewer than half the games list exactly three officials (from 2016-17 most "
-                 f"games list four, with no field saying which three worked): {', '.join(thin)}." if thin else "")]
+              + (" From 2016-17 (NBA) and 2018 (WNBA) most games list four officials, with no field saying "
+                 "which three worked; the NBA's liveData box scores flag the alternate, which gives the crew of "
+                 f"{' and '.join(resolved)} (amendment of October 19, 2026, in docs/design.md), and four-official "
+                 "games without a liveData box drop." if resolved else "")
+              + (f" Seasons where fewer than half the games have a crew of three: {', '.join(thin)}."
+                 if thin else "")]
     return "\n".join(lines + ["", "**Reading.** " + " ".join(readings)])
 
 

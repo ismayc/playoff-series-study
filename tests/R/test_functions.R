@@ -307,10 +307,29 @@ with_low_thresholds <- function(code, other = 1) {
   code
 }
 
+test_that("working crews", {
+  crews <- tibble(GAME_ID = c(rep("a", 4), rep("b", 4), rep("c", 4), rep("d", 3), rep("e", 4), "f", rep("g", 4)),
+                  OFFICIAL_ID = c(1:4, 1:4, 1:4, 1:3, 1:4, NA, 1:4))
+  live <- tibble(GAME_ID = c(rep("a", 4), rep("b", 3), rep("d", 3), rep("e", 3), rep("g", 3)),
+                 OFFICIAL_ID = c(1L, 2L, 3L, 4L, 1L, 2L, 5L, 1L, 2L, 3L, 1L, 2L, 4L, 1L, 2L, 3L),
+                 ASSIGNMENT = c("OFFICIAL1", "OFFICIAL2", "OFFICIAL3", "ALTERNATE", "OFFICIAL1", "OFFICIAL2", "OFFICIAL3",
+                                "OFFICIAL1", "OFFICIAL2", "ALTERNATE", "OFFICIAL1", "OFFICIAL2", "ALTERNATE",
+                                "OFFICIAL1", "OFFICIAL3", "OFFICIAL2"))
+  w <- working_crews(crews, live)
+  expect_equal(w$resolved$GAME_ID, c("a", "g"))
+  got <- split(w$crews$OFFICIAL_ID, w$crews$GAME_ID)
+  expect_equal(got$a, 1:3); expect_equal(got$b, 1:4); expect_equal(got$c, 1:4); expect_equal(got$d, 1:3)
+  expect_equal(got$e, 1:4); expect_equal(got$f, NA_integer_); expect_equal(got$g, 1:3)
+  expect_equal(names(w$crews), names(crews))
+})
+
 test_that("officials coverage and sample", with_low_thresholds({
   p <- off_parts()
-  cov <- official_coverage(p$dev, p$ids, p$crews, list(`0` = 2010))
+  none <- tibble(GAME_ID = character())
+  cov <- official_coverage(p$dev, p$ids, p$crews, list(`0` = 2010), none)
   expect_equal(cov$GAMES, c(3, 4)); expect_equal(cov$HARVESTED, c(3, 3)); expect_equal(cov$WITH_CREW, c(3, 2))
+  expect_equal(cov$RESOLVED, c(0, 0))
+  expect_equal(official_coverage(p$dev, p$ids, p$crews, list(`0` = 2010), tibble(GAME_ID = c("g11", "g31")))$RESOLVED, c(1, 0))
   s <- official_sample(p$dev, p$ids, p$crews)
   expect_equal(s$games$GAME_ID, c("g11", "g12", "g13", "g21", "g22"))
   expect_equal(s$games$RESID, c(-1, -0.5, 0, 1, 0.5))

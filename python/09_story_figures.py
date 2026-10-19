@@ -283,8 +283,9 @@ def fig_experience(es: pl.DataFrame) -> go.Figure:
     return f
 
 
-# Game numbers with fewer games than this are left off fig12 (WNBA Games 4
-# and 5 rest on a handful of series).
+# Game numbers with fewer games than this are left off fig12 (WNBA Game 5
+# rests on a handful of series; Game 4 too before the October 19, 2026
+# officials amendment).
 MIN_GAMES = 20
 
 

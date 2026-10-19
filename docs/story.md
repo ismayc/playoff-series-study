@@ -156,16 +156,20 @@ officials. Two things
 could make Game 1 the low point for fouls: lighter-whistled crews assigned
 to Game 1s, or the same officials calling Game 1s differently. The data
 point to the second. Game 1 crews run +0.00 fouls per 100 possessions
-against the series' other crews by their usual tendency (−0.03 to +0.04,
-across 240 NBA series), so assignment explains little or none of it. But the same
-NBA officials call 1.06 fewer fouls per 100 possessions in their Game 1s
-than in their later games, across 56 officials, and the WNBA's do the
+against the series' other crews by their usual tendency (−0.03 to +0.03,
+across 314 NBA series), so assignment explains little or none of it. But the same
+NBA officials call 1.15 fewer fouls per 100 possessions in their Game 1s
+than in their later games, across 63 officials, and the WNBA's do the
 same. Officials do differ from one another: in the NBA an official's foul
 level in even-numbered seasons tracks their level in odd ones, at r =
-+0.49. Recent games mostly list four officials with no note of which three
-worked, so seasons from 2016-17 on are thin here.
++0.50. Recent games mostly list four officials, one of them an alternate
+who did not work, and the stats record does not say which. The NBA's
+liveData box scores do, from 2019-20 in the NBA and from 2022 in the
+WNBA, and since October 19, 2026 those games count with the three who
+worked. Earlier four-official games are still left out, so 2017-18 and
+2018-19 in the NBA and 2018 to 2021 in the WNBA are thin here.
 
-{{fig:fig12_officials_py|Fouls per 100 possessions against the series mean, by game number (solid), and the usual tendency of the game's crew (dashed), in the same units. Fouls dip at Game 1 in both leagues while the crew line stays flat at zero, so Game 1s get ordinary crews. WNBA games past Game 3 are left off; too few series reach them.}}
+{{fig:fig12_officials_py|Fouls per 100 possessions against the series mean, by game number (solid), and the usual tendency of the game's crew (dashed), in the same units. Fouls dip at Game 1 in both leagues while the crew line stays flat at zero, so Game 1s get ordinary crews. WNBA games past Game 4 are left off; too few series reach them.}}
 
 ## Playoff experience changes little
 

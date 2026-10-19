@@ -3,10 +3,13 @@
 Implements "8. Fouls and the officials" in docs/design.md (R/12_officials.R
 is the twin; 04_reconcile.py compares them). First flattens the raw harvest
 (data/raw/officials/, from 10_harvest_officials.py) into
-data/game_officials.csv, which both twins read. Reads 06's
+data/game_officials.csv, and the cached liveData box scores
+(data/raw/live/, copied from the October 19, 2026 audit) into
+data/live_officials.csv; both twins read the two. Reads 06's
 profile_games.csv. Writes:
 
-- officials_coverage.csv: games, games harvested, games with a crew of three.
+- officials_coverage.csv: games, games harvested, games with a crew of
+  three, and how many of those had the alternate identified by liveData.
 - officials_profile.csv: 8a (PART pf100) and 8b (PART crew) by game number.
 - officials_within.csv: 8c, Game 1 minus later games with the official fixed.
 - officials_reliability.csv: 8d, split-half correlation of officials.
@@ -26,6 +29,7 @@ from pathlib import Path
 import polars as pl
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import livelib  # noqa: E402
 import officiallib as ol  # noqa: E402
 
 FIRST_SEASON = importlib.import_module("10_harvest_officials").FIRST_SEASON
@@ -45,13 +49,20 @@ def main() -> int:
         print(f"FAILED: no harvested officials in {raw}; run python/10_harvest_officials.py")
         return 1
     crews.write_csv(ROOT / "data" / "game_officials.csv")
+    live_dir = ROOT / "data" / "raw" / "live"
+    live = livelib.officials(live_dir)
+    if live.height == 0:
+        print(f"FAILED: no liveData officials in {live_dir}; copy the cached boxes there (see DATA_SOURCES.md)")
+        return 1
+    live.write_csv(ROOT / "data" / "live_officials.csv")
+    crews, resolved = ol.working_crews(crews, live)
 
     tg = pl.read_csv(ROOT / "data" / "team_games.csv", infer_schema_length=None,
                      schema_overrides={"GAME_ID": pl.Utf8, "SERIES_KEY": pl.Utf8})
     dev = pl.read_csv(ROOT / "output" / "profile_games.csv", schema_overrides={"SERIES_KEY": pl.Utf8})
     ids = ol.game_ids(tg)
 
-    cov = ol.coverage(dev, ids, crews, FIRST_SEASON)
+    cov = ol.coverage(dev, ids, crews, FIRST_SEASON, resolved)
     games, link = ol.sample(dev, ids, crews)
     if games.height == 0:
         print("FAILED: no question 4 game lists three officials")
@@ -68,7 +79,8 @@ def main() -> int:
     wo.write_csv(args.out / "officials_people.csv")
     h.write_csv(args.out / "officials_halves.csv")
     missing = cov["GAMES"].sum() - cov["HARVESTED"].sum()
-    print(f"officials: {games.height} games with a crew of three, {missing} games not yet harvested, "
+    print(f"officials: {games.height} games with a crew of three ({cov['RESOLVED'].sum()} with the alternate "
+          f"identified by liveData), {missing} games not yet harvested, "
           f"{link['OFFICIAL_ID'].n_unique()} officials, {wo.height} with both Game 1s and later games, "
           f"{h.height} with both season halves")
     return 0

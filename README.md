@@ -378,13 +378,23 @@ come from the stats API, which lists them only for recent seasons. Box
 scores cannot tell fouls called from fouls committed, so neither result
 says which side changed.
 
+**Changed October 19, 2026.** Recent games list four officials, one of them
+an alternate who did not work, and the stats API does not say which. Until
+this date those games were left out, which thinned the recent seasons. The
+NBA's liveData box scores, cached by an audit that day, mark each official
+as working or alternate; where they cover a game (NBA from 2019-20, WNBA
+from 2022), its crew is now the three marked as working. Every other rule
+is unchanged, and four-official games without a liveData box still drop.
+The rule and what it changed are in `docs/design.md` (the officials
+amendment).
+
 <!-- gen:officials -->
 | League | Seasons | Games with a crew of three | Game 1 fouls per 100 possessions | Game 1 crew tendency | Same official: Game 1 minus later games | Officials agree with themselves (even vs odd seasons) |
 |---|---|---|---|---|---|---|
-| NBA | 2001 to 2026 | 1576 of 2156 | -0.85 (-1.18 to -0.53) | +0.00 (-0.03 to +0.04), 240 series | -1.06 (-1.38 to -0.74), 56 officials | r = +0.49 (+0.24 to +0.67), 51 officials |
-| WNBA | 2004 to 2026 | 280 of 424 | -0.94 (-1.47 to -0.42) | +0.01 (-0.05 to +0.07), 90 series | -1.33 (-1.71 to -0.96), 24 officials | r = +0.41 (-0.13 to +0.76), 15 officials |
+| NBA | 2001 to 2026 | 1858 of 2156 | -0.88 (-1.17 to -0.59) | +0.00 (-0.03 to +0.03), 314 series | -1.15 (-1.41 to -0.88), 63 officials | r = +0.50 (+0.27 to +0.68), 54 officials |
+| WNBA | 2004 to 2026 | 360 of 424 | -1.10 (-1.57 to -0.62) | +0.00 (-0.05 to +0.06), 122 series | -1.63 (-2.07 to -1.18), 32 officials | r = +0.28 (-0.20 to +0.65), 19 officials |
 
-Seasons are the years the seasons end. Fouls per 100 possessions as deviations from the series mean (question 4); the crew tendency is the mean, over a game's officials, of how far above or below the league each runs in other series, as a deviation from the series' average crew. Means with 95% intervals; the split-half correlation has a Fisher interval. Seasons where fewer than half the games list exactly three officials (from 2016-17 most games list four, with no field saying which three worked): NBA 2001, NBA 2003, NBA 2018, NBA 2019, NBA 2024, NBA 2025, NBA 2026, WNBA 2003, WNBA 2018, WNBA 2019, WNBA 2020, WNBA 2021, WNBA 2022, WNBA 2024, WNBA 2025, WNBA 2026.
+Seasons are the years the seasons end. Fouls per 100 possessions as deviations from the series mean (question 4); the crew tendency is the mean, over a game's officials, of how far above or below the league each runs in other series, as a deviation from the series' average crew. Means with 95% intervals; the split-half correlation has a Fisher interval. From 2016-17 (NBA) and 2018 (WNBA) most games list four officials, with no field saying which three worked; the NBA's liveData box scores flag the alternate, which gives the crew of 282 NBA games (2021 to 2026) and 80 WNBA games (2022 to 2026) (amendment of October 19, 2026, in docs/design.md), and four-official games without a liveData box drop. Seasons where fewer than half the games have a crew of three: NBA 2001, NBA 2003, NBA 2018, NBA 2019, WNBA 2003, WNBA 2018, WNBA 2019, WNBA 2020, WNBA 2021.
 
 **Reading.** NBA: Game 1 crews are no lighter-whistled than the series' other crews (the interval includes zero); the same officials call fewer fouls in Game 1 than in later games; officials differ: one who calls more fouls than usual in even seasons does so in odd seasons too. WNBA: Game 1 crews are no lighter-whistled than the series' other crews (the interval includes zero); the same officials call fewer fouls in Game 1 than in later games; no sign that officials differ beyond chance.
 <!-- /gen:officials -->
@@ -465,7 +475,11 @@ has fetched the game logs.
 ```
 
 `run_checks.sh` runs the Python and R unit tests, the series build and its
-checks, both implementations of the analysis, the reconcile gate (every
-output cell must agree between Python and R), and the README drift check.
+checks, a gate comparing the team box scores with the cached NBA liveData
+box scores (`python/15_live_gate.py`, from 2019-20 on: every difference is
+listed, scoring counts must match exactly, and a snapshot taken before the
+game ended is listed and pinned rather than compared), both
+implementations of the analysis, the reconcile gate (every output cell
+must agree between Python and R), and the README drift check.
 Each gate was shown to fail on a real or injected error before it was
 trusted (`docs/design.md`).

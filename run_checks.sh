@@ -3,7 +3,8 @@
 # interpreter (the family orchestrator sets it to a shared venv).
 #
 # The harvests (01, 10, and 13) need the network and are not rerun here; the series build
-# needs the local, gitignored raw game logs.
+# needs the local, gitignored raw game logs; the liveData gate (15) and follow-up 8
+# need the cached liveData boxes in data/raw/live/ (gitignored, not re-fetchable).
 set -euo pipefail
 cd "$(dirname "$0")"
 PY=${PY:-../.venv/bin/python}
@@ -18,6 +19,10 @@ Rscript tests/R/run_tests.R | tail -1
 echo
 echo "=== series build and its checks ==="
 $PY python/02_build_series.py | tail -2
+
+echo
+echo "=== team box scores against the cached liveData boxes (2019-20 on) ==="
+$PY python/15_live_gate.py
 
 echo
 echo "=== question 1: Python, then R ==="
