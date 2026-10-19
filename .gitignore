@@ -55,4 +55,7 @@ output/break_series.csv
 output/officials_crew_games.csv
 output/officials_people.csv
 output/officials_halves.csv
+# Per team-series and per series (follow-up 9).
+output/experience_team.csv
+output/experience_series.csv
 output/r/

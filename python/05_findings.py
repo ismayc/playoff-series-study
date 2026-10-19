@@ -432,6 +432,54 @@ def officials_region(cov: pl.DataFrame, prof: pl.DataFrame, within: pl.DataFrame
     return "\n".join(lines + ["", "**Reading.** " + " ".join(readings)])
 
 
+# An interval end closer to zero than this (0.05 points or 0.05 fouls) is
+# called out as only just clearing it.
+NEAR_ZERO = {"CONTRAST_PCT": 0.0005, "CONTRAST_RATE": 0.0005, "CONTRAST_PF": 0.05}
+EXP_LABELS = {"roster": "Roster (minutes-weighted career playoff games)",
+              "franchise": "Franchise (playoff games in the three previous postseasons)"}
+
+
+def experience_region(es: pl.DataFrame, ec: pl.DataFrame) -> str:
+    lines = ["| League | Measure | Experience gap (games) | Series | 3P% contrast | Attempt-rate contrast "
+             "| Fouls per 100 contrast |", "|---|---|---|---|---|---|---|"]
+    readings = []
+    for lg, name in LEAGUES.items():
+        for measure, label in EXP_LABELS.items():
+            sub = es.filter((pl.col("LEAGUE") == lg) & (pl.col("MEASURE") == measure))
+            if sub.height == 0:
+                raise KeyError(f"no experience rows for {name} {measure}")
+            r = {(b, m): sub.filter((pl.col("BIN") == b) & (pl.col("METRIC") == m)).row(0, named=True)
+                 for b in ("low", "middle", "high", "any")
+                 for m in ("CONTRAST_PCT", "CONTRAST_RATE", "CONTRAST_PF")}
+            q1, q2 = r[("any", "CONTRAST_PCT")]["Q1"], r[("any", "CONTRAST_PCT")]["Q2"]
+            gaps = {"low": f"up to {q1:.1f}", "middle": f"{q1:.1f} to {q2:.1f}", "high": f"over {q2:.1f}",
+                    "any": "any gap"}
+            for b, g in gaps.items():
+                p, a, f = r[(b, "CONTRAST_PCT")], r[(b, "CONTRAST_RATE")], r[(b, "CONTRAST_PF")]
+                lines.append(f"| {name} | {label if b == 'low' else ''} | {g} | {p['N']} | {num_cell(p, 100)} "
+                             f"| {num_cell(a, 100)} | {num_cell(f)} |")
+            hits = []
+            for m, what in (("CONTRAST_PCT", "three-point percentage"), ("CONTRAST_RATE", "share of shots from three"),
+                            ("CONTRAST_PF", "foul count")):
+                row = r[("any", m)]
+                if excludes_zero(row):
+                    hits.append(f"the more experienced team's Game 1 {what} is relatively "
+                                f"{'higher' if row['MEAN'] > 0 else 'lower'}"
+                                + (" (the interval only just clears zero)"
+                                   if min(abs(row["LO"]), abs(row["HI"])) < NEAR_ZERO[m] else ""))
+            readings.append(f"{name}, {measure}: " + ("; ".join(hits) if hits else
+                            "no Game 1 difference between more and less experienced teams that the interval can tell from zero")
+                            + ".")
+    empty = ec.filter(pl.col("PLAYER_ROWS") == 0)
+    lines += ["", "Each contrast is the more experienced team's own Game 1 minus its own Games 2+, minus the same for "
+              "the less experienced team: percentage points for the shooting rates, fouls per 100 possessions for "
+              "fouls. Gap bins are terciles of the nonzero gap in each league. Mean over series with a 95% interval."
+              + (" Postseasons with no player rows: " + ", ".join(f"{LEAGUES[lg]} {s}" for lg, s in
+                                                                 empty.select("LEAGUE", "SEASON").iter_rows()) + "."
+                 if empty.height else " Every postseason in both leagues has player rows.")]
+    return "\n".join(lines + ["", "**Reading.** " + " ".join(readings)])
+
+
 def regions() -> dict[str, str]:
     summary = pl.read_csv(ROOT / "output" / "game1_summary.csv")
     pooled = pl.read_csv(ROOT / "output" / "game1_pooled.csv")
@@ -448,7 +496,9 @@ def regions() -> dict[str, str]:
             "breaks": breaks_region(pl.read_csv(ROOT / "output" / "break_summary.csv")),
             "decades": decades_region(pl.read_csv(ROOT / "output" / "profile_decade.csv")),
             "officials": officials_region(*(pl.read_csv(ROOT / "output" / f"officials_{t}.csv")
-                                            for t in ("coverage", "profile", "within", "reliability")))}
+                                            for t in ("coverage", "profile", "within", "reliability"))),
+            "experience": experience_region(pl.read_csv(ROOT / "output" / "experience_summary.csv"),
+                                            pl.read_csv(ROOT / "output" / "experience_coverage.csv"))}
 
 
 def render(text: str, new: dict[str, str]) -> str:

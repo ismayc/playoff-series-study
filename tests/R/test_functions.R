@@ -348,3 +348,55 @@ test_that("within official and reliability", with_low_thresholds({
   expect_equal(c(r$N, r$R), c(4, -0.5))
   expect_equal(c(r$LO, r$HI), c(tanh(atanh(-0.5) - 1.96), tanh(atanh(-0.5) + 1.96)))
 }))
+
+# ---- Follow-up 9; working in tests/python/test_experiencelib.py ----
+
+exp_parts <- function() {
+  games <- read_csv(file.path(fix, "profile_games.csv"), show_col_types = FALSE,
+                    col_types = cols(SERIES_KEY = col_character(), .default = col_guess())) %>%
+    mutate(GAME_ID = paste0("g", GAME_NO))
+  players <- read_csv(file.path(fix, "exp_players.csv"), show_col_types = FALSE,
+                      col_types = cols(GAME_ID = col_character(), MIN = col_double(), .default = col_guess()))
+  logs <- read_csv(file.path(fix, "exp_team_logs.csv"), show_col_types = FALSE,
+                   col_types = cols(GAME_ID = col_character(), .default = col_guess()))
+  list(games = games, players = players, logs = logs)
+}
+exp_expected <- c(CONTRAST_PCT = (1 / 4 - 3 / 7) - (1 / 4 - 9 / 57),
+                  CONTRAST_RATE = (1 / 4 - 7 / 19) - (1 / 2 - 3 / 10), CONTRAST_PF = -10)
+
+test_that("roster and franchise experience", {
+  p <- exp_parts()
+  r <- roster_experience(p$players, p$games)
+  expect_equal(r$ROSTER_EXP, c(10 / 3, 1.6))
+  f <- franchise_experience(p$logs, p$games)
+  expect_equal(f$FRAN_EXP, c(6, 3))
+})
+
+test_that("team gaps and contrasts", {
+  p <- exp_parts()
+  g <- team_gaps(p$games)
+  expect_equal(g$DPF, c(0, 10))
+  for (m in list(list(roster_experience(p$players, p$games), "ROSTER_EXP", 10 / 3 - 1.6),
+                 list(franchise_experience(p$logs, p$games), "FRAN_EXP", 3))) {
+    cv <- exp_contrasts(g, m[[1]], m[[2]])
+    expect_equal(cv$GAP, m[[3]])
+    for (k in names(exp_expected)) expect_equal(cv[[k]], unname(exp_expected[k]))
+  }
+  eq <- tibble(LEAGUE = 0, SEASON = 2010, SERIES_KEY = "1-2", TEAM_ID = c(1, 2), X = 2)
+  cv <- exp_contrasts(g, eq, "X")
+  expect_equal(cv$GAP, 0)
+  expect_true(is.na(cv$CONTRAST_PCT))
+})
+
+test_that("experience summary bins", {
+  cv <- tibble(LEAGUE = 0, SEASON = 2010, SERIES_KEY = letters[1:5], GAP = c(0, 1, 2, 3, 4),
+               CONTRAST_PCT = c(NA, 0.1, 0.2, 0.3, 0.4), CONTRAST_RATE = c(NA, 0, 0, 0, 0),
+               CONTRAST_PF = c(NA, 1, 1, 1, 1))
+  s <- exp_summary(cv, "roster")
+  s <- s[s$METRIC == "CONTRAST_PCT", ]
+  expect_equal(s$BIN, c("low", "middle", "high", "any"))
+  expect_equal(s$N, c(2, 1, 1, 4))
+  expect_equal(c(s$Q1[1], s$Q2[1]), c(2, 3))
+  expect_equal(s$EQUAL_SERIES[4], 1)
+  expect_equal(s$MEAN[4], 0.25)
+})

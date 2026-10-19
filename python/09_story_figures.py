@@ -2,8 +2,8 @@
 
 Every value comes from the committed summary outputs (game1_summary.csv,
 game1_season.csv, profile_summary.csv, stakes_summary.csv, rest_summary.csv,
-outshoot_summary.csv, break_summary.csv, profile_decade.csv, and
-officials_profile.csv), which 04_reconcile.py gates equal to the R run.
+outshoot_summary.csv, break_summary.csv, profile_decade.csv,
+officials_profile.csv, and experience_summary.csv), which 04_reconcile.py gates equal to the R run.
 Figures are plotly originals written to figures/; report_builder.py swaps in
 the family's famplot engine at publish time.
 
@@ -21,6 +21,7 @@ Figures:
   fig10_outshoot_py        Game 1 winner's series-win share, outshot or not
   fig11_fouls_eras_py      NBA Game 1 foul gap by decade, and 2020 against other seasons
   fig12_officials_py       fouls and crew tendency by game number
+  fig13_experience_py      more minus less experienced team, Game 1 contrasts
 
 Run:  python python/09_story_figures.py
 """
@@ -262,6 +263,26 @@ def fig_officials(op: pl.DataFrame) -> go.Figure:
     return f
 
 
+def fig_experience(es: pl.DataFrame) -> go.Figure:
+    """Every-gap contrasts per league and measure; one trace per contrast."""
+    cats = [(lg, m) for lg in LEAGUES for m in ("roster", "franchise")]
+    f = go.Figure()
+    for metric, label, scale, color in (("CONTRAST_PCT", "three-point percentage (points)", 100, "#2a78d6"),
+                                        ("CONTRAST_RATE", "share of shots from three (points)", 100, "#8db8ea"),
+                                        ("CONTRAST_PF", "fouls per 100 possessions", 1, "#eb6834")):
+        rows = [one(es, LEAGUE=lg, MEASURE=m, BIN="any", METRIC=metric) for lg, m in cats]
+        f.add_trace(go.Scatter(
+            x=[f"{LEAGUES[lg]}, {m}" for lg, m in cats], y=[r["MEAN"] * scale for r in rows], mode="markers",
+            name=label, error_y=interval(rows, scale), marker=dict(size=10, color=color),
+            customdata=[[r["N"]] for r in rows],
+            hovertemplate=f"%{{x}} experience, {label}: %{{y:+.2f}} (%{{customdata[0]}} series)<extra></extra>"))
+    f.add_hline(y=0, line_width=1, line_color="#898781")
+    f.update_layout(**base_layout("More experienced minus less experienced team, Game 1 against later games",
+                                  "League and experience measure", "Contrast (95% interval)"))
+    f.update_xaxes(type="category")
+    return f
+
+
 # Game numbers with fewer games than this are left off fig12 (WNBA Games 4
 # and 5 rest on a handful of series).
 MIN_GAMES = 20
@@ -295,6 +316,7 @@ def main() -> None:
         "fig11_fouls_eras_py": fig_fouls_eras(pl.read_csv(OUT / "profile_decade.csv"),
                                               pl.read_csv(OUT / "break_summary.csv")),
         "fig12_officials_py": fig_officials(pl.read_csv(OUT / "officials_profile.csv")),
+        "fig13_experience_py": fig_experience(pl.read_csv(OUT / "experience_summary.csv")),
     }
     for name, fig in figs.items():
         fig.write_html(FIG / f"{name}.html", include_plotlyjs="cdn")

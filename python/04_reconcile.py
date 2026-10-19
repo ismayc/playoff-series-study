@@ -1,8 +1,8 @@
 """Gate: the R and Python implementations of questions 1, 3, and 4 and
-follow-ups 5 to 8 must agree.
+follow-ups 5 to 9 must agree.
 
 Compares output/<table>.csv (Python) with output/r/<table>.csv (R) for every
-table 03, 06, 08, 11, and 12 write. In each table the key rows must match exactly, every
+table 03, 06, 08, 11, 12, and 14 write. In each table the key rows must match exactly, every
 shared column must exist on both sides, numbers must agree within TOL
 (blank on one side means blank on the other), and text and flags must be
 equal. An empty table or a missing file fails; nothing is skipped quietly.
@@ -12,6 +12,7 @@ equal. An empty table or a missing file fails; nothing is skipped quietly.
     python python/08_stakes_rest.py && Rscript R/08_stakes_rest.R
     python python/11_followups.py && Rscript R/11_followups.R
     python python/12_officials.py && Rscript R/12_officials.R
+    python python/14_experience.py && Rscript R/14_experience.R
     python python/04_reconcile.py
 """
 
@@ -51,12 +52,17 @@ TABLES = {
     "officials_crew_games.csv": ["LEAGUE", "SEASON", "SERIES_KEY", "GAME_NO"],
     "officials_people.csv": ["LEAGUE", "OFFICIAL_ID"],
     "officials_halves.csv": ["LEAGUE", "OFFICIAL_ID"],
+    "experience_coverage.csv": ["LEAGUE", "SEASON"],
+    "experience_team.csv": ["LEAGUE", "SEASON", "SERIES_KEY", "TEAM_ID"],
+    "experience_series.csv": ["MEASURE", "LEAGUE", "SEASON", "SERIES_KEY"],
+    "experience_summary.csv": ["LEAGUE", "MEASURE", "BIN", "METRIC"],
 }
 
 
 def read(path: Path) -> pl.DataFrame:
     return pl.read_csv(path, schema_overrides={"SERIES_KEY": pl.Utf8, "PANEL": pl.Utf8, "BIN": pl.Utf8,
-                                         "ESTIMATE": pl.Utf8, "PART": pl.Utf8},
+                                         "ESTIMATE": pl.Utf8, "PART": pl.Utf8,
+                                         "MEASURE": pl.Utf8},
                        infer_schema_length=None)
 
 

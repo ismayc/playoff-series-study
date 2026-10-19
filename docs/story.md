@@ -167,6 +167,22 @@ worked, so seasons from 2016-17 on are thin here.
 
 {{fig:fig12_officials_py|Fouls per 100 possessions against the series mean, by game number (solid), and the usual tendency of the game's crew (dashed), in the same units. Fouls dip at Game 1 in both leagues while the crew line stays flat at zero, so Game 1s get ordinary crews. WNBA games past Game 3 are left off; too few series reach them.}}
 
+## Playoff experience changes little
+
+Teams with more playoff experience do not shoot their Game 1 threes any
+differently. With experience measured as the roster's career playoff games,
+weighted by minutes in the series, the more experienced team's Game 1
+three-point percentage, relative to its own later games, runs +0.18 points
+against the less experienced team's (−1.65 to +2.00) across 629 NBA series,
+and its share of shots from three +0.11. The one hint is fouls: the more
+experienced NBA team's Game 1 has 0.43 fewer fouls per 100 possessions,
+relative to its later games, an interval that only just clears zero, and
+0.55 fewer when experience is counted as the franchise's playoff games in
+the three previous postseasons (−0.98 to −0.12). The WNBA shows no
+difference on any measure.
+
+{{fig:fig13_experience_py|The more experienced team's own Game 1 minus its own later games, minus the same for the less experienced team, every series with an experience gap, with 95% intervals. Shooting rates in percentage points, fouls per 100 possessions. Only the NBA's two foul intervals sit below zero.}}
+
 <div class="eyebrow beat">Limits</div>
 
 ## What this can and cannot say

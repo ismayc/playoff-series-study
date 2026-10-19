@@ -161,6 +161,21 @@ details.terms summary { padding: .55rem .9rem; cursor: pointer;
   color: var(--ink-2); font-weight: 600; }
 details.terms ul { margin: 0; padding: .2rem 1.4rem .8rem; }
 details.terms li { margin: .3rem 0; color: var(--ink-2); }
+/* sticky section nav (study pages): the masthead scrolls away, this stays */
+.sectionnav { position: sticky; top: 0; z-index: 30; background: var(--surface);
+  border-bottom: 1px solid var(--rule); }
+.sectionnav .inner { width: min(1200px, 94vw); margin: 0 auto; display: flex;
+  gap: 1.3rem; overflow-x: auto; white-space: nowrap; scrollbar-width: none;
+  padding: .55rem 0 .45rem; }
+.sectionnav .inner::-webkit-scrollbar { display: none; }
+.sectionnav a { font-family: "Barlow Condensed", system-ui, sans-serif;
+  font-weight: 500; font-size: .95rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-3); text-decoration: none;
+  padding-bottom: .15rem; border-bottom: 2px solid transparent; }
+.sectionnav a:hover { color: var(--ink); }
+.sectionnav a[aria-current="true"] { color: var(--accent-ink);
+  border-bottom-color: var(--accent); }
+main [id] { scroll-margin-top: 3.6rem; }
 /* hub cards */
 .cards { display: grid; grid-template-columns:
   repeat(auto-fit, minmax(290px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
@@ -209,6 +224,7 @@ html.reveal .is-in { opacity: 1; transform: none; }
   <a href="https://github.com/ismayc/playoff-series-study">Code on GitHub</a>
   <button class="themebtn" type="button" aria-label="Toggle color theme">◐</button>
 </div></header>
+<nav class="sectionnav" aria-label="Sections"><div class="inner"><a href="#the-question">The question</a><a href="#the-answer">The answer</a><a href="#through-a-series">Through a series</a><a href="#across-eras">Across eras</a><a href="#stakes-and-rest">Stakes and rest</a><a href="#follow-ups">Follow-ups</a><a href="#limits">Limits</a><a href="#method-code-and-verification">Method</a></div></nav>
 <main>
 <div class="eyebrow">Every NBA and WNBA playoff series</div>
 <h1>Is Game 1 three-point shooting worse than the rest of a playoff series?</h1>
@@ -235,7 +251,7 @@ leagues.</p>
 <div class="sub">NBA fouls per 100 possessions against the series average (WNBA −1.00).</div></div>
 </div>
 
-<div class="eyebrow beat">The question</div>
+<div class="eyebrow beat" id="the-question">The question</div>
 
 <h2>A fair comparison inside each series</h2>
 <p>Comparing Game 1s across the league with later games would mix in which
@@ -248,14 +264,14 @@ A Game 1 effect has to show up in both versions to count.</p>
 <p>The analysis plan was written down and fixed before any Game 1 number was
 computed. It was implemented twice, in Python and in R, and the two agree on
 every output cell.</p>
-<div class="eyebrow beat">The answer</div>
+<div class="eyebrow beat" id="the-answer">The answer</div>
 
 <h2>Game 1 accuracy is not worse</h2>
 <figure class="figure-card"><iframe src="figures/fig1_game1_gap_py.html" loading="lazy" style="height:436px" title="Game1 gap"></iframe><figcaption>Game 1 minus later games in the same series, in percentage points with 95% intervals. Accuracy sits on zero in both leagues and on both comparisons: the NBA is −0.03 against Games 2 on and −0.32 against Game 2 alone, the WNBA +0.26 and +0.64. NBA attempt rate is lower in Game 1 on both comparisons, −1.32 and −1.02. WNBA attempt rate is not distinguishable from zero.</figcaption></figure>
 <p>Counting every three-pointer together instead of averaging series, NBA
 Game 1s actually shot a little better than later games: 35.11% against
 34.83%. Nothing here supports a cold Game 1.</p>
-<div class="eyebrow beat">Through a series</div>
+<div class="eyebrow beat" id="through-a-series">Through a series</div>
 
 <h2>Volume climbs, game by game</h2>
 <p>Following every rate through the series, with each team measured against
@@ -273,7 +289,7 @@ rather than showing intent.</p>
 <figure class="figure-card"><iframe src="figures/fig3_fouls_by_game_py.html" loading="lazy" style="height:436px" title="Fouls by game"></iframe><figcaption>Fouls per 100 possessions against each team's series average, by game number. Game 1 is the low point in both leagues (NBA −1.05, WNBA −1.00) and Game 2 jumps back up. Free-throw rate follows the same pattern (NBA −2.23 points in Game 1).</figcaption></figure>
 <p>Fewer fouls in Game 1 can mean fewer called or fewer committed; box scores
 cannot separate the two.</p>
-<div class="eyebrow beat">Across eras</div>
+<div class="eyebrow beat" id="across-eras">Across eras</div>
 
 <h2>The game changed around Game 1</h2>
 <p>The NBA of 1984-85 barely used the three: in that season's Game 1s, 4.3% of
@@ -297,7 +313,7 @@ WNBA shows no decade with a volume gap that holds up beyond its first
 two seasons.</p>
 <figure class="figure-card"><iframe src="figures/fig7_season_rate_py.html" loading="lazy" style="height:436px" title="Season rate"></iframe><figcaption>Share of field-goal attempts taken from three, by season, every series pooled. Game 1 is solid, Games 2 on dashed. The NBA's Game 1 line sits under its later-games line every season through 2019-20, and the two meet in the 2020s.</figcaption></figure>
 <figure class="figure-card"><iframe src="figures/fig5_decade_volume_py.html" loading="lazy" style="height:436px" title="Decade volume"></iframe><figcaption>Game 1 minus Games 2 on, share of shots from three, by decade, with 95% intervals. The NBA gap is −1.79 points in the 2000s and 2010s and −0.30 in the 2020s, an interval that includes zero.</figcaption></figure>
-<div class="eyebrow beat">Stakes and rest</div>
+<div class="eyebrow beat" id="stakes-and-rest">Stakes and rest</div>
 
 <h2>Neither the round nor the layoff changes it</h2>
 <p>No round, from the first round to the Finals, shows a Game 1 accuracy gap
@@ -310,7 +326,7 @@ with a gap, the more-rested team's Game 1 shooting is relatively worse by
 own. Rest also arrives with recent form, so this stays a hint.</p>
 <figure class="figure-card"><iframe src="figures/fig8_stakes_py.html" loading="lazy" style="height:436px" title="Stakes"></iframe><figcaption>Game 1 minus Games 2 on, by round, with 95% intervals. Darker points are the share of shots from three, lighter points three-point percentage. Every accuracy point includes zero. The NBA's volume gap clears zero in every round but the second.</figcaption></figure>
 <figure class="figure-card"><iframe src="figures/fig9_rest_py.html" loading="lazy" style="height:436px" title="Rest"></iframe><figcaption>The more-rested team's own Game 1 minus its own later games, minus the same for the less-rested team, by the size of the rest gap, NBA. The all-gaps point sits just below zero, but no single gap size clears it.</figcaption></figure>
-<div class="eyebrow beat">Follow-ups</div>
+<div class="eyebrow beat" id="follow-ups">Follow-ups</div>
 
 <h2>Winning Game 1 matters; outshooting in it does not</h2>
 <p>The team that shoots better from three in Game 1 goes on to win the series
@@ -345,7 +361,20 @@ level in even-numbered seasons tracks their level in odd ones, at r =
 +0.49. Recent games mostly list four officials with no note of which three
 worked, so seasons from 2016-17 on are thin here.</p>
 <figure class="figure-card"><iframe src="figures/fig12_officials_py.html" loading="lazy" style="height:436px" title="Officials"></iframe><figcaption>Fouls per 100 possessions against the series mean, by game number (solid), and the usual tendency of the game's crew (dashed), in the same units. Fouls dip at Game 1 in both leagues while the crew line stays flat at zero, so Game 1s get ordinary crews. WNBA games past Game 3 are left off; too few series reach them.</figcaption></figure>
-<div class="eyebrow beat">Limits</div>
+<h2>Playoff experience changes little</h2>
+<p>Teams with more playoff experience do not shoot their Game 1 threes any
+differently. With experience measured as the roster's career playoff games,
+weighted by minutes in the series, the more experienced team's Game 1
+three-point percentage, relative to its own later games, runs +0.18 points
+against the less experienced team's (−1.65 to +2.00) across 629 NBA series,
+and its share of shots from three +0.11. The one hint is fouls: the more
+experienced NBA team's Game 1 has 0.43 fewer fouls per 100 possessions,
+relative to its later games, an interval that only just clears zero, and
+0.55 fewer when experience is counted as the franchise's playoff games in
+the three previous postseasons (−0.98 to −0.12). The WNBA shows no
+difference on any measure.</p>
+<figure class="figure-card"><iframe src="figures/fig13_experience_py.html" loading="lazy" style="height:436px" title="Experience"></iframe><figcaption>The more experienced team's own Game 1 minus its own later games, minus the same for the less experienced team, every series with an experience gap, with 95% intervals. Shooting rates in percentage points, fouls per 100 possessions. Only the NBA's two foul intervals sit below zero.</figcaption></figure>
+<div class="eyebrow beat" id="limits">Limits</div>
 
 <h2>What this can and cannot say</h2>
 <p>Box scores record what happened, not why. A difference between Game 1 and
@@ -356,7 +385,7 @@ left out. The 2026 WNBA Finals was in progress when the data were gathered
 and is excluded until it ends.</p>
 <p>The game logs come from stats.nba.com and stay local; this page and its
 repository publish only summaries, never the game-by-game records.</p>
-<h2>Method, code, and verification</h2><p>The full technical write-up (data provenance, model specification, validation gates, and stated limitations) is the <a href="https://github.com/ismayc/playoff-series-study#readme">README</a>. The analysis is implemented independently in R and Python and reconciled to numeric tolerance; <code>run_checks.sh</code> replays every gate.</p>
+<h2 id="method-code-and-verification">Method, code, and verification</h2><p>The full technical write-up (data provenance, model specification, validation gates, and stated limitations) is the <a href="https://github.com/ismayc/playoff-series-study#readme">README</a>. The analysis is implemented independently in R and Python and reconciled to numeric tolerance; <code>run_checks.sh</code> replays every gate.</p>
 </main>
 <footer>Public data · dual-implementation reconciled · every gate scripted ·
 <a href="https://github.com/ismayc/basketball-data-science">the family on GitHub</a></footer>
@@ -414,6 +443,46 @@ repository publish only summaries, never the game-by-game records.</p>
   }, {threshold: 0.08, rootMargin: "0px 0px -6% 0px"});
   Array.prototype.forEach.call(els, function (el) { io.observe(el); });
   window.__revealReady = true;
+})();
+</script>
+<script>
+(function () {
+  var nav = document.querySelector(".sectionnav");
+  if (!nav) { return; }
+  var links = Array.prototype.slice.call(nav.querySelectorAll("a"));
+  var row = nav.querySelector(".inner");
+  var targets = links.map(function (a) {
+    return document.getElementById(a.getAttribute("href").slice(1));
+  });
+  var last = null;
+  function update() {
+    var edge = nav.getBoundingClientRect().bottom + 24, cur = -1;
+    targets.forEach(function (t, i) {
+      if (t && t.getBoundingClientRect().top <= edge) { cur = i; }
+    });
+    // At the foot of the page the last sections are too short to reach the
+    // bar, so the final one counts as current there.
+    var de = document.documentElement;
+    if (window.scrollY + window.innerHeight >= de.scrollHeight - 2) { cur = targets.length - 1; }
+    if (cur === last) { return; }
+    last = cur;
+    links.forEach(function (a, i) {
+      if (i === cur) { a.setAttribute("aria-current", "true"); }
+      else { a.removeAttribute("aria-current"); }
+    });
+    var a = links[cur];
+    if (a && row) {
+      var l = a.offsetLeft, r = l + a.offsetWidth;
+      if (l < row.scrollLeft || r > row.scrollLeft + row.clientWidth) {
+        row.scrollLeft = Math.max(0, l - 16);
+      }
+    }
+  }
+  // Straight from the event, not via requestAnimationFrame, which stalls in
+  // background tabs and offscreen frames; eight rect reads per scroll is cheap.
+  window.addEventListener("scroll", update, {passive: true});
+  window.addEventListener("resize", update);
+  update();
 })();
 </script>
 </body>

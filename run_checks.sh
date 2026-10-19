@@ -2,7 +2,7 @@
 # Every check in this study. Non-zero exit on any failure. PY overrides the
 # interpreter (the family orchestrator sets it to a shared venv).
 #
-# The harvests (01 and 10) need the network and are not rerun here; the series build
+# The harvests (01, 10, and 13) need the network and are not rerun here; the series build
 # needs the local, gitignored raw game logs.
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -43,6 +43,11 @@ echo
 echo "=== follow-up 8 (officials): Python, then R ==="
 $PY python/12_officials.py
 Rscript R/12_officials.R
+
+echo
+echo "=== follow-up 9 (experience): Python, then R ==="
+$PY python/14_experience.py
+Rscript R/14_experience.R
 
 echo
 echo "=== reconciliation: R vs Python ==="

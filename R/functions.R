@@ -524,3 +524,87 @@ official_reliability <- function(h) {
     tibble(LEAGUE = lg, N = n, R = r, LO = lo, HI = hi)
   }))
 }
+
+# ---- Follow-up 9: experienced vs inexperienced (twin of python/experiencelib.py) ----
+
+EXP_TEAM_KEYS <- c("LEAGUE", "SEASON", "SERIES_KEY", "TEAM_ID")
+EXP_CONTRASTS <- c("CONTRAST_PCT", "CONTRAST_RATE", "CONTRAST_PF")
+FRANCHISE_SEASONS <- 3
+
+roster_experience <- function(players, games) {
+  per_season <- players %>% group_by(LEAGUE, PLAYER_ID, SEASON) %>%
+    summarise(N = n_distinct(GAME_ID), .groups = "drop") %>% arrange(LEAGUE, PLAYER_ID, SEASON) %>%
+    group_by(LEAGUE, PLAYER_ID) %>% mutate(PRIOR = cumsum(N) - N) %>% ungroup()
+  ids <- games %>% distinct(LEAGUE, SEASON, SERIES_KEY, GAME_ID)
+  players %>% inner_join(ids, by = c("LEAGUE", "SEASON", "GAME_ID")) %>%
+    group_by(LEAGUE, SEASON, SERIES_KEY, TEAM_ID, PLAYER_ID) %>%
+    summarise(MIN = sum(ifelse(is.na(MIN), 0, MIN)), .groups = "drop") %>%
+    inner_join(per_season %>% select(LEAGUE, PLAYER_ID, SEASON, PRIOR), by = c("LEAGUE", "PLAYER_ID", "SEASON")) %>%
+    group_by(LEAGUE, SEASON, SERIES_KEY, TEAM_ID) %>%
+    summarise(ROSTER_EXP = safe_ratio(sum(MIN * PRIOR), sum(MIN)), .groups = "drop") %>%
+    arrange(LEAGUE, SEASON, SERIES_KEY, TEAM_ID)
+}
+
+franchise_experience <- function(team_logs, games) {
+  per <- team_logs %>% group_by(LEAGUE, TEAM_ID, SEASON) %>% summarise(N = n_distinct(GAME_ID), .groups = "drop")
+  teams <- games %>% distinct(LEAGUE, SEASON, SERIES_KEY, TEAM_ID)
+  bind_rows(lapply(seq_len(FRANCHISE_SEASONS), function(k)
+    teams %>% left_join(per %>% mutate(SEASON = SEASON + k), by = c("LEAGUE", "TEAM_ID", "SEASON")) %>%
+      mutate(N = ifelse(is.na(N), 0, N)))) %>%
+    group_by(LEAGUE, SEASON, SERIES_KEY, TEAM_ID) %>% summarise(FRAN_EXP = as.numeric(sum(N)), .groups = "drop") %>%
+    arrange(LEAGUE, SEASON, SERIES_KEY, TEAM_ID)
+}
+
+team_gaps <- function(games) {
+  tm <- team_game_metrics(games)
+  g1 <- tm %>% filter(GAME_NO == 1) %>% group_by(LEAGUE, SEASON, SERIES_KEY, TEAM_ID) %>%
+    summarise(M1 = sum(FG3M), A1 = sum(FG3A), F1 = sum(FGA), PF1 = mean_or_na(PF100), .groups = "drop")
+  rest <- tm %>% filter(GAME_NO >= 2) %>% group_by(LEAGUE, SEASON, SERIES_KEY, TEAM_ID) %>%
+    summarise(MR = sum(FG3M), AR = sum(FG3A), FR = sum(FGA), PFR = mean_or_na(PF100), .groups = "drop")
+  g1 %>% inner_join(rest, by = EXP_TEAM_KEYS) %>%
+    transmute(LEAGUE, SEASON, SERIES_KEY, TEAM_ID,
+              DP = safe_ratio(M1, A1) - safe_ratio(MR, AR), DR = safe_ratio(A1, F1) - safe_ratio(AR, FR),
+              DPF = PF1 - PFR) %>%
+    arrange(LEAGUE, SEASON, SERIES_KEY, TEAM_ID)
+}
+
+exp_contrasts <- function(gaps, exp, col) {
+  t <- gaps %>% inner_join(exp, by = EXP_TEAM_KEYS) %>%
+    arrange(LEAGUE, SEASON, SERIES_KEY, desc(.data[[col]]), TEAM_ID)
+  hi <- t %>% group_by(LEAGUE, SEASON, SERIES_KEY) %>% slice(1) %>% ungroup()
+  lo <- t %>% group_by(LEAGUE, SEASON, SERIES_KEY) %>% slice(n()) %>% ungroup()
+  hi %>% inner_join(lo, by = c("LEAGUE", "SEASON", "SERIES_KEY"), suffix = c("", "_LO")) %>%
+    mutate(GAP = .data[[col]] - .data[[paste0(col, "_LO")]], ok = GAP > 0,
+           CONTRAST_PCT = ifelse(ok, DP - DP_LO, NA_real_),
+           CONTRAST_RATE = ifelse(ok, DR - DR_LO, NA_real_),
+           CONTRAST_PF = ifelse(ok, DPF - DPF_LO, NA_real_)) %>%
+    select(LEAGUE, SEASON, SERIES_KEY, GAP, all_of(EXP_CONTRASTS)) %>%
+    arrange(LEAGUE, SEASON, SERIES_KEY)
+}
+
+exp_summary <- function(cv, measure) {
+  rows <- list()
+  for (league in sort(unique(cv$LEAGUE))) {
+    lv <- cv[cv$LEAGUE == league, ]
+    pos <- lv[!is.na(lv$GAP) & lv$GAP > 0, ]
+    equal <- sum(!is.na(lv$GAP) & lv$GAP == 0)
+    q <- unname(quantile(pos$GAP, c(1 / 3, 2 / 3), type = 7))
+    bins <- list(low = pos$GAP <= q[1], middle = pos$GAP > q[1] & pos$GAP <= q[2],
+                 high = pos$GAP > q[2], any = rep(TRUE, nrow(pos)))
+    for (b in names(bins)) {
+      bv <- pos[bins[[b]], ]
+      for (m in EXP_CONTRASTS) {
+        rows[[length(rows) + 1]] <- as_tibble(c(list(LEAGUE = league, MEASURE = measure, BIN = b, METRIC = m,
+                                                     Q1 = q[1], Q2 = q[2], EQUAL_SERIES = equal),
+                                                describe_values(bv[[m]])))
+      }
+    }
+  }
+  bind_rows(rows)
+}
+
+exp_coverage <- function(players, seasons) {
+  n <- players %>% count(LEAGUE, SEASON, name = "PLAYER_ROWS")
+  seasons %>% left_join(n, by = c("LEAGUE", "SEASON")) %>%
+    mutate(PLAYER_ROWS = ifelse(is.na(PLAYER_ROWS), 0L, PLAYER_ROWS)) %>% arrange(LEAGUE, SEASON)
+}

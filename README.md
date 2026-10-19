@@ -389,6 +389,41 @@ Seasons are the years the seasons end. Fouls per 100 possessions as deviations f
 **Reading.** NBA: Game 1 crews are no lighter-whistled than the series' other crews (the interval includes zero); the same officials call fewer fouls in Game 1 than in later games; officials differ: one who calls more fouls than usual in even seasons does so in odd seasons too. WNBA: Game 1 crews are no lighter-whistled than the series' other crews (the interval includes zero); the same officials call fewer fouls in Game 1 than in later games; no sign that officials differ beyond chance.
 <!-- /gen:officials -->
 
+### 9. Experienced against inexperienced teams
+
+Does the less experienced team have a different Game 1? Experience is
+measured two ways: the roster's career playoff games before that
+postseason, weighted by each player's minutes in the series (the
+headline), and the franchise's playoff games in the three previous
+postseasons (the check). As with the rest gap, each team is measured
+against its own later games, then the more experienced team is compared
+with the less experienced one.
+
+<!-- gen:experience -->
+| League | Measure | Experience gap (games) | Series | 3P% contrast | Attempt-rate contrast | Fouls per 100 contrast |
+|---|---|---|---|---|---|---|
+| NBA | Roster (minutes-weighted career playoff games) | up to 14.1 | 209 | -0.95 (-4.45 to +2.54) | +0.78 (-0.21 to +1.78) | -0.00 (-0.72 to +0.71) |
+| NBA |  | 14.1 to 34.0 | 210 | +2.57 (-0.02 to +5.15) | +0.63 (-0.55 to +1.80) | -0.62 (-1.32 to +0.08) |
+| NBA |  | over 34.0 | 210 | -1.09 (-4.43 to +2.25) | -1.07 (-2.05 to -0.08) | -0.66 (-1.44 to +0.13) |
+| NBA |  | any gap | 629 | +0.18 (-1.65 to +2.00) | +0.11 (-0.50 to +0.73) | -0.43 (-0.85 to -0.00) |
+| NBA | Franchise (playoff games in the three previous postseasons) | up to 11.0 | 207 | +0.76 (-2.70 to +4.21) | +0.13 (-0.94 to +1.19) | -0.01 (-0.77 to +0.75) |
+| NBA |  | 11.0 to 26.0 | 214 | -0.65 (-3.59 to +2.30) | -0.08 (-1.19 to +1.04) | -0.49 (-1.22 to +0.25) |
+| NBA |  | over 26.0 | 195 | +1.27 (-1.99 to +4.54) | -0.50 (-1.52 to +0.53) | -1.19 (-1.93 to -0.45) |
+| NBA |  | any gap | 616 | +0.43 (-1.43 to +2.29) | -0.14 (-0.76 to +0.48) | -0.55 (-0.98 to -0.12) |
+| WNBA | Roster (minutes-weighted career playoff games) | up to 4.7 | 57 | +2.96 (-2.94 to +8.86) | -0.17 (-2.81 to +2.47) | +0.69 (-1.85 to +3.24) |
+| WNBA |  | 4.7 to 11.1 | 56 | -1.18 (-7.15 to +4.80) | +1.98 (-1.02 to +4.98) | -0.40 (-2.59 to +1.80) |
+| WNBA |  | over 11.1 | 57 | +3.16 (-2.36 to +8.68) | +1.64 (-0.97 to +4.25) | +2.65 (+1.08 to +4.22) |
+| WNBA |  | any gap | 170 | +1.66 (-1.68 to +5.01) | +1.15 (-0.44 to +2.73) | +0.99 (-0.25 to +2.23) |
+| WNBA | Franchise (playoff games in the three previous postseasons) | up to 5.0 | 56 | +2.01 (-4.58 to +8.59) | -0.83 (-3.64 to +1.98) | +0.09 (-2.15 to +2.34) |
+| WNBA |  | 5.0 to 12.0 | 59 | -0.72 (-5.65 to +4.21) | +1.01 (-1.84 to +3.85) | +1.33 (-0.81 to +3.46) |
+| WNBA |  | over 12.0 | 50 | +3.88 (-2.50 to +10.25) | +0.97 (-1.77 to +3.71) | +1.81 (-0.32 to +3.95) |
+| WNBA |  | any gap | 165 | +1.60 (-1.83 to +5.03) | +0.37 (-1.25 to +1.99) | +1.05 (-0.20 to +2.31) |
+
+Each contrast is the more experienced team's own Game 1 minus its own Games 2+, minus the same for the less experienced team: percentage points for the shooting rates, fouls per 100 possessions for fouls. Gap bins are terciles of the nonzero gap in each league. Mean over series with a 95% interval. Every postseason in both leagues has player rows.
+
+**Reading.** NBA, roster: the more experienced team's Game 1 foul count is relatively lower (the interval only just clears zero). NBA, franchise: the more experienced team's Game 1 foul count is relatively lower. WNBA, roster: no Game 1 difference between more and less experienced teams that the interval can tell from zero. WNBA, franchise: no Game 1 difference between more and less experienced teams that the interval can tell from zero.
+<!-- /gen:experience -->
+
 ## What this design cannot claim
 
 - **Causes.** A difference between Game 1 and later games mixes rest, scouting

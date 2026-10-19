@@ -370,7 +370,7 @@ Python and R twins reconciled by 04.
 - **Question.** Does the less experienced team in a series have a different
   Game 1, relative to its own later games, than the more experienced team?
 - **Roster experience** (headline). For team t in series s: each player who
-  appears for t in s, weighted by his minutes in s, contributes his career
+  appears for t in s, weighted by their minutes in s, contributes their career
   playoff games before that postseason (earlier seasons only, so an earlier
   round of the same postseason does not count; stage is question 3's
   subject). ROSTER_EXP is the minutes-weighted mean. Source: player-mode
