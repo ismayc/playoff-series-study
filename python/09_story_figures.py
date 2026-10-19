@@ -1,7 +1,9 @@
 """Build the interactive figures for the family page (docs/story.md).
 
 Every value comes from the committed summary outputs (game1_summary.csv,
-game1_season.csv, and profile_summary.csv), which 04_reconcile.py gates equal to the R run.
+game1_season.csv, profile_summary.csv, stakes_summary.csv, rest_summary.csv,
+outshoot_summary.csv, break_summary.csv, profile_decade.csv, and
+officials_profile.csv), which 04_reconcile.py gates equal to the R run.
 Figures are plotly originals written to figures/; report_builder.py swaps in
 the family's famplot engine at publish time.
 
@@ -14,6 +16,11 @@ Figures:
   fig5_decade_volume_py    Game 1 minus Games 2+ attempt rate, by decade
   fig6_season_pct_py       Game 1 and Games 2+ three-point percentage per season
   fig7_season_rate_py      Game 1 and Games 2+ attempt rate per season
+  fig8_stakes_py           Game 1 gaps by stage (distance from the Finals)
+  fig9_rest_py             rested-minus-tired Game 1 contrast by rest gap (NBA)
+  fig10_outshoot_py        Game 1 winner's series-win share, outshot or not
+  fig11_fouls_eras_py      NBA Game 1 foul gap by decade, and 2020 against other seasons
+  fig12_officials_py       fouls and crew tendency by game number
 
 Run:  python python/09_story_figures.py
 """
@@ -31,6 +38,9 @@ FIG = ROOT / "figures"
 LEAGUES = {0: "NBA", 10: "WNBA"}
 # famplot's first two family colors, so each league keeps its color across figures.
 COLORS = {0: "#2a78d6", 10: "#eb6834"}
+# Lighter shades of the same, for a league's second series in one figure
+# (famplot draws every marker as a filled circle; it has no marker.symbol).
+LIGHT = {0: "#8db8ea", 10: "#f3a77f"}
 
 
 def one(df: pl.DataFrame, **keys) -> dict:
@@ -129,6 +139,134 @@ def fig_season_levels(season: pl.DataFrame, seg: str, title: str, ytitle: str) -
     return f
 
 
+def interval(rows: list[dict], scale: float, mean: str = "MEAN") -> dict:
+    return dict(type="data", symmetric=False,
+                array=[(r["HI"] - r[mean]) * scale for r in rows],
+                arrayminus=[(r[mean] - r["LO"]) * scale for r in rows])
+
+
+def stage_label(stage: int) -> str:
+    return "Finals" if stage == 0 else f"{stage} round{'s' if stage > 1 else ''} before"
+
+
+def fig_stakes(st: pl.DataFrame) -> go.Figure:
+    """NBA and WNBA Game 1 attempt-rate and accuracy gaps by stage."""
+    f = go.Figure()
+    for lg, name in LEAGUES.items():
+        stages = sorted(st.filter(pl.col("LEAGUE") == lg)["STAGE"].unique().to_list(), reverse=True)
+        if not stages:
+            raise SystemExit(f"no stage rows for {name}")
+        for metric, label, color in (("D_RATE", "share of shots from three", COLORS[lg]),
+                                     ("D_PCT", "three-point percentage", LIGHT[lg])):
+            rows = [one(st, LEAGUE=lg, STAGE=s, METRIC=metric) for s in stages]
+            f.add_trace(go.Scatter(
+                x=[stage_label(s) for s in stages], y=[r["MEAN"] * 100 for r in rows], mode="markers",
+                name=f"{name}, {label}", error_y=interval(rows, 100),
+                marker=dict(size=10, color=color),
+                customdata=[[r["N"]] for r in rows],
+                hovertemplate=f"{name} %{{x}}, {label}: %{{y:+.2f}} points (%{{customdata[0]}} series)<extra></extra>"))
+    f.add_hline(y=0, line_width=1, line_color="#898781")
+    f.update_layout(**base_layout("Game 1 minus Games 2+, by round", "Round (distance from the Finals)",
+                                  "Percentage points (95% interval)"))
+    # Category order is first appearance; the NBA (four stages) comes first.
+    f.update_xaxes(type="category")
+    return f
+
+
+def fig_rest(rs: pl.DataFrame) -> go.Figure:
+    """NBA only: the WNBA's intervals (8 to 97 series a bin) would swamp it; its
+    numbers are in the README."""
+    bins = ["1-2", "3-5", "6+", "any"]
+    labels = ["1-2 days", "3-5 days", "6+ days", "any gap"]
+    rows = [one(rs, LEAGUE=0, BIN=b, METRIC="CONTRAST_PCT") for b in bins]
+    f = go.Figure()
+    f.add_trace(go.Scatter(
+        x=labels, y=[r["MEAN"] * 100 for r in rows], mode="markers", name="NBA", error_y=interval(rows, 100),
+        marker=dict(size=10, color=COLORS[0]), customdata=[[r["N"]] for r in rows],
+        hovertemplate="NBA, %{x}: %{y:+.2f} points (%{customdata[0]} series)<extra></extra>"))
+    f.add_hline(y=0, line_width=1, line_color="#898781")
+    f.update_layout(**base_layout("NBA: more-rested team's Game 1 three-point shooting, relative to the less-rested",
+                                  "Rest gap before Game 1", "Percentage points (95% interval)"))
+    f.update_xaxes(type="category")
+    return f
+
+
+def fig_outshoot(os_: pl.DataFrame) -> go.Figure:
+    """One column per league and Game 1 shooting result, each league's pair
+    side by side; one trace with per-point colors keeps that order (famplot
+    orders categories by first appearance)."""
+    kinds = (("g1_winner_outshot", "also outshot", "#2a78d6"), ("g1_winner_not_outshot", "was outshot", "#898781"))
+    rows, x, colors = [], [], []
+    for lg, name in LEAGUES.items():
+        for est, short, color in kinds:
+            rows.append(one(os_, LEAGUE=lg, ESTIMATE=est))
+            x.append(f"{name}, Game 1 winner {short}")
+            colors.append(color)
+    f = go.Figure(go.Scatter(
+        x=x, y=[r["P"] * 100 for r in rows], mode="markers", name="Series won",
+        error_y=interval(rows, 100, "P"), marker=dict(size=11, color=colors), showlegend=False,
+        customdata=[[r["N"]] for r in rows],
+        hovertemplate="%{x} from three: %{y:.1f}% win the series (%{customdata[0]} series)<extra></extra>"))
+    f.update_layout(**base_layout("How often the Game 1 winner wins the series, by Game 1 three-point shooting",
+                                  "", "Series won, % (95% interval)"))
+    f.update_xaxes(type="category")
+    return f
+
+
+def fig_fouls_eras(pdec: pl.DataFrame, br: pl.DataFrame) -> go.Figure:
+    """NBA Game 1 PF100 deviation by decade, then 2020 against every other season."""
+    dec = (pdec.filter((pl.col("LEAGUE") == 0) & (pl.col("GAME_NO") == 1) & (pl.col("METRIC") == "PF100"))
+               .sort("DECADE"))
+    if dec.height == 0:
+        raise SystemExit("no NBA decade foul rows")
+    d_rows = dec.to_dicts()
+    split = [one(br, LEAGUE=0, PANEL=p, METRIC="G1_PF100") for p in ("other_seasons", "season_2020")]
+    f = go.Figure()
+    f.add_trace(go.Scatter(
+        x=[f"{r['DECADE']}s" for r in d_rows], y=[r["MEAN"] for r in d_rows], mode="markers", name="By decade",
+        error_y=interval(d_rows, 1), marker=dict(size=10, color=COLORS[0]),
+        customdata=[[r["N"]] for r in d_rows],
+        hovertemplate="NBA %{x}: %{y:+.2f} fouls per 100 (%{customdata[0]} series)<extra></extra>"))
+    f.add_trace(go.Scatter(
+        x=["Every season but 2020", "2020 (single site)"], y=[r["MEAN"] for r in split], mode="markers",
+        name="2020 against the rest", error_y=interval(split, 1), marker=dict(size=10, color="#898781"),
+        customdata=[[r["N"]] for r in split],
+        hovertemplate="NBA %{x}: %{y:+.2f} fouls per 100 (%{customdata[0]} series)<extra></extra>"))
+    f.add_hline(y=0, line_width=1, line_color="#898781")
+    f.update_layout(**base_layout("NBA Game 1 fouls against the series average", "",
+                                  "Fouls per 100 possessions (95% interval)"))
+    f.update_xaxes(type="category")
+    return f
+
+
+def fig_officials(op: pl.DataFrame) -> go.Figure:
+    """Per league: the PF100 deviation by game number and the crew tendency."""
+    f = go.Figure()
+    for lg, name in LEAGUES.items():
+        for part, label, dash in (("pf100", "fouls", None), ("crew", "crew tendency", "dash")):
+            rows = op.filter((pl.col("LEAGUE") == lg) & (pl.col("PART") == part)
+                             & (pl.col("N") >= MIN_GAMES)).sort("GAME_NO").to_dicts()
+            if not rows:
+                raise SystemExit(f"no officials rows for {name} {part}")
+            f.add_trace(go.Scatter(
+                x=[f"G{r['GAME_NO']}" for r in rows], y=[r["MEAN"] for r in rows], mode="lines+markers",
+                name=f"{name} {label}", error_y=interval(rows, 1),
+                line=dict(color=COLORS[lg] if part == "pf100" else LIGHT[lg], dash=dash),
+                marker=dict(size=8, color=COLORS[lg] if part == "pf100" else LIGHT[lg]),
+                customdata=[[r["N"]] for r in rows],
+                hovertemplate=f"{name} {label}, %{{x}}: %{{y:+.2f}} per 100 (%{{customdata[0]}})<extra></extra>"))
+    f.add_hline(y=0, line_width=1, line_color="#898781")
+    f.update_layout(**base_layout("Fouls and the officials' usual tendency, by game number", "Game number",
+                                  "Fouls per 100 possessions from the series mean"))
+    f.update_xaxes(type="category")
+    return f
+
+
+# Game numbers with fewer games than this are left off fig12 (WNBA Games 4
+# and 5 rest on a handful of series).
+MIN_GAMES = 20
+
+
 def main() -> None:
     FIG.mkdir(exist_ok=True)
     summary = pl.read_csv(OUT / "game1_summary.csv")
@@ -151,6 +289,12 @@ def main() -> None:
         "fig7_season_rate_py": fig_season_levels(
             season, "RATE", "Share of shots from three by season, Game 1 and Games 2+",
             "3PA / FGA, % (all series pooled)"),
+        "fig8_stakes_py": fig_stakes(pl.read_csv(OUT / "stakes_summary.csv")),
+        "fig9_rest_py": fig_rest(pl.read_csv(OUT / "rest_summary.csv", schema_overrides={"BIN": pl.Utf8})),
+        "fig10_outshoot_py": fig_outshoot(pl.read_csv(OUT / "outshoot_summary.csv")),
+        "fig11_fouls_eras_py": fig_fouls_eras(pl.read_csv(OUT / "profile_decade.csv"),
+                                              pl.read_csv(OUT / "break_summary.csv")),
+        "fig12_officials_py": fig_officials(pl.read_csv(OUT / "officials_profile.csv")),
     }
     for name, fig in figs.items():
         fig.write_html(FIG / f"{name}.html", include_plotlyjs="cdn")

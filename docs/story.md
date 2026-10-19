@@ -119,6 +119,10 @@ with a gap, the more-rested team's Game 1 shooting is relatively worse by
 2.49 points (−4.92 to −0.06), but no single size of gap clears zero on its
 own. Rest also arrives with recent form, so this stays a hint.
 
+{{fig:fig8_stakes_py|Game 1 minus Games 2 on, by round, with 95% intervals. Darker points are the share of shots from three, lighter points three-point percentage. Every accuracy point includes zero. The NBA's volume gap clears zero in every round but the second.}}
+
+{{fig:fig9_rest_py|The more-rested team's own Game 1 minus its own later games, minus the same for the less-rested team, by the size of the rest gap, NBA. The all-gaps point sits just below zero, but no single gap size clears it.}}
+
 <div class="eyebrow beat">Follow-ups</div>
 
 ## Winning Game 1 matters; outshooting in it does not
@@ -131,6 +135,8 @@ they also outshot their opponent from three, and 76.8% when they did not.
 In the WNBA the difference is +7.7 points, with an interval from −7.0 to
 +22.5 across 167 series.
 
+{{fig:fig10_outshoot_py|Share of series won by the Game 1 winner, split by whether it also outshot its opponent from three in that game, with 95% intervals. The NBA's two shares are level. The WNBA's differ, but their intervals overlap widely.}}
+
 ## The 2020 bubble had no Game 1 foul dip
 
 The NBA's 2020 playoffs, played in one arena without fans, are the
@@ -140,6 +146,8 @@ every other season. That rests on 15 series, so it is a lead to follow
 rather than a finding. Otherwise the dip is steady: it appears in every
 NBA decade, from −1.53 in the 1980s to −0.64 in the 2010s, and in
 best-of-5 and best-of-7 series alike.
+
+{{fig:fig11_fouls_eras_py|NBA Game 1 fouls per 100 possessions against the series average, with 95% intervals. Every decade sits below zero. The 2020 single-site playoffs are the one point above it, with the widest interval, from a single season of series.}}
 
 ## The same officials whistle Game 1 more lightly
 
@@ -156,6 +164,8 @@ same. Officials do differ from one another: in the NBA an official's foul
 level in even-numbered seasons tracks their level in odd ones, at r =
 +0.49. Recent games mostly list four officials with no note of which three
 worked, so seasons from 2016-17 on are thin here.
+
+{{fig:fig12_officials_py|Fouls per 100 possessions against the series mean, by game number (solid), and the usual tendency of the game's crew (dashed), in the same units. Fouls dip at Game 1 in both leagues while the crew line stays flat at zero, so Game 1s get ordinary crews. WNBA games past Game 3 are left off; too few series reach them.}}
 
 <div class="eyebrow beat">Limits</div>
 
