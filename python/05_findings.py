@@ -395,6 +395,43 @@ def decades_region(pdec: pl.DataFrame) -> str:
     return "\n".join(out + ["", "**Reading.** " + " ".join(readings)])
 
 
+def officials_region(cov: pl.DataFrame, prof: pl.DataFrame, within: pl.DataFrame, rel: pl.DataFrame) -> str:
+    lines = ["| League | Seasons | Games with a crew of three | Game 1 fouls per 100 possessions "
+             "| Game 1 crew tendency | Same official: Game 1 minus later games | Officials agree with themselves "
+             "(even vs odd seasons) |", "|---|---|---|---|---|---|---|"]
+    readings, thin = [], []
+    for lg, name in LEAGUES.items():
+        c = cov.filter(pl.col("LEAGUE") == lg)
+        if c.height == 0:
+            raise KeyError(f"no officials coverage rows for {name}")
+        used = c.filter(pl.col("WITH_CREW") > 0)
+        thin += [f"{name} {s}" for s, g, w in c.select("SEASON", "GAMES", "WITH_CREW").iter_rows() if w < g / 2]
+        pf = prof.filter((pl.col("LEAGUE") == lg) & (pl.col("PART") == "pf100") & (pl.col("GAME_NO") == 1)).row(0, named=True)
+        cr = prof.filter((pl.col("LEAGUE") == lg) & (pl.col("PART") == "crew") & (pl.col("GAME_NO") == 1)).row(0, named=True)
+        wi = within.filter(pl.col("LEAGUE") == lg).row(0, named=True)
+        r = rel.filter(pl.col("LEAGUE") == lg).row(0, named=True)
+        rel_cell = f"r = {r['R']:+.2f} ({r['LO']:+.2f} to {r['HI']:+.2f}), {r['N']} officials"
+        lines.append(f"| {name} | {used['SEASON'].min()} to {used['SEASON'].max()} | {c['WITH_CREW'].sum()} of {c['GAMES'].sum()} "
+                     f"| {num_cell(pf)} | {num_cell(cr)}, {cr['N']} series "
+                     f"| {num_cell(wi)}, {wi['N']} officials | {rel_cell} |")
+        crew_says = ("Game 1 crews are no lighter-whistled than the series' other crews (the interval includes zero)"
+                     if not excludes_zero(cr) else
+                     f"Game 1 crews are {'lighter' if cr['MEAN'] < 0 else 'heavier'}-whistled than the series' other crews")
+        within_says = ("the same officials call fewer fouls in Game 1 than in later games"
+                       if excludes_zero(wi) and wi["MEAN"] < 0 else
+                       "with the official held fixed the Game 1 difference is not one the interval can tell from zero")
+        rel_says = ("officials differ: one who calls more fouls than usual in even seasons does so in odd seasons too"
+                    if r["LO"] > 0 else "no sign that officials differ beyond chance")
+        readings.append(f"{name}: {crew_says}; {within_says}; {rel_says}.")
+    lines += ["", "Seasons are the years the seasons end. Fouls per 100 possessions as deviations from the series "
+              "mean (question 4); the crew tendency is the mean, over a game's officials, of how far above or below "
+              "the league each runs in other series, as a deviation from the series' average crew. Means with "
+              "95% intervals; the split-half correlation has a Fisher interval."
+              + (f" Seasons where fewer than half the games list exactly three officials (from 2016-17 most "
+                 f"games list four, with no field saying which three worked): {', '.join(thin)}." if thin else "")]
+    return "\n".join(lines + ["", "**Reading.** " + " ".join(readings)])
+
+
 def regions() -> dict[str, str]:
     summary = pl.read_csv(ROOT / "output" / "game1_summary.csv")
     pooled = pl.read_csv(ROOT / "output" / "game1_pooled.csv")
@@ -409,7 +446,9 @@ def regions() -> dict[str, str]:
             "rest": rest_region(pl.read_csv(ROOT / "output" / "rest_summary.csv")),
             "outshoot": outshoot_region(pl.read_csv(ROOT / "output" / "outshoot_summary.csv")),
             "breaks": breaks_region(pl.read_csv(ROOT / "output" / "break_summary.csv")),
-            "decades": decades_region(pl.read_csv(ROOT / "output" / "profile_decade.csv"))}
+            "decades": decades_region(pl.read_csv(ROOT / "output" / "profile_decade.csv")),
+            "officials": officials_region(*(pl.read_csv(ROOT / "output" / f"officials_{t}.csv")
+                                            for t in ("coverage", "profile", "within", "reliability")))}
 
 
 def render(text: str, new: dict[str, str]) -> str:

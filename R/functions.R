@@ -409,3 +409,118 @@ profile_decade <- function(dev) {
   }
   bind_rows(rows)
 }
+
+# ---- Follow-up 8: fouls and the officials (twin of python/officiallib.py) ----
+
+CREW_SIZE <- 3
+MIN_OTHER_GAMES <- 5
+MIN_SPLIT_GAMES <- 3
+MIN_HALF_GAMES <- 10
+OFF_GAME_KEYS <- c("LEAGUE", "SEASON", "SERIES_KEY", "GAME_NO")
+OFF_SERIES_KEYS <- c("LEAGUE", "SEASON", "SERIES_KEY")
+
+official_game_ids <- function(team_games) {
+  team_games %>% distinct(LEAGUE, SEASON, SERIES_KEY, GAME_NO, GAME_ID) %>% arrange(LEAGUE, SEASON, SERIES_KEY, GAME_NO)
+}
+
+official_coverage <- function(dev, ids, crews, first) {
+  keep <- rep(FALSE, nrow(dev))
+  for (lg in names(first)) keep <- keep | (dev$LEAGUE == as.integer(lg) & dev$SEASON >= first[[lg]])
+  n <- crews %>% group_by(GAME_ID) %>% summarise(N_OFF = n_distinct(OFFICIAL_ID[!is.na(OFFICIAL_ID)]), .groups = "drop")
+  dev[keep, OFF_GAME_KEYS] %>% left_join(ids, by = OFF_GAME_KEYS) %>% left_join(n, by = "GAME_ID") %>%
+    group_by(LEAGUE, SEASON) %>%
+    summarise(GAMES = n(), HARVESTED = sum(!is.na(N_OFF)), WITH_CREW = sum(!is.na(N_OFF) & N_OFF == CREW_SIZE),
+              .groups = "drop") %>%
+    arrange(LEAGUE, SEASON)
+}
+
+official_sample <- function(dev, ids, crews) {
+  c <- crews %>% filter(!is.na(OFFICIAL_ID)) %>% distinct()
+  full <- c %>% count(GAME_ID, name = "N_OFF") %>% filter(N_OFF == CREW_SIZE)
+  games <- dev %>% select(all_of(OFF_GAME_KEYS), PF100) %>% inner_join(ids, by = OFF_GAME_KEYS) %>%
+    semi_join(full, by = "GAME_ID") %>% filter(!is.na(PF100)) %>%
+    group_by(LEAGUE, GAME_NO) %>% mutate(RESID = PF100 - mean(PF100)) %>% ungroup() %>%
+    arrange(LEAGUE, SEASON, SERIES_KEY, GAME_NO)
+  link <- c %>% inner_join(games %>% select(GAME_ID, all_of(OFF_GAME_KEYS), PF100, RESID), by = "GAME_ID") %>%
+    arrange(LEAGUE, SEASON, SERIES_KEY, GAME_NO, OFFICIAL_ID)
+  list(games = games, link = link)
+}
+
+official_game1_profile <- function(games) {
+  rows <- list()
+  for (league in sort(unique(games$LEAGUE))) {
+    lv <- games[games$LEAGUE == league, ]
+    for (g in sort(unique(lv$GAME_NO))) {
+      rows[[length(rows) + 1]] <- as_tibble(c(list(LEAGUE = league, PART = "pf100", GAME_NO = g),
+                                              describe_values(lv$PF100[lv$GAME_NO == g])))
+    }
+  }
+  bind_rows(rows)
+}
+
+crew_values <- function(games, link) {
+  tot <- link %>% group_by(LEAGUE, OFFICIAL_ID) %>% summarise(T_SUM = sum(RESID), T_N = n(), .groups = "drop")
+  own <- link %>% group_by(LEAGUE, SEASON, SERIES_KEY, OFFICIAL_ID) %>%
+    summarise(S_SUM = sum(RESID), S_N = n(), .groups = "drop")
+  tend <- own %>% inner_join(tot, by = c("LEAGUE", "OFFICIAL_ID")) %>%
+    mutate(OTHER_N = T_N - S_N, TEND = ifelse(OTHER_N >= MIN_OTHER_GAMES, (T_SUM - S_SUM) / OTHER_N, NA_real_)) %>%
+    select(LEAGUE, SEASON, SERIES_KEY, OFFICIAL_ID, TEND)
+  crew <- link %>% select(all_of(OFF_GAME_KEYS), OFFICIAL_ID) %>%
+    inner_join(tend, by = c(OFF_SERIES_KEYS, "OFFICIAL_ID")) %>%
+    group_by(LEAGUE, SEASON, SERIES_KEY, GAME_NO) %>% summarise(CREW = mean_or_na(TEND), .groups = "drop")
+  games %>% select(all_of(OFF_GAME_KEYS)) %>% left_join(crew, by = OFF_GAME_KEYS) %>%
+    arrange(LEAGUE, SEASON, SERIES_KEY, GAME_NO)
+}
+
+crew_profile <- function(cv, dev) {
+  want <- dev %>% count(LEAGUE, SEASON, SERIES_KEY, name = "WANT")
+  have <- cv %>% filter(!is.na(CREW)) %>% count(LEAGUE, SEASON, SERIES_KEY, name = "HAVE")
+  ok <- want %>% inner_join(have, by = OFF_SERIES_KEYS) %>% filter(WANT == HAVE) %>% select(all_of(OFF_SERIES_KEYS))
+  d <- cv %>% inner_join(ok, by = OFF_SERIES_KEYS) %>% group_by(LEAGUE, SEASON, SERIES_KEY) %>%
+    mutate(CREW_DEV = CREW - mean(CREW)) %>% ungroup()
+  rows <- list()
+  for (league in sort(unique(d$LEAGUE))) {
+    lv <- d[d$LEAGUE == league, ]
+    for (g in sort(unique(lv$GAME_NO))) {
+      rows[[length(rows) + 1]] <- as_tibble(c(list(LEAGUE = league, PART = "crew", GAME_NO = g),
+                                              describe_values(lv$CREW_DEV[lv$GAME_NO == g])))
+    }
+  }
+  bind_rows(rows)
+}
+
+within_official <- function(link) {
+  link %>% group_by(LEAGUE, OFFICIAL_ID) %>%
+    summarise(N_G1 = sum(GAME_NO == 1), N_LATER = sum(GAME_NO >= 2),
+              G1 = mean_or_na(PF100[GAME_NO == 1]), LATER = mean_or_na(PF100[GAME_NO >= 2]), .groups = "drop") %>%
+    filter(N_G1 >= MIN_SPLIT_GAMES, N_LATER >= MIN_SPLIT_GAMES) %>%
+    mutate(D = G1 - LATER) %>% arrange(LEAGUE, OFFICIAL_ID)
+}
+
+within_summary <- function(wo) {
+  bind_rows(lapply(sort(unique(wo$LEAGUE)), function(lg)
+    as_tibble(c(list(LEAGUE = lg), describe_values(wo$D[wo$LEAGUE == lg])))))
+}
+
+official_halves <- function(link) {
+  link %>% group_by(LEAGUE, OFFICIAL_ID) %>%
+    summarise(N_EVEN = sum(SEASON %% 2 == 0), N_ODD = sum(SEASON %% 2 == 1),
+              EVEN = mean_or_na(RESID[SEASON %% 2 == 0]), ODD = mean_or_na(RESID[SEASON %% 2 == 1]),
+              .groups = "drop") %>%
+    filter(N_EVEN >= MIN_HALF_GAMES, N_ODD >= MIN_HALF_GAMES) %>% arrange(LEAGUE, OFFICIAL_ID)
+}
+
+official_reliability <- function(h) {
+  bind_rows(lapply(sort(unique(h$LEAGUE)), function(lg) {
+    lv <- h[h$LEAGUE == lg, ]
+    n <- nrow(lv)
+    r <- if (n >= 2 && sd(lv$EVEN) > 0 && sd(lv$ODD) > 0) cor(lv$EVEN, lv$ODD) else NA_real_
+    lo <- hi <- NA_real_
+    if (!is.na(r) && n > 3 && abs(r) < 1) {
+      se <- 1 / sqrt(n - 3)
+      lo <- tanh(atanh(r) - Z * se)
+      hi <- tanh(atanh(r) + Z * se)
+    }
+    tibble(LEAGUE = lg, N = n, R = r, LO = lo, HI = hi)
+  }))
+}

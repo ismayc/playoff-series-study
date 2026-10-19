@@ -347,6 +347,15 @@ differ at all.
   sqrt(n - 3)). A correlation near zero means the spread between officials
   is noise; a clearly positive one means some officials call more fouls,
   year after year.
+- **What the harvest showed** (October 19, 2026, before any follow-up 8
+  result was looked at). All 2,604 games from 2000-01 (NBA) and 2003
+  (WNBA) on were fetched. No officials are listed for any 2000-01 or
+  2002-03 NBA playoff game, and none for 2003 WNBA. From 2016-17 (NBA) and
+  2018 (WNBA) most games list four officials, and one 2004 NBA game lists
+  six; the records have no field saying which three worked the game (the
+  `assignment` field is blank), so the fourth is probably an alternate but
+  that is unverified. Those games stay out as specified, which leaves the
+  recent seasons thin; `output/officials_coverage.csv` gives the counts.
 - **What stays local.** Per-game crews and per-official values name people
   next to game-level statistics, so they stay in gitignored files; the
   committed tables are the coverage counts and the summaries.

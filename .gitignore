@@ -51,4 +51,8 @@ output/profile_games.csv
 output/rest_series.csv
 output/outshoot_series.csv
 output/break_series.csv
+# Per game and per official: officials' names sit next to game-level statistics.
+output/officials_crew_games.csv
+output/officials_people.csv
+output/officials_halves.csv
 output/r/

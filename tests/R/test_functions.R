@@ -290,3 +290,61 @@ test_that("profile by decade", {
   expect_equal(pd$N, c(2, 1))
   expect_equal(pd$MEAN, c(2, 5))
 })
+
+# ---- Follow-up 8; working in tests/python/test_officiallib.py ----
+
+off_parts <- function() {
+  g <- read_csv(file.path(fix, "official_games.csv"), show_col_types = FALSE,
+                col_types = cols(SERIES_KEY = col_character(), GAME_ID = col_character(), .default = col_guess()))
+  crews <- read_csv(file.path(fix, "official_crews.csv"), show_col_types = FALSE,
+                    col_types = cols(GAME_ID = col_character(), OFFICIAL_ID = col_integer()))
+  list(dev = g %>% select(-GAME_ID), ids = g %>% select(LEAGUE, SEASON, SERIES_KEY, GAME_NO, GAME_ID), crews = crews)
+}
+with_low_thresholds <- function(code, other = 1) {
+  old <- c(MIN_OTHER_GAMES, MIN_SPLIT_GAMES, MIN_HALF_GAMES)
+  MIN_OTHER_GAMES <<- other; MIN_SPLIT_GAMES <<- 1; MIN_HALF_GAMES <<- 1
+  on.exit({ MIN_OTHER_GAMES <<- old[1]; MIN_SPLIT_GAMES <<- old[2]; MIN_HALF_GAMES <<- old[3] })
+  code
+}
+
+test_that("officials coverage and sample", with_low_thresholds({
+  p <- off_parts()
+  cov <- official_coverage(p$dev, p$ids, p$crews, list(`0` = 2010))
+  expect_equal(cov$GAMES, c(3, 4)); expect_equal(cov$HARVESTED, c(3, 3)); expect_equal(cov$WITH_CREW, c(3, 2))
+  s <- official_sample(p$dev, p$ids, p$crews)
+  expect_equal(s$games$GAME_ID, c("g11", "g12", "g13", "g21", "g22"))
+  expect_equal(s$games$RESID, c(-1, -0.5, 0, 1, 0.5))
+  expect_equal(nrow(s$link), 15)
+  expect_equal(official_game1_profile(s$games)$MEAN, c(-2, 0.5, 3))
+}))
+
+test_that("crew tendencies and profile", with_low_thresholds({
+  p <- off_parts()
+  s <- official_sample(p$dev, p$ids, p$crews)
+  cv <- crew_values(s$games, s$link)
+  expect_equal(cv$CREW, c(2.5 / 3, 0.75, 0.75, -1.75 / 3, -0.5))
+  cp <- crew_profile(cv, p$dev)
+  expect_equal(cp$N, c(2, 2, 1))
+  expect_equal(cp$MEAN, c(1 / 144, 1 / 144, -1 / 36))
+}))
+
+test_that("crew tendency needs other games", with_low_thresholds({
+  p <- off_parts()
+  s <- official_sample(p$dev, p$ids, p$crews)
+  cv <- crew_values(s$games, s$link)
+  expect_equal(cv$CREW, c(NA, NA, NA, -0.5, NA))
+}, other = 3))
+
+test_that("within official and reliability", with_low_thresholds({
+  p <- off_parts()
+  s <- official_sample(p$dev, p$ids, p$crews)
+  wo <- within_official(s$link)
+  expect_equal(wo$OFFICIAL_ID, 1:3)
+  expect_equal(wo$D, c(-2.5, -3.5, -4))
+  expect_equal(within_summary(wo)$MEAN, -10 / 3)
+  h <- official_halves(s$link)
+  expect_equal(h$EVEN, c(-0.75, -0.5, -0.5, -0.25))
+  r <- official_reliability(h)
+  expect_equal(c(r$N, r$R), c(4, -0.5))
+  expect_equal(c(r$LO, r$HI), c(tanh(atanh(-0.5) - 1.96), tanh(atanh(-0.5) + 1.96)))
+}))

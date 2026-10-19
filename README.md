@@ -44,7 +44,7 @@ cold Game 1.
 | NBA | -1.32 (-1.61 to -1.03) | -1.02 (-1.37 to -0.67) |
 | WNBA | -0.33 (-0.99 to +0.34) | -0.33 (-1.09 to +0.42) |
 
-Three-point attempt rate (3PA / FGA), percentage points of field-goal attempts.
+Three-point attempt rate (3PA / <abbr title="Field-goal attempts.">FGA</abbr>), percentage points of field-goal attempts.
 
 **Reading.** NBA: a smaller share of shots from three in Game 1, on both comparisons. WNBA: no Game 1 difference in volume that holds on both comparisons.
 
@@ -198,7 +198,7 @@ there is not a change in which series are present.
 |---|---|---|---|---|---|---|---|
 | Games | 630 | 630 | 630 | 583 | 448 | 266 | 109 |
 | Fouls per 100 possessions | **-1.05** | +0.20 | **+0.38** | **+0.64** | +0.06 | **-0.43** | +0.06 |
-| Free-throw rate (FTA / FGA, x100) | **-2.23** | **+0.65** | **+0.73** | **+1.10** | +0.29 | -0.63 | -0.62 |
+| Free-throw rate (FTA / <abbr title="Field-goal attempts.">FGA</abbr>, x100) | **-2.23** | **+0.65** | **+0.73** | **+1.10** | +0.29 | -0.63 | -0.62 |
 | Turnovers per 100 possessions | -0.04 | +0.10 | +0.12 | +0.09 | -0.10 | -0.08 | **-0.91** |
 | Pace (possessions per regulation game) | **+0.60** | +0.18 | -0.17 | -0.09 | -0.09 | -0.42 | **-1.68** |
 | Points per 100 possessions | -0.53 | +0.48 | +0.06 | -0.25 | +0.43 | -0.24 | +0.09 |
@@ -213,7 +213,7 @@ there is not a change in which series are present.
 |---|---|---|---|---|---|---|---|
 | Games | 155 | 155 | 155 | 155 | 155 | 109 | 109 |
 | Fouls per 100 possessions | **-1.15** | **+0.48** | +0.27 | **+0.63** | +0.11 | **-0.55** | +0.06 |
-| Free-throw rate (FTA / FGA, x100) | **-2.20** | **+1.78** | -0.05 | +0.55 | +0.56 | -0.30 | -0.62 |
+| Free-throw rate (FTA / <abbr title="Field-goal attempts.">FGA</abbr>, x100) | **-2.20** | **+1.78** | -0.05 | +0.55 | +0.56 | -0.30 | -0.62 |
 | Turnovers per 100 possessions | +0.16 | +0.32 | +0.16 | +0.15 | -0.22 | +0.11 | **-0.91** |
 | Pace (possessions per regulation game) | **+1.30** | +0.45 | -0.33 | -0.15 | -0.26 | +0.25 | **-1.68** |
 | Points per 100 possessions | -0.79 | **+1.24** | +0.11 | -0.50 | +0.91 | **-1.45** | +0.09 |
@@ -228,7 +228,7 @@ there is not a change in which series are present.
 |---|---|---|---|---|---|
 | Games | 170 | 170 | 109 | 28 | 15 |
 | Fouls per 100 possessions | **-1.00** | **+0.63** | +0.33 | +0.66 | +0.69 |
-| Free-throw rate (FTA / FGA, x100) | **-1.80** | **+1.64** | -0.35 | +1.63 | +1.24 |
+| Free-throw rate (FTA / <abbr title="Field-goal attempts.">FGA</abbr>, x100) | **-1.80** | **+1.64** | -0.35 | +1.63 | +1.24 |
 | Turnovers per 100 possessions | -0.10 | +0.31 | -0.42 | +0.01 | +0.61 |
 | Pace (possessions per regulation game) | +0.08 | +0.31 | **-0.64** | +0.65 | -0.97 |
 | Points per 100 possessions | -0.30 | +0.24 | +0.27 | -0.40 | -0.52 |
@@ -243,7 +243,7 @@ there is not a change in which series are present.
 |---|---|---|---|---|---|
 | Games | 81 | 81 | 81 | 15 | 15 |
 | Fouls per 100 possessions | **-0.78** | +0.15 | +0.44 | +0.35 | +0.69 |
-| Free-throw rate (FTA / FGA, x100) | -1.26 | +1.00 | -0.18 | +1.18 | +1.24 |
+| Free-throw rate (FTA / <abbr title="Field-goal attempts.">FGA</abbr>, x100) | -1.26 | +1.00 | -0.18 | +1.18 | +1.24 |
 | Turnovers per 100 possessions | +0.04 | +0.45 | **-0.61** | +0.01 | +0.61 |
 | Pace (possessions per regulation game) | +0.24 | +0.48 | **-0.58** | +0.26 | -0.97 |
 | Points per 100 possessions | -0.37 | -0.48 | +0.84 | +0.55 | -0.52 |
@@ -330,7 +330,7 @@ Percentage points except fouls (per 100 possessions); the foul and free-throw co
 |---|---|---|---|---|---|
 | Series | 75 | 150 | 150 | 150 | 105 |
 | Fouls per 100 possessions | **-1.53** | **-1.30** | **-1.13** | **-0.64** | **-0.81** |
-| Free-throw rate (FTA / FGA, x100) | **-3.81** | **-2.89** | **-2.34** | -0.99 | **-1.77** |
+| Free-throw rate (FTA / <abbr title="Field-goal attempts.">FGA</abbr>, x100) | **-3.81** | **-2.89** | **-2.34** | -0.99 | **-1.77** |
 | Turnovers per 100 possessions | +0.13 | -0.05 | -0.05 | +0.00 | -0.20 |
 | Pace (possessions per regulation game) | **+0.86** | **+0.71** | +0.49 | **+0.64** | +0.35 |
 | Points per 100 possessions | -0.27 | -0.79 | -1.10 | -0.16 | -0.04 |
@@ -345,7 +345,7 @@ Percentage points except fouls (per 100 possessions); the foul and free-throw co
 |---|---|---|---|---|
 | Series | 6 | 70 | 54 | 40 |
 | Fouls per 100 possessions | -0.97 | **-0.89** | **-0.91** | **-1.34** |
-| Free-throw rate (FTA / FGA, x100) | -1.18 | **-1.71** | **-1.94** | **-1.85** |
+| Free-throw rate (FTA / <abbr title="Field-goal attempts.">FGA</abbr>, x100) | -1.18 | **-1.71** | **-1.94** | **-1.85** |
 | Turnovers per 100 possessions | +0.13 | -0.12 | +0.00 | -0.21 |
 | Pace (possessions per regulation game) | +0.60 | -0.26 | +0.25 | +0.37 |
 | Points per 100 possessions | +0.41 | +0.47 | -0.59 | -1.36 |
@@ -368,6 +368,26 @@ Bold: the 95% interval excludes zero.
 
 **Reading.** NBA: Game 1 differs from the series mean in every decade for fouls per 100 possessions. WNBA: no rate differs from the series mean in every decade (the 1990s holds fewer than 10 series).
 <!-- /gen:decades -->
+
+### 8. Fouls and the officials
+
+Question 4 found fewer fouls in Game 1. Two explanations involve the
+officials: the league could send lighter-whistled crews to Game 1s, or the
+same officials could call Game 1s more loosely. The officials for each game
+come from the stats API, which lists them only for recent seasons. Box
+scores cannot tell fouls called from fouls committed, so neither result
+says which side changed.
+
+<!-- gen:officials -->
+| League | Seasons | Games with a crew of three | Game 1 fouls per 100 possessions | Game 1 crew tendency | Same official: Game 1 minus later games | Officials agree with themselves (even vs odd seasons) |
+|---|---|---|---|---|---|---|
+| NBA | 2001 to 2026 | 1576 of 2156 | -0.85 (-1.18 to -0.53) | +0.00 (-0.03 to +0.04), 240 series | -1.06 (-1.38 to -0.74), 56 officials | r = +0.49 (+0.24 to +0.67), 51 officials |
+| WNBA | 2004 to 2026 | 280 of 424 | -0.94 (-1.47 to -0.42) | +0.01 (-0.05 to +0.07), 90 series | -1.33 (-1.71 to -0.96), 24 officials | r = +0.41 (-0.13 to +0.76), 15 officials |
+
+Seasons are the years the seasons end. Fouls per 100 possessions as deviations from the series mean (question 4); the crew tendency is the mean, over a game's officials, of how far above or below the league each runs in other series, as a deviation from the series' average crew. Means with 95% intervals; the split-half correlation has a Fisher interval. Seasons where fewer than half the games list exactly three officials (from 2016-17 most games list four, with no field saying which three worked): NBA 2001, NBA 2003, NBA 2018, NBA 2019, NBA 2024, NBA 2025, NBA 2026, WNBA 2003, WNBA 2018, WNBA 2019, WNBA 2020, WNBA 2021, WNBA 2022, WNBA 2024, WNBA 2025, WNBA 2026.
+
+**Reading.** NBA: Game 1 crews are no lighter-whistled than the series' other crews (the interval includes zero); the same officials call fewer fouls in Game 1 than in later games; officials differ: one who calls more fouls than usual in even seasons does so in odd seasons too. WNBA: Game 1 crews are no lighter-whistled than the series' other crews (the interval includes zero); the same officials call fewer fouls in Game 1 than in later games; no sign that officials differ beyond chance.
+<!-- /gen:officials -->
 
 ## What this design cannot claim
 
