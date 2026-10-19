@@ -247,3 +247,106 @@ season the attempt-weighted Game 1 and Games 2+ totals: 3P% = sum of 3PM /
 sum of 3PA, attempt rate = sum of 3PA / sum of FGA, over every series in the
 question 1 sample. These are levels with no intervals, read as description.
 The table holds season totals, not series or games, so it is committed.
+
+## Follow-ups 5 to 8, fixed October 19, 2026 before any of them was computed
+
+Chester asked on October 19, 2026 for the four parts of the backlog entry
+that questions 1 to 4 left out. All four are exploratory: estimates and
+intervals, no significance claims. Each is implemented in Python and in R
+and reconciled by 04, like questions 1 to 4. Proportions use the Wald
+interval p plus or minus 1.96 sqrt(p (1 - p) / n), a difference of two
+proportions sqrt(p1 q1 / n1 + p2 q2 / n2), and means the question 1
+interval, so both implementations agree exactly.
+
+### 5. Does the Game 1 three-point winner win the series?
+
+From the backlog's question 2. The obvious version is confounded: the team
+that outshoots its opponent from three in Game 1 usually also wins Game 1,
+and Game 1 winners usually win the series. So the comparison is made
+within the Game 1 result.
+
+- **Sample.** The question 1 sample (valid series, two or more games,
+  complete three-point seasons). A series drops, and is counted, when
+  either team has no three-point attempts in Game 1 or the two Game 1
+  three-point percentages are equal.
+- **Per series, from the Game 1 winner's side.** OUTSHOT is true when the
+  Game 1 winner's Game 1 3P% is higher than the loser's. SERIES_WIN is
+  true when the Game 1 winner also wins the series.
+- **Estimates, per league.** (a) The share of series won by the team with
+  the higher Game 1 3P%, whichever team won Game 1. (b) The Game 1 winner's
+  series-win share when OUTSHOT and when not, and the difference (OUTSHOT
+  minus not). A difference near zero means Game 1 three-point shooting says
+  nothing about the series beyond who won the game.
+
+### 6. Format breaks: the 2020 bubble and series length
+
+From the backlog's question 3 ("natural breaks").
+
+- **Sample.** The question 1 series values (D_PCT, D2_PCT, D_RATE,
+  D2_RATE), plus each series' Game 1 deviation in PF100 and FTR from the
+  question 4 game table (G1_PF100, G1_FTR), joined on the series key. A
+  series outside the question 4 sample has those two blank.
+- **Bubble.** Per league, 2020 against every other season, for each of the
+  six metrics. Both 2020 postseasons were played at a single site with no
+  home crowd (Amendment 1).
+- **Series length.** Per league, by wins needed: best-of-5 (3) and
+  best-of-7 (4) in the NBA (best-of-5 first rounds through 2001-02), and
+  best-of-3 (2), best-of-5 (3), and best-of-7 (4) in the WNBA (the only
+  WNBA best-of-7 in the sample is the 2025 Finals, so it gets no interval).
+  Length is confounded with round and era (short series are early rounds,
+  and the NBA's ended in 2002); the table is description.
+
+### 7. Question 4 profiles by decade
+
+From the backlog's question 4 ("by era"). The question 4 "every series"
+profile (mean deviation by game number with its interval), computed
+separately per league and decade, where a decade is the season's end year
+rounded down to a multiple of 10, as in question 1. Written to
+`output/profile_decade.csv`.
+
+### 8. Fouls and the officials
+
+From the backlog's question 4 ("split by referee crew where the data
+allows"). Question 4 found fewer fouls per 100 possessions in Game 1. This
+asks whether the officials assigned explain it, and whether officials
+differ at all.
+
+- **Data.** BoxScoreSummaryV3 officials per game, harvested by
+  `python/10_harvest_officials.py` into `data/raw/officials/` (gitignored).
+  A probe on October 19, 2026 found officials listed from about 2001-02
+  (NBA) and 2004 (WNBA) and none earlier; 2002-03 had one empty game in
+  the probe, so coverage is measured, not assumed.
+- **Sample.** Question 4 games (PF100 deviation from `profile_games`)
+  that list exactly three officials. Other games drop and are counted per
+  league and season in `output/officials_coverage.csv`. Each league is
+  analyzed alone; an official's games are pooled across seasons.
+- **8a, the Game 1 dip in this sample.** The question 4 PF100 profile at
+  Game 1, recomputed on the officials sample, so 8b has a comparison.
+- **8b, crew assignment.** Each game's residual is its PF100 deviation
+  minus the league's mean deviation at that game number in the officials
+  sample (so a Game 1 is not counted as low just for being a Game 1). An
+  official's tendency for a given series is the mean residual over the
+  games they worked in other series of the same league; an official with
+  fewer than five such games is left out of the crew. A game's CREW value
+  is the mean tendency of its listed officials who have one. CREW
+  deviation is CREW minus its mean over the series' games, using only
+  series whose every game has a CREW value. The mean CREW deviation by game
+  number shows whether low-whistle crews get Game 1s; compare its Game 1
+  value with 8a. (The league mean at each game number includes the game
+  itself; with hundreds of games per game number this is not corrected.)
+- **8c, the same official in Game 1 and later.** For each official with at
+  least three Game 1s and three later games in the sample: their mean PF100
+  deviation in Game 1s minus their mean in Games 2 on. The mean over
+  officials with its interval shows whether the dip holds with the person
+  fixed. An official's games are not independent of other officials' (three
+  share each game), so the interval is approximate.
+- **8d, do officials differ?** For each official with at least ten games in
+  even-numbered seasons and ten in odd-numbered seasons: their mean residual
+  (as in 8b) in each half. The Pearson correlation of the two halves over
+  officials, with the Fisher interval tanh(atanh(r) plus or minus 1.96 /
+  sqrt(n - 3)). A correlation near zero means the spread between officials
+  is noise; a clearly positive one means some officials call more fouls,
+  year after year.
+- **What stays local.** Per-game crews and per-official values name people
+  next to game-level statistics, so they stay in gitignored files; the
+  committed tables are the coverage counts and the summaries.
