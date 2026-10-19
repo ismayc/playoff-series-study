@@ -44,7 +44,7 @@ cold Game 1.
 | NBA | -1.32 (-1.61 to -1.03) | -1.02 (-1.37 to -0.67) |
 | WNBA | -0.33 (-0.99 to +0.34) | -0.33 (-1.09 to +0.42) |
 
-Three-point attempt rate (3PA / <abbr title="Field-goal attempts.">FGA</abbr>), percentage points of field-goal attempts.
+Three-point attempt rate (3PA / FGA), percentage points of field-goal attempts.
 
 **Reading.** NBA: a smaller share of shots from three in Game 1, on both comparisons. WNBA: no Game 1 difference in volume that holds on both comparisons.
 
@@ -198,7 +198,7 @@ there is not a change in which series are present.
 |---|---|---|---|---|---|---|---|
 | Games | 630 | 630 | 630 | 583 | 448 | 266 | 109 |
 | Fouls per 100 possessions | **-1.05** | +0.20 | **+0.38** | **+0.64** | +0.06 | **-0.43** | +0.06 |
-| Free-throw rate (FTA / <abbr title="Field-goal attempts.">FGA</abbr>, x100) | **-2.23** | **+0.65** | **+0.73** | **+1.10** | +0.29 | -0.63 | -0.62 |
+| Free-throw rate (FTA / FGA, x100) | **-2.23** | **+0.65** | **+0.73** | **+1.10** | +0.29 | -0.63 | -0.62 |
 | Turnovers per 100 possessions | -0.04 | +0.10 | +0.12 | +0.09 | -0.10 | -0.08 | **-0.91** |
 | Pace (possessions per regulation game) | **+0.60** | +0.18 | -0.17 | -0.09 | -0.09 | -0.42 | **-1.68** |
 | Points per 100 possessions | -0.53 | +0.48 | +0.06 | -0.25 | +0.43 | -0.24 | +0.09 |
@@ -213,7 +213,7 @@ there is not a change in which series are present.
 |---|---|---|---|---|---|---|---|
 | Games | 155 | 155 | 155 | 155 | 155 | 109 | 109 |
 | Fouls per 100 possessions | **-1.15** | **+0.48** | +0.27 | **+0.63** | +0.11 | **-0.55** | +0.06 |
-| Free-throw rate (FTA / <abbr title="Field-goal attempts.">FGA</abbr>, x100) | **-2.20** | **+1.78** | -0.05 | +0.55 | +0.56 | -0.30 | -0.62 |
+| Free-throw rate (FTA / FGA, x100) | **-2.20** | **+1.78** | -0.05 | +0.55 | +0.56 | -0.30 | -0.62 |
 | Turnovers per 100 possessions | +0.16 | +0.32 | +0.16 | +0.15 | -0.22 | +0.11 | **-0.91** |
 | Pace (possessions per regulation game) | **+1.30** | +0.45 | -0.33 | -0.15 | -0.26 | +0.25 | **-1.68** |
 | Points per 100 possessions | -0.79 | **+1.24** | +0.11 | -0.50 | +0.91 | **-1.45** | +0.09 |
@@ -228,7 +228,7 @@ there is not a change in which series are present.
 |---|---|---|---|---|---|
 | Games | 170 | 170 | 109 | 28 | 15 |
 | Fouls per 100 possessions | **-1.00** | **+0.63** | +0.33 | +0.66 | +0.69 |
-| Free-throw rate (FTA / <abbr title="Field-goal attempts.">FGA</abbr>, x100) | **-1.80** | **+1.64** | -0.35 | +1.63 | +1.24 |
+| Free-throw rate (FTA / FGA, x100) | **-1.80** | **+1.64** | -0.35 | +1.63 | +1.24 |
 | Turnovers per 100 possessions | -0.10 | +0.31 | -0.42 | +0.01 | +0.61 |
 | Pace (possessions per regulation game) | +0.08 | +0.31 | **-0.64** | +0.65 | -0.97 |
 | Points per 100 possessions | -0.30 | +0.24 | +0.27 | -0.40 | -0.52 |
@@ -243,7 +243,7 @@ there is not a change in which series are present.
 |---|---|---|---|---|---|
 | Games | 81 | 81 | 81 | 15 | 15 |
 | Fouls per 100 possessions | **-0.78** | +0.15 | +0.44 | +0.35 | +0.69 |
-| Free-throw rate (FTA / <abbr title="Field-goal attempts.">FGA</abbr>, x100) | -1.26 | +1.00 | -0.18 | +1.18 | +1.24 |
+| Free-throw rate (FTA / FGA, x100) | -1.26 | +1.00 | -0.18 | +1.18 | +1.24 |
 | Turnovers per 100 possessions | +0.04 | +0.45 | **-0.61** | +0.01 | +0.61 |
 | Pace (possessions per regulation game) | +0.24 | +0.48 | **-0.58** | +0.26 | -0.97 |
 | Points per 100 possessions | -0.37 | -0.48 | +0.84 | +0.55 | -0.52 |
@@ -271,6 +271,103 @@ Three-point attempt rate, each team relative to its own series mean, percentage 
 
 **Reading.** NBA: the team behind in the series takes relatively fewer threes than the leader. WNBA: the team behind in the series takes relatively fewer threes than the leader.
 <!-- /gen:state -->
+
+## Follow-ups
+
+Four parts of the original idea that questions 1 to 4 left out, each
+defined in [`docs/design.md`](docs/design.md) before it was computed.
+Exploratory: estimates and intervals, no significance claims.
+
+### 5. Does the Game 1 three-point winner win the series?
+
+The team that shoots better from three in Game 1 usually wins Game 1, and
+Game 1 winners usually win the series. So the question is asked with the
+Game 1 result held fixed: among Game 1 winners, do the ones that also
+outshot their opponent from three win the series more often?
+
+<!-- gen:outshoot -->
+| League | Series | Better Game 1 three-point shooter wins the series | Game 1 winner wins the series: it also outshot | it was outshot | Difference |
+|---|---|---|---|---|---|
+| NBA | 614 | 59.8% (55.9 to 63.7) | 76.7% (72.6 to 80.7), 420 series | 76.8% (70.9 to 82.7), 194 series | -0.1 (-7.3 to +7.0) |
+| WNBA | 167 | 61.1% (53.7 to 68.5) | 75.0% (67.0 to 83.0), 112 series | 67.3% (54.9 to 79.7), 55 series | +7.7 (-7.0 to +22.5) |
+
+Shares of series in percent with a 95% interval; the difference is in percentage points. Series with equal Game 1 three-point percentages, or a team with no Game 1 attempts, are left out (NBA 16, WNBA 3).
+
+**Reading.** NBA: with the Game 1 result held fixed, outshooting the opponent from three adds nothing that the interval can tell from zero. WNBA: with the Game 1 result held fixed, outshooting the opponent from three adds nothing that the interval can tell from zero.
+<!-- /gen:outshoot -->
+
+### 6. Format breaks: the 2020 single-site playoffs and series length
+
+Both 2020 postseasons were played at one site with no crowd. Series
+length is confounded with round and era (short series are early rounds,
+and the NBA's best-of-5 first rounds ended in 2002), so the length rows
+are description.
+
+<!-- gen:breaks -->
+| League | Split | Series | 3P%: Game 1 minus Games 2+ | Attempt rate: Game 1 minus Games 2+ | Game 1 fouls per 100 possessions | Game 1 free-throw rate (x100) |
+|---|---|---|---|---|---|---|
+| NBA | 2020 (single site) | 15 | +0.54 (-2.13 to +3.21) | -0.14 (-1.84 to +1.56) | +0.63 (-0.35 to +1.61) | -0.11 (-1.95 to +1.72) |
+| NBA | every other season | 615 | -0.04 (-0.91 to +0.82) | -1.35 (-1.64 to -1.05) | -1.09 (-1.31 to -0.86) | -2.28 (-2.80 to -1.76) |
+| NBA | best-of-5 | 144 | +0.36 (-1.98 to +2.71) | -1.61 (-2.10 to -1.12) | -0.88 (-1.32 to -0.44) | -2.59 (-3.68 to -1.50) |
+| NBA | best-of-7 | 486 | -0.15 (-0.99 to +0.70) | -1.23 (-1.58 to -0.89) | -1.10 (-1.36 to -0.84) | -2.12 (-2.70 to -1.54) |
+| WNBA | 2020 (single site) | 3 | +5.92 (-0.86 to +12.69) | +3.21 (+0.84 to +5.58) | -1.32 (-2.11 to -0.54) | -0.40 (-4.28 to +3.48) |
+| WNBA | every other season | 167 | +0.16 (-1.26 to +1.59) | -0.39 (-1.07 to +0.28) | -1.00 (-1.41 to -0.59) | -1.82 (-2.79 to -0.86) |
+| WNBA | best-of-3 | 127 | +0.45 (-1.15 to +2.05) | -0.61 (-1.36 to +0.14) | -0.90 (-1.34 to -0.47) | -1.43 (-2.50 to -0.36) |
+| WNBA | best-of-5 | 42 | -0.40 (-3.40 to +2.59) | +0.25 (-1.10 to +1.60) | -1.24 (-2.21 to -0.27) | -2.76 (-4.81 to -0.72) |
+| WNBA | best-of-7 | 1 | +4.78 (one series) | +10.88 (one series) | -3.92 (one series) | -7.73 (one series) |
+
+Percentage points except fouls (per 100 possessions); the foul and free-throw columns are Game 1's deviation from the series mean, as in question 4. Mean over series with a 95% interval.
+
+**Reading.** NBA: the Game 1 foul dip holds in other seasons; in 2020 it is absent (the interval includes zero), from 15 series. WNBA: the Game 1 foul dip holds in other seasons; there are too few 2020 series (3) to say whether it held there.
+<!-- /gen:breaks -->
+
+### 7. Question 4 by decade
+
+<!-- gen:decades -->
+**NBA, Game 1 deviation from the series mean, by decade.**
+
+| Rate | 1980s | 1990s | 2000s | 2010s | 2020s |
+|---|---|---|---|---|---|
+| Series | 75 | 150 | 150 | 150 | 105 |
+| Fouls per 100 possessions | **-1.53** | **-1.30** | **-1.13** | **-0.64** | **-0.81** |
+| Free-throw rate (FTA / FGA, x100) | **-3.81** | **-2.89** | **-2.34** | -0.99 | **-1.77** |
+| Turnovers per 100 possessions | +0.13 | -0.05 | -0.05 | +0.00 | -0.20 |
+| Pace (possessions per regulation game) | **+0.86** | **+0.71** | +0.49 | **+0.64** | +0.35 |
+| Points per 100 possessions | -0.27 | -0.79 | -1.10 | -0.16 | -0.04 |
+| Offensive rebound % (x100) | -0.59 | -0.18 | +0.17 | -0.31 | +0.06 |
+| Assists per made field goal (x100) | **+1.76** | +0.35 | -0.82 | +0.21 | -0.72 |
+| Three-point attempt rate (x100) | **-0.49** | **-1.12** | **-1.40** | **-1.54** | -0.26 |
+| Three-point % (x100) | -1.42 | -0.93 | -0.42 | +0.86 | +0.13 |
+
+**WNBA, Game 1 deviation from the series mean, by decade.**
+
+| Rate | 1990s | 2000s | 2010s | 2020s |
+|---|---|---|---|---|
+| Series | 6 | 70 | 54 | 40 |
+| Fouls per 100 possessions | -0.97 | **-0.89** | **-0.91** | **-1.34** |
+| Free-throw rate (FTA / FGA, x100) | -1.18 | **-1.71** | **-1.94** | **-1.85** |
+| Turnovers per 100 possessions | +0.13 | -0.12 | +0.00 | -0.21 |
+| Pace (possessions per regulation game) | +0.60 | -0.26 | +0.25 | +0.37 |
+| Points per 100 possessions | +0.41 | +0.47 | -0.59 | -1.36 |
+| Offensive rebound % (x100) | -0.63 | -0.31 | -0.17 | -0.89 |
+| Assists per made field goal (x100) | +3.08 | -0.86 | +0.31 | -1.42 |
+| Three-point attempt rate (x100) | **+1.30** | -0.20 | -0.52 | +0.18 |
+| Three-point % (x100) | **-4.19** | +0.30 | +0.30 | -0.27 |
+
+**NBA three-point attempt rate (x100) by game number and decade.**
+
+| Decade | G1 | G2 | G3 | G4 | G5 | G6 | G7 |
+|---|---|---|---|---|---|---|---|
+| 1980s | **-0.49** | +0.36 | -0.25 | +0.20 | +0.47 | -0.77 | **+1.60** |
+| 1990s | **-1.12** | +0.23 | +0.16 | +0.10 | +0.39 | **+1.03** | **+1.28** |
+| 2000s | **-1.40** | -0.06 | +0.08 | **+0.62** | +0.09 | **+1.29** | +0.43 |
+| 2010s | **-1.54** | **-0.67** | **+0.69** | +0.49 | **+0.71** | +0.21 | **+1.67** |
+| 2020s | -0.26 | +0.11 | +0.15 | -0.29 | +0.16 | +0.08 | +0.45 |
+
+Bold: the 95% interval excludes zero.
+
+**Reading.** NBA: Game 1 differs from the series mean in every decade for fouls per 100 possessions. WNBA: no rate differs from the series mean in every decade (the 1990s holds fewer than 10 series).
+<!-- /gen:decades -->
 
 ## What this design cannot claim
 

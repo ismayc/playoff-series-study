@@ -1,7 +1,7 @@
-"""Write the generator-owned regions of README.md from the question 1 outputs.
+"""Write the generator-owned regions of README.md from the committed outputs.
 
-Every number in those regions comes from output/game1_summary.csv or
-output/game1_pooled.csv; prose outside the regions carries no numbers
+Every number in those regions comes from a committed summary table under
+output/ (questions 1 to 4 and follow-ups 5 to 8); prose outside the regions carries no numbers
 (family rule). Regions are delimited by <!-- gen:NAME --> and
 <!-- /gen:NAME -->.
 
@@ -25,6 +25,8 @@ README = ROOT / "README.md"
 # before rendering and comparing, as the other studies' generators do.
 ABBR = re.compile(r'<abbr title="[^"]*">([^<]*)</abbr>')
 LEAGUES = {0: "NBA", 10: "WNBA"}
+# Below this many series a reading names the count instead of a direction.
+FEW = 10
 
 
 def pp(x: float) -> str:
@@ -281,6 +283,118 @@ def eras_region(summary: pl.DataFrame, season: pl.DataFrame) -> str:
     return "\n".join(lines + ["", "**Reading.** " + " ".join(runs)])
 
 
+def share(row: dict) -> str:
+    """A proportion as a percentage with its interval, one decimal."""
+    return f"{row['P'] * 100:.1f}% ({row['LO'] * 100:.1f} to {row['HI'] * 100:.1f})"
+
+
+def outshoot_region(os_: pl.DataFrame) -> str:
+    lines = ["| League | Series | Better Game 1 three-point shooter wins the series "
+             "| Game 1 winner wins the series: it also outshot | it was outshot | Difference |",
+             "|---|---|---|---|---|---|"]
+    readings = []
+    for lg, name in LEAGUES.items():
+        r = {e: os_.filter((pl.col("LEAGUE") == lg) & (pl.col("ESTIMATE") == e)).row(0, named=True)
+             for e in ("shooter_wins_series", "g1_winner_outshot", "g1_winner_not_outshot", "difference")}
+        d = r["difference"]
+        diff = f"{d['P'] * 100:+.1f} ({d['LO'] * 100:+.1f} to {d['HI'] * 100:+.1f})"
+        lines.append(f"| {name} | {r['shooter_wins_series']['N']} | {share(r['shooter_wins_series'])} "
+                     f"| {share(r['g1_winner_outshot'])}, {r['g1_winner_outshot']['N']} series "
+                     f"| {share(r['g1_winner_not_outshot'])}, {r['g1_winner_not_outshot']['N']} series | {diff} |")
+        readings.append(f"{name}: " + (
+            "with the Game 1 result held fixed, outshooting the opponent from three adds nothing "
+            "that the interval can tell from zero." if not excludes_zero_p(d) else
+            f"with the Game 1 result held fixed, the Game 1 winner that also outshot its opponent wins the series "
+            f"{'more' if d['P'] > 0 else 'less'} often."))
+    dropped = {LEAGUES[k]: v for k, v in os_.filter(pl.col("ESTIMATE") == "difference")
+               .select("LEAGUE", "N_DROPPED").iter_rows()}
+    lines += ["", "Shares of series in percent with a 95% interval; the difference is in percentage points. "
+              "Series with equal Game 1 three-point percentages, or a team with no Game 1 attempts, are left out ("
+              + ", ".join(f"{k} {v}" for k, v in dropped.items()) + ")."]
+    return "\n".join(lines + ["", "**Reading.** " + " ".join(readings)])
+
+
+def excludes_zero_p(row: dict) -> bool:
+    return row["LO"] is not None and (row["LO"] > 0 or row["HI"] < 0)
+
+
+BREAK_LABELS = {"season_2020": "2020 (single site)", "other_seasons": "every other season",
+                "best_of_3": "best-of-3", "best_of_5": "best-of-5", "best_of_7": "best-of-7"}
+
+
+def num_cell(row: dict, k: float = 1.0) -> str:
+    if row["LO"] is None:
+        return f"{row['MEAN'] * k:+.2f} (one series)"
+    return f"{row['MEAN'] * k:+.2f} ({row['LO'] * k:+.2f} to {row['HI'] * k:+.2f})"
+
+
+def breaks_region(br: pl.DataFrame) -> str:
+    lines = ["| League | Split | Series | 3P%: Game 1 minus Games 2+ | Attempt rate: Game 1 minus Games 2+ "
+             "| Game 1 fouls per 100 possessions | Game 1 free-throw rate (x100) |", "|---|---|---|---|---|---|---|"]
+    readings = []
+    for lg, name in LEAGUES.items():
+        sub = br.filter(pl.col("LEAGUE") == lg)
+        for panel, label in BREAK_LABELS.items():
+            if sub.filter(pl.col("PANEL") == panel).height == 0:
+                continue
+            m = {k: get(sub, lg, panel, k) for k in ("D_PCT", "D_RATE", "G1_PF100", "G1_FTR")}
+            lines.append(f"| {name} | {label} | {m['D_PCT']['N']} | {num_cell(m['D_PCT'], 100)} "
+                         f"| {num_cell(m['D_RATE'], 100)} | {num_cell(m['G1_PF100'])} | {num_cell(m['G1_FTR'], 100)} |")
+        b, o = get(sub, lg, "season_2020", "G1_PF100"), get(sub, lg, "other_seasons", "G1_PF100")
+        in_2020 = (f"there are too few 2020 series ({b['N']}) to say whether it held there"
+                   if b["N"] < FEW else
+                   f"in 2020 it {'holds' if excludes_zero(b) else 'is absent (the interval includes zero)'}, "
+                   f"from {b['N']} series")
+        readings.append(f"{name}: the Game 1 foul dip {'holds' if excludes_zero(o) else 'is absent'} in other "
+                        f"seasons; {in_2020}.")
+    lines += ["", "Percentage points except fouls (per 100 possessions); the foul and free-throw columns are "
+              "Game 1's deviation from the series mean, as in question 4. Mean over series with a 95% interval."]
+    return "\n".join(lines + ["", "**Reading.** " + " ".join(readings)])
+
+
+def decades_region(pdec: pl.DataFrame) -> str:
+    out, readings = [], []
+    for lg, name in LEAGUES.items():
+        sub = pdec.filter((pl.col("LEAGUE") == lg) & (pl.col("GAME_NO") == 1))
+        decades = sorted(sub["DECADE"].unique().to_list())
+        out += [f"**{name}, Game 1 deviation from the series mean, by decade.**", "",
+                "| Rate | " + " | ".join(f"{d}s" for d in decades) + " |", "|---|" + "---|" * len(decades),
+                "| Series | " + " | ".join(str(sub.filter((pl.col("DECADE") == d) & (pl.col("METRIC") == "PF100"))["N"].item())
+                                         for d in decades) + " |"]
+        every = []
+        for m, (label, k) in PROFILE_LABELS.items():
+            cells, hits = [], 0
+            for d in decades:
+                r = sub.filter((pl.col("DECADE") == d) & (pl.col("METRIC") == m)).row(0, named=True)
+                text = f"{r['MEAN'] * k:+.2f}"
+                hit = r["LO"] is not None and excludes_zero(r)
+                hits += hit
+                cells.append(f"**{text}**" if hit else text)
+            out.append(f"| {label} | " + " | ".join(cells) + " |")
+            if hits == len(decades):
+                every.append(label.split(" (")[0].lower())
+        out.append("")
+        thin = [f"{d}s" for d in decades
+                if sub.filter((pl.col("DECADE") == d) & (pl.col("METRIC") == "PF100"))["N"].item() < FEW]
+        readings.append(f"{name}: " + (f"Game 1 differs from the series mean in every decade for {', '.join(every)}"
+                                       if every else "no rate differs from the series mean in every decade")
+                        + (f" (the {', '.join(thin)} hold{'s' if len(thin) == 1 else ''} fewer than {FEW} series)"
+                           if thin else "") + ".")
+    rate = pdec.filter((pl.col("LEAGUE") == 0) & (pl.col("METRIC") == "FG3A_RATE"))
+    games = sorted(rate["GAME_NO"].unique().to_list())
+    out += ["**NBA three-point attempt rate (x100) by game number and decade.**", "",
+            "| Decade | " + " | ".join(f"G{g}" for g in games) + " |", "|---|" + "---|" * len(games)]
+    for d in sorted(rate["DECADE"].unique().to_list()):
+        cells = []
+        for g in games:
+            r = rate.filter((pl.col("DECADE") == d) & (pl.col("GAME_NO") == g)).row(0, named=True)
+            text = f"{r['MEAN'] * 100:+.2f}"
+            cells.append(f"**{text}**" if r["LO"] is not None and excludes_zero(r) else text)
+        out.append(f"| {d}s | " + " | ".join(cells) + " |")
+    out += ["", "Bold: the 95% interval excludes zero."]
+    return "\n".join(out + ["", "**Reading.** " + " ".join(readings)])
+
+
 def regions() -> dict[str, str]:
     summary = pl.read_csv(ROOT / "output" / "game1_summary.csv")
     pooled = pl.read_csv(ROOT / "output" / "game1_pooled.csv")
@@ -292,7 +406,10 @@ def regions() -> dict[str, str]:
             "eras": eras_region(summary, season),
             "profiles": profiles_region(prof), "state": state_region(state),
             "stakes": stakes_region(pl.read_csv(ROOT / "output" / "stakes_summary.csv")),
-            "rest": rest_region(pl.read_csv(ROOT / "output" / "rest_summary.csv"))}
+            "rest": rest_region(pl.read_csv(ROOT / "output" / "rest_summary.csv")),
+            "outshoot": outshoot_region(pl.read_csv(ROOT / "output" / "outshoot_summary.csv")),
+            "breaks": breaks_region(pl.read_csv(ROOT / "output" / "break_summary.csv")),
+            "decades": decades_region(pl.read_csv(ROOT / "output" / "profile_decade.csv"))}
 
 
 def render(text: str, new: dict[str, str]) -> str:

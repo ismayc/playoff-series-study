@@ -317,3 +317,95 @@ stake_summary <- function(sv) {
   }
   bind_rows(rows)
 }
+
+# ---- Follow-ups 5 to 7 (twin of python/followlib.py) ----
+
+BREAK_METRICS <- c("D_PCT", "D2_PCT", "D_RATE", "D2_RATE", "G1_PF100", "G1_FTR")
+BREAK_PANELS <- list(season_2020 = function(d) d$SEASON == 2020,
+                     other_seasons = function(d) d$SEASON != 2020,
+                     best_of_3 = function(d) d$WINS_NEEDED == 2,
+                     best_of_5 = function(d) d$WINS_NEEDED == 3,
+                     best_of_7 = function(d) d$WINS_NEEDED == 4)
+
+# Share of TRUE among non-NA flags, with the Wald 95% interval.
+proportion_values <- function(x) {
+  kept <- x[!is.na(x)]
+  n <- length(kept)
+  out <- list(N = n, N_DROPPED = length(x) - n, P = NA_real_, SE = NA_real_, LO = NA_real_, HI = NA_real_)
+  if (n == 0) return(out)
+  p <- sum(kept) / n
+  se <- sqrt(p * (1 - p) / n)
+  out$P <- p
+  out$SE <- se
+  out$LO <- p - Z * se
+  out$HI <- p + Z * se
+  out
+}
+
+outshoot_values <- function(games) {
+  keys <- c("LEAGUE", "SEASON", "SERIES_KEY")
+  g1 <- games %>% filter(GAME_NO == 1) %>% mutate(PCT = safe_ratio(FG3M, FG3A))
+  win <- g1 %>% filter(WL == "W") %>% transmute(LEAGUE, SEASON, SERIES_KEY, G1_WINNER = TEAM_ID, WINNER_ID, W_PCT = PCT)
+  lose <- g1 %>% filter(WL == "L") %>% transmute(LEAGUE, SEASON, SERIES_KEY, L_PCT = PCT)
+  win %>% inner_join(lose, by = keys) %>%
+    mutate(SERIES_WIN = G1_WINNER == WINNER_ID,
+           ok = !is.na(W_PCT) & !is.na(L_PCT) & W_PCT != L_PCT,
+           OUTSHOT = ifelse(ok, W_PCT > L_PCT, NA),
+           SHOOTER_WON = ifelse(ok, OUTSHOT == SERIES_WIN, NA)) %>%
+    select(LEAGUE, SEASON, SERIES_KEY, W_PCT, L_PCT, OUTSHOT, SERIES_WIN, SHOOTER_WON) %>%
+    arrange(LEAGUE, SEASON, SERIES_KEY)
+}
+
+outshoot_summary <- function(ov) {
+  rows <- list()
+  for (league in sort(unique(ov$LEAGUE))) {
+    lv <- ov[ov$LEAGUE == league, ]
+    dropped <- sum(is.na(lv$OUTSHOT))
+    shooter <- proportion_values(lv$SHOOTER_WON)
+    yes <- proportion_values(lv$SERIES_WIN[!is.na(lv$OUTSHOT) & lv$OUTSHOT])
+    no <- proportion_values(lv$SERIES_WIN[!is.na(lv$OUTSHOT) & !lv$OUTSHOT])
+    yes$N_DROPPED <- dropped
+    no$N_DROPPED <- dropped
+    diff <- list(N = yes$N + no$N, N_DROPPED = dropped, P = NA_real_, SE = NA_real_, LO = NA_real_, HI = NA_real_)
+    if (yes$N > 0 && no$N > 0) {
+      diff$P <- yes$P - no$P
+      diff$SE <- sqrt(yes$SE^2 + no$SE^2)
+      diff$LO <- diff$P - Z * diff$SE
+      diff$HI <- diff$P + Z * diff$SE
+    }
+    for (e in list(list("shooter_wins_series", shooter), list("g1_winner_outshot", yes),
+                   list("g1_winner_not_outshot", no), list("difference", diff))) {
+      rows[[length(rows) + 1]] <- as_tibble(c(list(LEAGUE = league, ESTIMATE = e[[1]]), e[[2]]))
+    }
+  }
+  bind_rows(rows)
+}
+
+break_values <- function(series, games, dev) {
+  keys <- c("LEAGUE", "SEASON", "SERIES_KEY")
+  wins <- games %>% distinct(LEAGUE, SEASON, SERIES_KEY, WINS_NEEDED)
+  g1 <- dev %>% filter(GAME_NO == 1) %>% transmute(LEAGUE, SEASON, SERIES_KEY, G1_PF100 = PF100, G1_FTR = FTR)
+  series %>% select(LEAGUE, SEASON, SERIES_KEY, D_PCT, D2_PCT, D_RATE, D2_RATE) %>%
+    left_join(wins, by = keys) %>% left_join(g1, by = keys) %>% arrange(LEAGUE, SEASON, SERIES_KEY)
+}
+
+break_summary <- function(bv) summarize_values(bv, BREAK_PANELS, BREAK_METRICS)
+
+profile_decade <- function(dev) {
+  d <- dev %>% mutate(DECADE = (SEASON %/% 10) * 10)
+  rows <- list()
+  for (league in sort(unique(d$LEAGUE))) {
+    lv <- d[d$LEAGUE == league, ]
+    for (dec in sort(unique(lv$DECADE))) {
+      dv <- lv[lv$DECADE == dec, ]
+      for (g in sort(unique(dv$GAME_NO))) {
+        gv <- dv[dv$GAME_NO == g, ]
+        for (m in PROFILE_METRICS) {
+          rows[[length(rows) + 1]] <- as_tibble(c(list(LEAGUE = league, DECADE = dec, GAME_NO = g, METRIC = m),
+                                                  describe_values(gv[[m]])))
+        }
+      }
+    }
+  }
+  bind_rows(rows)
+}

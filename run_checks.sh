@@ -35,6 +35,11 @@ $PY python/08_stakes_rest.py
 Rscript R/08_stakes_rest.R
 
 echo
+echo "=== follow-ups 5 to 7: Python, then R ==="
+$PY python/11_followups.py
+Rscript R/11_followups.R
+
+echo
 echo "=== reconciliation: R vs Python ==="
 $PY python/04_reconcile.py | tail -1
 

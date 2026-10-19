@@ -233,3 +233,60 @@ test_that("stake summary", {
   expect_equal(sort(unique(s$STAGE)), c(0, 1))
   expect_equal((s %>% filter(STAGE == 1, METRIC == "D_PCT"))$MEAN, 0.3)
 })
+
+# ---- Follow-ups 5 to 7; working in tests/python/test_followlib.py ----
+
+follow <- read_csv(file.path(fix, "follow_games.csv"), show_col_types = FALSE,
+                   col_types = cols(SERIES_KEY = col_character(), .default = col_guess()))
+
+test_that("outshoot values", {
+  ov <- outshoot_values(follow)
+  expect_equal(ov$SERIES_KEY, c("1-2", "3-4", "5-6"))
+  expect_equal(ov$OUTSHOT, c(TRUE, FALSE, NA))
+  expect_equal(ov$SERIES_WIN, c(TRUE, FALSE, TRUE))
+  expect_equal(ov$SHOOTER_WON, c(TRUE, TRUE, NA))
+  expect_equal(ov$W_PCT, c(0.4, 0.2, 0.3))
+})
+
+test_that("outshoot summary", {
+  s <- outshoot_summary(outshoot_values(follow))
+  get <- function(e) s[s$ESTIMATE == e, ]
+  expect_equal(c(get("shooter_wins_series")$N, get("shooter_wins_series")$P), c(2, 1))
+  expect_equal(get("shooter_wins_series")$N_DROPPED, 1)
+  expect_equal(c(get("g1_winner_outshot")$N, get("g1_winner_outshot")$P), c(1, 1))
+  expect_equal(c(get("g1_winner_not_outshot")$N, get("g1_winner_not_outshot")$P), c(1, 0))
+  expect_equal(c(get("difference")$P, get("difference")$SE, get("difference")$N_DROPPED), c(1, 0, 1))
+})
+
+test_that("proportion interval", {
+  p <- proportion_values(c(TRUE, FALSE, TRUE, TRUE, NA))
+  expect_equal(c(p$N, p$N_DROPPED, p$P), c(4, 1, 0.75))
+  se <- sqrt(0.75 * 0.25 / 4)
+  expect_equal(c(p$LO, p$HI), c(0.75 - 1.96 * se, 0.75 + 1.96 * se))
+})
+
+test_that("break values and panels", {
+  series <- tibble(LEAGUE = c(0, 0), SEASON = c(2010, 2020), SERIES_KEY = c("1-2", "3-4"),
+                   D_PCT = c(0.1, 0.3), D2_PCT = 0, D_RATE = 0, D2_RATE = 0)
+  dev <- tibble(LEAGUE = c(0, 0, 0), SEASON = c(2010, 2010, 2020), SERIES_KEY = c("1-2", "1-2", "3-4"),
+                GAME_NO = c(1, 2, 2), PF100 = c(-2, 2, 5), FTR = c(-0.1, 0.1, 0.2))
+  bv <- break_values(series, follow, dev)
+  expect_equal(bv$WINS_NEEDED, c(2, 2))
+  expect_equal(bv$G1_PF100, c(-2, NA))
+  s <- break_summary(bv)
+  r20 <- s[s$PANEL == "season_2020" & s$METRIC == "D_PCT", ]
+  expect_equal(c(r20$N, r20$MEAN), c(1, 0.3))
+  b3 <- s[s$PANEL == "best_of_3" & s$METRIC == "D_PCT", ]
+  expect_equal(c(b3$N, b3$MEAN), c(2, 0.2))
+  expect_equal(sum(s$PANEL == "best_of_7"), 0)
+})
+
+test_that("profile by decade", {
+  dev <- tibble(LEAGUE = 0, SEASON = c(1999, 1990, 2001), GAME_NO = 1)
+  for (m in PROFILE_METRICS) dev[[m]] <- c(1, 3, 5)
+  pd <- profile_decade(dev)
+  pd <- pd[pd$METRIC == "PF100", ]
+  expect_equal(pd$DECADE, c(1990, 2000))
+  expect_equal(pd$N, c(2, 1))
+  expect_equal(pd$MEAN, c(2, 5))
+})
