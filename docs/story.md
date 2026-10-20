@@ -36,6 +36,8 @@ is averaged over series. Because Games 6 and 7 exist only in close series,
 the same estimate is repeated against Game 2 alone, which every series has.
 A Game 1 effect has to show up in both versions to count.
 
+{{svg:dg1_within_series|Why the study compares each series only with itself. The flow: every NBA series has a Game 1, but series peel off as they end and only the close ones reach Games 6 and 7, so a league-wide comparison by game number would mix different series. The strips: each series' Game 1 is set against its own later games, and again against its Game 2 alone. Both differences sit near zero.}}
+
 The analysis plan was written down and fixed before any Game 1 number was
 computed. It was implemented twice, in Python and in R, and the two agree on
 every output cell.
@@ -135,6 +137,8 @@ they also outshot their opponent from three, and 76.8% when they did not.
 In the WNBA the difference is +7.7 points, with an interval from −7.0 to
 +22.5 across 167 series.
 
+{{svg:dg3_outshoot|Where the better Game 1 shooter's series record comes from. In most series that team also won Game 1, and Game 1 winners take the series 76.7% of the time when they also outshot the other team and 76.8% when they did not. Split by the Game 1 result, the shooting edge adds nothing.}}
+
 {{fig:fig10_outshoot_py|Share of series won by the Game 1 winner, split by whether it also outshot its opponent from three in that game, with 95% intervals. The NBA's two shares are level. The WNBA's differ, but their intervals overlap widely.}}
 
 ## The 2020 bubble had no Game 1 foul dip
@@ -168,6 +172,11 @@ liveData box scores do, from 2019-20 in the NBA and from 2022 in the
 WNBA, and since October 19, 2026 those games count with the three who
 worked. Earlier four-official games are still left out, so 2017-18 and
 2018-19 in the NBA and 2018 to 2021 in the WNBA are thin here.
+
+The diagram below sets out the two explanations, and the chart
+after it follows both measures game by game.
+
+{{svg:dg2_officials|The two explanations for the Game 1 foul dip. Crews assigned to Game 1s whistle at the same level as the series' other crews (A: +0.00 fouls per 100 possessions), while the same officials call 1.15 fewer fouls in their own Game 1s than in their later games (B). The dip comes from how Game 1s are called, not from who is assigned to them.}}
 
 {{fig:fig12_officials_py|Fouls per 100 possessions against the series mean, by game number (solid), and the usual tendency of the game's crew (dashed), in the same units. Fouls dip at Game 1 in both leagues while the crew line stays flat at zero, so Game 1s get ordinary crews. WNBA games past Game 4 are left off; too few series reach them.}}
 

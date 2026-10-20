@@ -65,3 +65,7 @@ $PY python/05_findings.py --check
 echo
 echo "=== review page builds ==="
 $PY python/07_review.py
+
+echo
+echo "=== diagrams: every explainer SVG rebuilds identically ==="
+$PY -I python/16_diagrams.py --check | tail -1

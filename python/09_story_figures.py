@@ -71,7 +71,7 @@ def fig_gap(summary: pl.DataFrame) -> go.Figure:
             marker=dict(size=10),
             hovertemplate=f"{name}, %{{x}}: %{{y:+.2f}} points<extra></extra>"))
     f.add_hline(y=0, line_width=1, line_color="#898781")
-    f.update_layout(**base_layout("Game 1 minus later games in the same series",
+    f.update_layout(**base_layout("Game 1 accuracy sits on zero; NBA Game 1 volume is lower",
                                   "", "Percentage points (95% interval)"))
     return f
 
