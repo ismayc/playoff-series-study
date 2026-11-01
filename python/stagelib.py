@@ -59,7 +59,8 @@ def stage_mismatches(tg: pl.DataFrame, st: pl.DataFrame) -> pl.DataFrame:
 def unexplained_missing_stages(tg: pl.DataFrame, st: pl.DataFrame) -> pl.DataFrame:
     """Series without a stage in a league-season that does have a Finals in
     the data. A missing stage is expected only where the Finals is absent
-    (the 2026 WNBA Finals, excluded while in progress)."""
+    (the 2026 WNBA Finals, excluded while in progress until November 1,
+    2026)."""
     with_finals = tg.filter(pl.col("FINALS")).select("LEAGUE", "SEASON").unique()
     return st.filter(pl.col("STAGE").is_null()).join(with_finals, on=["LEAGUE", "SEASON"])
 

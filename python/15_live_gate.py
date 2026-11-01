@@ -1,6 +1,6 @@
 """Gate: team box scores in data/team_games.csv against the NBA liveData
 box scores, for the games the October 19, 2026 audit cached (NBA 2019-20
-on and WNBA 2022 on).
+on and WNBA 2022 on) plus the 2026 WNBA Finals, fetched November 1, 2026.
 
 The reference is data/live_team_box.csv (one row per game and team), which
 this script rebuilds from data/raw/live/ whenever those files are present

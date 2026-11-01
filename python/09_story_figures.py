@@ -77,9 +77,14 @@ def fig_gap(summary: pl.DataFrame) -> go.Figure:
 
 
 def fig_by_game(prof: pl.DataFrame, metric: str, scale: float, title: str, ytitle: str, unit: str) -> go.Figure:
+    """One line per league by game number. A game number with no interval
+    (one game, so no spread) is left off: the 2026 WNBA Finals, added on
+    November 1, 2026, is the league's only series past Game 5, and its
+    Game 6 and Game 7 points would be one game each."""
     f = go.Figure()
     for lg, name in LEAGUES.items():
-        rows = (prof.filter((pl.col("LEAGUE") == lg) & (pl.col("PANEL") == "all") & (pl.col("METRIC") == metric))
+        rows = (prof.filter((pl.col("LEAGUE") == lg) & (pl.col("PANEL") == "all") & (pl.col("METRIC") == metric)
+                            & pl.col("LO").is_not_null())
                     .sort("GAME_NO"))
         if rows.height == 0:
             raise SystemExit(f"no profile rows for {name} {metric}")

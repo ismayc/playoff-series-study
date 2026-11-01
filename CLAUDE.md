@@ -26,9 +26,10 @@ and what loading the data showed are in `docs/design.md`; read it first.
   series or game, so `GAME_NO` always comes from date order, and 02 checks
   it against the encoded digit from 2002 on. NBA 3PA, TOV, and OREB are
   incomplete before 1984-85 (`output/coverage.csv`). The 1954 NBA round
-  robins and the 2026 WNBA Finals (in progress at harvest) are excluded as
-  known invalid in `02_build_series.py::KNOWN_INVALID`. The 2020 NBA bubble
-  lists home and road teams on a neutral floor.
+  robins are excluded as known invalid in
+  `02_build_series.py::KNOWN_INVALID` (the 2026 WNBA Finals was listed
+  there while in progress; re-harvested November 1, 2026). The 2020 NBA
+  bubble lists home and road teams on a neutral floor.
 - **Sources of truth:** stats.nba.com box scores. Basketball-Reference is
   the independent check for series lengths when one is needed.
 - **Suspicious results:** a perfect score, a total of zero, or an impossibly

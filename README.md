@@ -21,7 +21,7 @@ Personal research in the basketball-data-science family. Data: NBA.com.
 | League | Series | Game 1 minus Games 2+ | Game 1 minus Game 2 |
 |---|---|---|---|
 | NBA | 630 | -0.03 (-0.87 to +0.82) | -0.32 (-1.36 to +0.73) |
-| WNBA | 170 | +0.26 (-1.14 to +1.67) | +0.64 (-0.87 to +2.14) |
+| WNBA | 171 | +0.21 (-1.19 to +1.61) | +0.58 (-0.93 to +2.08) |
 
 Three-point percentage, both teams pooled within each series; mean over series in percentage points with a 95% interval.
 
@@ -42,7 +42,7 @@ cold Game 1.
 | League | Game 1 minus Games 2+ | Game 1 minus Game 2 |
 |---|---|---|
 | NBA | -1.32 (-1.61 to -1.03) | -1.02 (-1.37 to -0.67) |
-| WNBA | -0.33 (-0.99 to +0.34) | -0.33 (-1.09 to +0.42) |
+| WNBA | -0.32 (-0.98 to +0.35) | -0.32 (-1.08 to +0.43) |
 
 Three-point attempt rate (3PA / <abbr title="Field-goal attempts.">FGA</abbr>), percentage points of field-goal attempts.
 
@@ -69,7 +69,7 @@ for it.
 | League | Game 1 minus expected | Games 2+ minus expected | Series with a baseline |
 |---|---|---|---|
 | NBA | -0.45 (-1.16 to +0.27) | -0.60 (-0.99 to -0.21) | 615 of 630 |
-| WNBA | +0.73 (-0.51 to +1.97) | +0.52 (-0.46 to +1.50) | 170 of 170 |
+| WNBA | +0.64 (-0.61 to +1.89) | +0.49 (-0.48 to +1.47) | 171 of 171 |
 
 Expected 3P% is the team's regular-season 3P% plus its opponent's 3P% allowed minus the league's.
 
@@ -77,8 +77,8 @@ Expected 3P% is the team's regular-season 3P% plus its opponent's 3P% allowed mi
 |---|---|---|---|---|
 | NBA | home | 614 | -0.79 (-2.15 to +0.57) | -1.09 (-2.19 to +0.02) |
 | NBA | road | 615 | -0.12 (-1.34 to +1.09) | -0.71 (-1.80 to +0.38) |
-| WNBA | home | 167 | +0.68 (-1.54 to +2.90) | +0.55 (-1.25 to +2.35) |
-| WNBA | road | 167 | -0.67 (-2.90 to +1.57) | +0.58 (-1.31 to +2.48) |
+| WNBA | home | 168 | +0.64 (-1.57 to +2.85) | +0.46 (-1.34 to +2.26) |
+| WNBA | road | 168 | -0.74 (-2.97 to +1.49) | +0.49 (-1.40 to +2.38) |
 <!-- /gen:baseline -->
 
 Game 1 is at the higher seed's floor. The 2020 seasons were played at
@@ -90,7 +90,7 @@ neutral sites and are left out of the home and road rows only.
 | League | Game 1 3P% | Games 2+ 3P% | Difference |
 |---|---|---|---|
 | NBA | 35.11 | 34.83 | +0.28 |
-| WNBA | 34.79 | 34.40 | +0.39 |
+| WNBA | 34.63 | 34.23 | +0.40 |
 
 Every three-pointer in every Game 1 against every one after it, no intervals.
 <!-- /gen:pooled -->
@@ -113,7 +113,7 @@ read against how much the game changed around it.
 | WNBA | 1990s | 6 | -6.55 (-10.99 to -2.10) | +2.14 (+0.20 to +4.08) |
 | WNBA | 2000s | 70 | +0.55 (-1.63 to +2.73) | -0.27 (-1.28 to +0.75) |
 | WNBA | 2010s | 54 | +1.13 (-1.70 to +3.95) | -0.94 (-1.97 to +0.09) |
-| WNBA | 2020s | 40 | -0.38 (-2.80 to +2.04) | +0.02 (-1.65 to +1.70) |
+| WNBA | 2020s | 41 | -0.59 (-2.99 to +1.80) | +0.06 (-1.58 to +1.70) |
 
 Game 1 minus Games 2+, mean over series in percentage points with a 95% interval.
 
@@ -127,7 +127,7 @@ Game 1 minus Games 2+, mean over series in percentage points with a 95% interval
 | WNBA | 1990s | 2 | 27.1 | 34.1 | 25.0 | 22.6 | 0 of 2 |
 | WNBA | 2000s | 10 | 35.3 | 34.7 | 23.6 | 24.0 | 7 of 10 |
 | WNBA | 2010s | 10 | 34.8 | 33.5 | 22.6 | 23.9 | 6 of 10 |
-| WNBA | 2020s | 7 | 35.0 | 34.9 | 33.3 | 32.4 | 4 of 7 |
+| WNBA | 2020s | 7 | 34.5 | 34.4 | 33.5 | 32.8 | 4 of 7 |
 
 Every three in the decade's series pooled, so a season with more threes counts for more.
 
@@ -151,9 +151,9 @@ adjustment.
 | NBA | 1 round before the Finals | 84 | +0.26 (-1.92 to +2.44) | +0.60 (-1.89 to +3.09) | -1.56 (-2.28 to -0.84) |
 | NBA | 2 rounds before the Finals | 168 | -0.80 (-2.35 to +0.75) | -2.15 (-4.09 to -0.20) | -0.55 (-1.16 to +0.06) |
 | NBA | 3 rounds before the Finals | 336 | +0.25 (-0.96 to +1.46) | +0.56 (-0.95 to +2.06) | -1.60 (-1.98 to -1.23) |
-| WNBA | Finals | 28 | -1.52 (-5.67 to +2.64) | +0.20 (-4.28 to +4.68) | +0.77 (-0.83 to +2.38) |
-| WNBA | 1 round before the Finals | 56 | +0.35 (-1.84 to +2.54) | +0.71 (-1.53 to +2.94) | -0.67 (-1.78 to +0.45) |
-| WNBA | 2 rounds before the Finals | 80 | +0.76 (-1.33 to +2.85) | +0.91 (-1.39 to +3.22) | -0.44 (-1.39 to +0.50) |
+| WNBA | Finals | 29 | -1.78 (-5.82 to +2.26) | -0.14 (-4.52 to +4.24) | +0.80 (-0.75 to +2.35) |
+| WNBA | 1 round before the Finals | 58 | +0.28 (-1.84 to +2.40) | +0.49 (-1.69 to +2.67) | -0.63 (-1.71 to +0.46) |
+| WNBA | 2 rounds before the Finals | 84 | +0.85 (-1.17 to +2.87) | +0.88 (-1.34 to +3.11) | -0.49 (-1.47 to +0.50) |
 
 **Reading.** No stage in either league shows a Game 1 accuracy gap that holds on both comparisons. NBA: the attempt-rate gap excludes zero at 3 of 4 stages (Finals, 1 round before the Finals, 3 rounds before the Finals). WNBA: the attempt-rate gap excludes zero at 0 of 3 stages.
 <!-- /gen:stakes -->
@@ -179,7 +179,7 @@ the less-rested one.
 
 Each contrast is the more-rested team's own Game 1 minus own Games 2+, minus the same for the less-rested team, in percentage points.
 
-**Reading.** NBA: across every nonzero gap the more-rested team's Game 1 three-point shooting is relatively worse, but no single gap bin excludes zero, so it is a hint, not a finding (293 series with no gap left out). WNBA: no rest-gap difference in Game 1 three-point shooting (73 series with no gap left out).
+**Reading.** NBA: across every nonzero gap the more-rested team's Game 1 three-point shooting is relatively worse, but no single gap bin excludes zero, so it is a hint, not a finding (293 series with no gap left out). WNBA: no rest-gap difference in Game 1 three-point shooting (74 series with no gap left out).
 <!-- /gen:rest -->
 
 ## Question 4: how the box score moves through a series
@@ -224,33 +224,33 @@ there is not a change in which series are present.
 
 **WNBA, every series.**
 
-| Rate, deviation from the series mean | G1 | G2 | G3 | G4 | G5 |
-|---|---|---|---|---|---|
-| Games | 170 | 170 | 109 | 28 | 15 |
-| Fouls per 100 possessions | **-1.00** | **+0.63** | +0.33 | +0.66 | +0.69 |
-| Free-throw rate (FTA / <abbr title="Field-goal attempts.">FGA</abbr>, x100) | **-1.80** | **+1.64** | -0.35 | +1.63 | +1.24 |
-| Turnovers per 100 possessions | -0.10 | +0.31 | -0.42 | +0.01 | +0.61 |
-| Pace (possessions per regulation game) | +0.08 | +0.31 | **-0.64** | +0.65 | -0.97 |
-| Points per 100 possessions | -0.30 | +0.24 | +0.27 | -0.40 | -0.52 |
-| Offensive rebound % (x100) | -0.42 | +0.49 | +0.16 | -1.94 | +1.59 |
-| Assists per made field goal (x100) | -0.48 | +0.29 | +0.18 | -1.02 | +2.68 |
-| Three-point attempt rate (x100) | -0.16 | +0.17 | -0.05 | -0.13 | +0.52 |
-| Three-point % (x100) | +0.01 | -0.61 | +0.34 | **+3.14** | -1.52 |
+| Rate, deviation from the series mean | G1 | G2 | G3 | G4 | G5 | G6 | G7 |
+|---|---|---|---|---|---|---|---|
+| Games | 171 | 171 | 110 | 29 | 16 | 1 | 1 |
+| Fouls per 100 possessions | **-1.04** | **+0.63** | +0.32 | +0.89 | +0.52 | +2.57 | -2.96 |
+| Free-throw rate (FTA / <abbr title="Field-goal attempts.">FGA</abbr>, x100) | **-1.81** | **+1.71** | -0.32 | +1.82 | +0.59 | -2.70 | -7.23 |
+| Turnovers per 100 possessions | -0.11 | +0.33 | -0.42 | +0.06 | +0.63 | -0.50 | -1.35 |
+| Pace (possessions per regulation game) | +0.09 | +0.33 | **-0.57** | +0.46 | **-1.24** | +1.47 | -3.85 |
+| Points per 100 possessions | -0.34 | +0.23 | +0.37 | -0.41 | -0.93 | +4.90 | -0.52 |
+| Offensive rebound % (x100) | -0.41 | +0.47 | +0.13 | -1.55 | +1.35 | -4.72 | +3.73 |
+| Assists per made field goal (x100) | -0.45 | +0.31 | +0.33 | -1.59 | +2.44 | +2.87 | -6.34 |
+| Three-point attempt rate (x100) | -0.15 | +0.17 | -0.07 | -0.16 | +0.49 | +3.85 | -2.26 |
+| Three-point % (x100) | -0.04 | -0.59 | +0.46 | **+2.69** | -1.58 | +8.13 | -4.00 |
 
 **WNBA, full-length series only** (same series in every column).
 
-| Rate, deviation from the series mean | G1 | G2 | G3 | G4 | G5 |
-|---|---|---|---|---|---|
-| Games | 81 | 81 | 81 | 15 | 15 |
-| Fouls per 100 possessions | **-0.78** | +0.15 | +0.44 | +0.35 | +0.69 |
-| Free-throw rate (FTA / <abbr title="Field-goal attempts.">FGA</abbr>, x100) | -1.26 | +1.00 | -0.18 | +1.18 | +1.24 |
-| Turnovers per 100 possessions | +0.04 | +0.45 | **-0.61** | +0.01 | +0.61 |
-| Pace (possessions per regulation game) | +0.24 | +0.48 | **-0.58** | +0.26 | -0.97 |
-| Points per 100 possessions | -0.37 | -0.48 | +0.84 | +0.55 | -0.52 |
-| Offensive rebound % (x100) | -0.02 | +0.06 | +0.13 | -2.50 | +1.59 |
-| Assists per made field goal (x100) | +0.19 | +0.16 | -0.44 | -2.21 | +2.68 |
-| Three-point attempt rate (x100) | +0.07 | -0.21 | +0.03 | +0.11 | +0.52 |
-| Three-point % (x100) | -0.35 | -0.14 | +0.15 | +3.39 | -1.52 |
+| Rate, deviation from the series mean | G1 | G2 | G3 | G4 | G5 | G6 | G7 |
+|---|---|---|---|---|---|---|---|
+| Games | 82 | 82 | 82 | 16 | 16 | 1 | 1 |
+| Fouls per 100 possessions | **-0.85** | +0.17 | +0.42 | +0.80 | +0.52 | +2.57 | -2.96 |
+| Free-throw rate (FTA / <abbr title="Field-goal attempts.">FGA</abbr>, x100) | -1.30 | +1.15 | -0.15 | +1.55 | +0.59 | -2.70 | -7.23 |
+| Turnovers per 100 possessions | +0.01 | +0.48 | **-0.61** | +0.11 | +0.63 | -0.50 | -1.35 |
+| Pace (possessions per regulation game) | +0.26 | +0.52 | -0.50 | -0.07 | **-1.24** | +1.47 | -3.85 |
+| Points per 100 possessions | -0.44 | -0.49 | +0.96 | +0.48 | -0.93 | +4.90 | -0.52 |
+| Offensive rebound % (x100) | -0.01 | +0.01 | +0.09 | -1.76 | +1.35 | -4.72 | +3.73 |
+| Assists per made field goal (x100) | +0.23 | +0.19 | -0.24 | -3.18 | +2.44 | +2.87 | -6.34 |
+| Three-point attempt rate (x100) | +0.08 | -0.21 | +0.00 | +0.04 | +0.49 | +3.85 | -2.26 |
+| Three-point % (x100) | -0.44 | -0.11 | +0.31 | +2.57 | -1.58 | +8.13 | -4.00 |
 
 Bold: the 95% interval excludes zero. Each cell is the mean over games of the two teams' deviations from their own series means.
 <!-- /gen:profiles -->
@@ -265,7 +265,7 @@ game, from Game 2 on, whenever one leads the series.
 | League | Games with a series leader | Trailing minus leading team | Tied games left out |
 |---|---|---|---|
 | NBA | 2077 | -1.07 (-1.35 to -0.80) | 589 |
-| WNBA | 220 | -2.34 (-3.24 to -1.44) | 102 |
+| WNBA | 223 | -2.31 (-3.20 to -1.42) | 105 |
 
 Three-point attempt rate, each team relative to its own series mean, percentage points.
 
@@ -289,7 +289,7 @@ outshot their opponent from three win the series more often?
 | League | Series | Better Game 1 three-point shooter wins the series | Game 1 winner wins the series: it also outshot | it was outshot | Difference |
 |---|---|---|---|---|---|
 | NBA | 614 | 59.8% (55.9 to 63.7) | 76.7% (72.6 to 80.7), 420 series | 76.8% (70.9 to 82.7), 194 series | -0.1 (-7.3 to +7.0) |
-| WNBA | 167 | 61.1% (53.7 to 68.5) | 75.0% (67.0 to 83.0), 112 series | 67.3% (54.9 to 79.7), 55 series | +7.7 (-7.0 to +22.5) |
+| WNBA | 168 | 61.3% (53.9 to 68.7) | 75.2% (67.3 to 83.2), 113 series | 67.3% (54.9 to 79.7), 55 series | +7.9 (-6.8 to +22.7) |
 
 Shares of series in percent with a 95% interval; the difference is in percentage points. Series with equal Game 1 three-point percentages, or a team with no Game 1 attempts, are left out (NBA 16, WNBA 3).
 
@@ -311,10 +311,10 @@ are description.
 | NBA | best-of-5 | 144 | +0.36 (-1.98 to +2.71) | -1.61 (-2.10 to -1.12) | -0.88 (-1.32 to -0.44) | -2.59 (-3.68 to -1.50) |
 | NBA | best-of-7 | 486 | -0.15 (-0.99 to +0.70) | -1.23 (-1.58 to -0.89) | -1.10 (-1.36 to -0.84) | -2.12 (-2.70 to -1.54) |
 | WNBA | 2020 (single site) | 3 | +5.92 (-0.86 to +12.69) | +3.21 (+0.84 to +5.58) | -1.32 (-2.11 to -0.54) | -0.40 (-4.28 to +3.48) |
-| WNBA | every other season | 167 | +0.16 (-1.26 to +1.59) | -0.39 (-1.07 to +0.28) | -1.00 (-1.41 to -0.59) | -1.82 (-2.79 to -0.86) |
+| WNBA | every other season | 168 | +0.11 (-1.31 to +1.53) | -0.38 (-1.05 to +0.29) | -1.03 (-1.44 to -0.62) | -1.84 (-2.79 to -0.88) |
 | WNBA | best-of-3 | 127 | +0.45 (-1.15 to +2.05) | -0.61 (-1.36 to +0.14) | -0.90 (-1.34 to -0.47) | -1.43 (-2.50 to -0.36) |
 | WNBA | best-of-5 | 42 | -0.40 (-3.40 to +2.59) | +0.25 (-1.10 to +1.60) | -1.24 (-2.21 to -0.27) | -2.76 (-4.81 to -0.72) |
-| WNBA | best-of-7 | 1 | +4.78 (one series) | +10.88 (one series) | -3.92 (one series) | -7.73 (one series) |
+| WNBA | best-of-7 | 2 | -2.18 (-15.82 to +11.47) | +6.20 (-2.98 to +15.38) | -5.09 (-7.40 to -2.79) | -5.84 (-9.55 to -2.12) |
 
 Percentage points except fouls (per 100 possessions); the foul and free-throw columns are Game 1's deviation from the series mean, as in question 4. Mean over series with a 95% interval.
 
@@ -343,16 +343,16 @@ Percentage points except fouls (per 100 possessions); the foul and free-throw co
 
 | Rate | 1990s | 2000s | 2010s | 2020s |
 |---|---|---|---|---|
-| Series | 6 | 70 | 54 | 40 |
-| Fouls per 100 possessions | -0.97 | **-0.89** | **-0.91** | **-1.34** |
-| Free-throw rate (FTA / <abbr title="Field-goal attempts.">FGA</abbr>, x100) | -1.18 | **-1.71** | **-1.94** | **-1.85** |
-| Turnovers per 100 possessions | +0.13 | -0.12 | +0.00 | -0.21 |
-| Pace (possessions per regulation game) | +0.60 | -0.26 | +0.25 | +0.37 |
-| Points per 100 possessions | +0.41 | +0.47 | -0.59 | -1.36 |
-| Offensive rebound % (x100) | -0.63 | -0.31 | -0.17 | -0.89 |
-| Assists per made field goal (x100) | +3.08 | -0.86 | +0.31 | -1.42 |
-| Three-point attempt rate (x100) | **+1.30** | -0.20 | -0.52 | +0.18 |
-| Three-point % (x100) | **-4.19** | +0.30 | +0.30 | -0.27 |
+| Series | 6 | 70 | 54 | 41 |
+| Fouls per 100 possessions | -0.97 | **-0.89** | **-0.91** | **-1.46** |
+| Free-throw rate (FTA / <abbr title="Field-goal attempts.">FGA</abbr>, x100) | -1.18 | **-1.71** | **-1.94** | **-1.90** |
+| Turnovers per 100 possessions | +0.13 | -0.12 | +0.00 | -0.28 |
+| Pace (possessions per regulation game) | +0.60 | -0.26 | +0.25 | +0.41 |
+| Points per 100 possessions | +0.41 | +0.47 | -0.59 | -1.48 |
+| Offensive rebound % (x100) | -0.63 | -0.31 | -0.17 | -0.86 |
+| Assists per made field goal (x100) | +3.08 | -0.86 | +0.31 | -1.29 |
+| Three-point attempt rate (x100) | **+1.30** | -0.20 | -0.52 | +0.20 |
+| Three-point % (x100) | **-4.19** | +0.30 | +0.30 | -0.45 |
 
 **NBA three-point attempt rate (x100) by game number and decade.**
 
@@ -392,9 +392,9 @@ amendment).
 | League | Seasons | Games with a crew of three | Game 1 fouls per 100 possessions | Game 1 crew tendency | Same official: Game 1 minus later games | Officials agree with themselves (even vs odd seasons) |
 |---|---|---|---|---|---|---|
 | NBA | 2001 to 2026 | 1858 of 2156 | -0.88 (-1.17 to -0.59) | +0.00 (-0.03 to +0.03), 314 series | -1.15 (-1.41 to -0.88), 63 officials | r = +0.50 (+0.27 to +0.68), 54 officials |
-| WNBA | 2004 to 2026 | 360 of 424 | -1.10 (-1.57 to -0.62) | +0.00 (-0.05 to +0.06), 122 series | -1.63 (-2.07 to -1.18), 32 officials | r = +0.28 (-0.20 to +0.65), 19 officials |
+| WNBA | 2004 to 2026 | 367 of 431 | -1.14 (-1.61 to -0.66) | +0.01 (-0.05 to +0.06), 123 series | -1.73 (-2.21 to -1.26), 33 officials | r = +0.43 (-0.01 to +0.73), 20 officials |
 
-Seasons are the years the seasons end. Fouls per 100 possessions as deviations from the series mean (question 4); the crew tendency is the mean, over a game's officials, of how far above or below the league each runs in other series, as a deviation from the series' average crew. Means with 95% intervals; the split-half correlation has a Fisher interval. From 2016-17 (NBA) and 2018 (WNBA) most games list four officials, with no field saying which three worked; the NBA's liveData box scores flag the alternate, which gives the crew of 282 NBA games (2021 to 2026) and 80 WNBA games (2022 to 2026) (amendment of October 19, 2026, in docs/design.md), and four-official games without a liveData box drop. Seasons where fewer than half the games have a crew of three: NBA 2001, NBA 2003, NBA 2018, NBA 2019, WNBA 2003, WNBA 2018, WNBA 2019, WNBA 2020, WNBA 2021.
+Seasons are the years the seasons end. Fouls per 100 possessions as deviations from the series mean (question 4); the crew tendency is the mean, over a game's officials, of how far above or below the league each runs in other series, as a deviation from the series' average crew. Means with 95% intervals; the split-half correlation has a Fisher interval. From 2016-17 (NBA) and 2018 (WNBA) most games list four officials, with no field saying which three worked; the NBA's liveData box scores flag the alternate, which gives the crew of 282 NBA games (2021 to 2026) and 84 WNBA games (2022 to 2026) (amendment of October 19, 2026, in docs/design.md), and four-official games without a liveData box drop. Seasons where fewer than half the games have a crew of three: NBA 2001, NBA 2003, NBA 2018, NBA 2019, WNBA 2003, WNBA 2018, WNBA 2019, WNBA 2020, WNBA 2021.
 
 **Reading.** NBA: Game 1 crews are no lighter-whistled than the series' other crews (the interval includes zero); the same officials call fewer fouls in Game 1 than in later games; officials differ: one who calls more fouls than usual in even seasons does so in odd seasons too. WNBA: Game 1 crews are no lighter-whistled than the series' other crews (the interval includes zero); the same officials call fewer fouls in Game 1 than in later games; no sign that officials differ beyond chance.
 <!-- /gen:officials -->
@@ -421,13 +421,13 @@ with the less experienced one.
 | NBA |  | over 26.0 | 195 | +1.27 (-1.99 to +4.54) | -0.50 (-1.52 to +0.53) | -1.19 (-1.93 to -0.45) |
 | NBA |  | any gap | 616 | +0.43 (-1.43 to +2.29) | -0.14 (-0.76 to +0.48) | -0.55 (-0.98 to -0.12) |
 | WNBA | Roster (minutes-weighted career playoff games) | up to 4.7 | 57 | +2.96 (-2.94 to +8.86) | -0.17 (-2.81 to +2.47) | +0.69 (-1.85 to +3.24) |
-| WNBA |  | 4.7 to 11.1 | 56 | -1.18 (-7.15 to +4.80) | +1.98 (-1.02 to +4.98) | -0.40 (-2.59 to +1.80) |
+| WNBA |  | 4.7 to 11.1 | 57 | -1.04 (-6.91 to +4.84) | +2.06 (-0.90 to +5.01) | -0.45 (-2.61 to +1.71) |
 | WNBA |  | over 11.1 | 57 | +3.16 (-2.36 to +8.68) | +1.64 (-0.97 to +4.25) | +2.65 (+1.08 to +4.22) |
-| WNBA |  | any gap | 170 | +1.66 (-1.68 to +5.01) | +1.15 (-0.44 to +2.73) | +0.99 (-0.25 to +2.23) |
-| WNBA | Franchise (playoff games in the three previous postseasons) | up to 5.0 | 56 | +2.01 (-4.58 to +8.59) | -0.83 (-3.64 to +1.98) | +0.09 (-2.15 to +2.34) |
+| WNBA |  | any gap | 171 | +1.69 (-1.63 to +5.02) | +1.18 (-0.40 to +2.75) | +0.96 (-0.27 to +2.20) |
+| WNBA | Franchise (playoff games in the three previous postseasons) | up to 5.0 | 57 | +1.85 (-4.62 to +8.33) | -0.93 (-3.70 to +1.84) | +0.15 (-2.06 to +2.36) |
 | WNBA |  | 5.0 to 12.0 | 59 | -0.72 (-5.65 to +4.21) | +1.01 (-1.84 to +3.85) | +1.33 (-0.81 to +3.46) |
 | WNBA |  | over 12.0 | 50 | +3.88 (-2.50 to +10.25) | +0.97 (-1.77 to +3.71) | +1.81 (-0.32 to +3.95) |
-| WNBA |  | any gap | 165 | +1.60 (-1.83 to +5.03) | +0.37 (-1.25 to +1.99) | +1.05 (-0.20 to +2.31) |
+| WNBA |  | any gap | 166 | +1.55 (-1.86 to +4.96) | +0.33 (-1.28 to +1.94) | +1.07 (-0.18 to +2.32) |
 
 Each contrast is the more experienced team's own Game 1 minus its own Games 2+, minus the same for the less experienced team: percentage points for the shooting rates, fouls per 100 possessions for fouls. Gap bins are terciles of the nonzero gap in each league. Mean over series with a 95% interval. Every postseason in both leagues has player rows.
 
@@ -450,8 +450,8 @@ Each contrast is the more experienced team's own Game 1 minus its own Games 2+, 
   or fewer committed; box scores cannot tell the two apart.
 - **Before 1984-85 in the NBA.** Three-point attempts are missing from most
   box scores before then (`output/coverage.csv`).
-- **The 2026 WNBA Finals,** in progress at harvest and excluded until it
-  ends.
+- **The 2026 WNBA Finals** was in progress at the first harvest and excluded;
+  it was re-harvested on November 1, 2026, after Game 7, and is now included.
 
 ## Question 2: the review page
 

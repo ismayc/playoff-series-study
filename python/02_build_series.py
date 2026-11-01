@@ -37,13 +37,13 @@ OUT = ROOT / "output"
 # Invalid series that are expected, keyed by league, season, and the
 # validator's reason, with why. Filled from the first full build (October 18,
 # 2026); any other invalid series, including a different reason in a listed
-# season, is a failure.
+# season, is a failure. The 2026 WNBA Finals was listed here while it was in
+# progress (one game in at the October 18, 2026 harvest, "Finals shorter than
+# an earlier round"); the game logs were re-harvested on November 1, 2026,
+# after Game 7 on October 31, and the entry was dropped.
 KNOWN_INVALID: dict[tuple[str, int, str], str] = {
     ("00", 1954, "pair met twice"):
         "division round robins: each pair met in the round robin and again later",
-    ("10", 2026, "Finals shorter than an earlier round"):
-        "Finals in progress at harvest (Game 1 played October 17, 2026); delete "
-        "data/raw/gamelogs/wnba_2026_po.csv and rerun 01 once it ends, then drop this entry",
 }
 
 

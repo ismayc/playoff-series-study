@@ -61,7 +61,11 @@ What loading it showed:
   seen to fire on its real case before the case was listed: the ID check on
   2000-01 (NBA) and 1997 to 2001 (WNBA), the run check on 1954, and the
   format check on the 2026 Finals, which the win-count rules alone passed as
-  a complete one-game series.
+  a complete one-game series. **Note (November 1, 2026):** the 2026 WNBA
+  Finals ended on October 31, 2026 (seven games); the 2026 WNBA playoff
+  logs were re-harvested that day, the series passed every check, and its
+  known-invalid entry was dropped. The 1954 round robins are the one
+  known-invalid case left.
 - **Checked against known results:** the Finals of 1970, 1984, 1998, 2016,
   and 2025 (NBA) and of 2005, 2016, and 2025 (WNBA) come out with the right
   teams and lengths, and modern seasons have 15 NBA and 7 WNBA series.
@@ -171,7 +175,8 @@ replaces the two looser bullets above.
   the ID encodes a round (2002 on), stage must equal the season's highest
   round minus the series' round, for every series; 08 fails otherwise. A
   series whose winner's path does not reach a valid Finals (the 2026 WNBA
-  semifinals, while the Finals is excluded) has no stage and is counted.
+  semifinals, while the Finals was excluded, until November 1, 2026) has no
+  stage and is counted.
 - **Stakes.** The question 1 sample and series values (D_PCT, D2_PCT,
   D_RATE), summarized by league and stage with the question 1 interval.
 - **Opponent strength.** The backlog entry proposed adjusting for both
@@ -199,6 +204,9 @@ replaces the two looser bullets above.
   series at stages 3 to 0, the fixed 16-team bracket. The only series
   without a stage are the six 2026 WNBA series, whose Finals is excluded;
   08 fails if a series lacks a stage in any season that has a Finals.
+  **Note (November 1, 2026):** with the 2026 WNBA Finals re-harvested and
+  valid, every series in the data has a stage (the count of series with an
+  encoded round is in the 08 output, not fixed here).
 
 ### Question 4, fixed October 18, 2026 before any profile was computed
 

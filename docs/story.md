@@ -14,14 +14,14 @@ leagues.
 <div class="value">−0.03</div>
 <div class="sub">Game 1 three-point percentage minus Games 2 on, in points, across 630 series (95% interval −0.87 to +0.82).</div></div>
 <div class="tile"><div class="label">WNBA accuracy</div>
-<div class="value">+0.26</div>
-<div class="sub">The same comparison across 170 series (−1.14 to +1.67). No Game 1 dip.</div></div>
+<div class="value">+0.21</div>
+<div class="sub">The same comparison across 171 series (−1.19 to +1.61). No Game 1 dip.</div></div>
 <div class="tile"><div class="label">NBA volume</div>
 <div class="value">−1.32</div>
 <div class="sub">Points of field-goal attempts taken from three, Game 1 against Games 2 on (−1.61 to −1.03).</div></div>
 <div class="tile"><div class="label">Fouls in Game 1</div>
 <div class="value">−1.05</div>
-<div class="sub">NBA fouls per 100 possessions against the series average (WNBA −1.00).</div></div>
+<div class="sub">NBA fouls per 100 possessions against the series average (WNBA −1.04).</div></div>
 </div>
 
 <div class="eyebrow beat">The question</div>
@@ -46,7 +46,7 @@ every output cell.
 
 ## Game 1 accuracy is not worse
 
-{{fig:fig1_game1_gap_py|Game 1 minus later games in the same series, in percentage points with 95% intervals. Accuracy sits on zero in both leagues and on both comparisons: the NBA is −0.03 against Games 2 on and −0.32 against Game 2 alone, the WNBA +0.26 and +0.64. NBA attempt rate is lower in Game 1 on both comparisons, −1.32 and −1.02. WNBA attempt rate is not distinguishable from zero.}}
+{{fig:fig1_game1_gap_py|Game 1 minus later games in the same series, in percentage points with 95% intervals. Accuracy sits on zero in both leagues and on both comparisons: the NBA is −0.03 against Games 2 on and −0.32 against Game 2 alone, the WNBA +0.21 and +0.58. NBA attempt rate is lower in Game 1 on both comparisons, −1.32 and −1.02. WNBA attempt rate is not distinguishable from zero.}}
 
 Counting every three-pointer together instead of averaging series, NBA
 Game 1s actually shot a little better than later games: 35.11% against
@@ -67,11 +67,11 @@ kept, so the climb is not a change in which series are present.
 One natural explanation is that the team behind in the series starts
 shooting its way back. The data say the opposite: from Game 2 on, the team
 trailing in the series takes relatively fewer threes than the leader, by
-−1.07 points in the NBA (−1.35 to −0.80) and −2.34 in the WNBA. Trailing
+−1.07 points in the NBA (−1.35 to −0.80) and −2.31 in the WNBA. Trailing
 teams have also just lost games, so this sorts teams by recent results
 rather than showing intent.
 
-{{fig:fig3_fouls_by_game_py|Fouls per 100 possessions against each team's series average, by game number. Game 1 is the low point in both leagues (NBA −1.05, WNBA −1.00) and Game 2 jumps back up. Free-throw rate follows the same pattern (NBA −2.23 points in Game 1).}}
+{{fig:fig3_fouls_by_game_py|Fouls per 100 possessions against each team's series average, by game number. Game 1 is the low point in both leagues (NBA −1.05, WNBA −1.04) and Game 2 jumps back up. Free-throw rate follows the same pattern (NBA −2.23 points in Game 1).}}
 
 Fewer fouls in Game 1 can mean fewer called or fewer committed; box scores
 cannot separate the two.
@@ -134,8 +134,8 @@ The team that shoots better from three in Game 1 goes on to win the series
 Game 1 winners take most series. With the Game 1 result held fixed, the
 edge disappears: NBA Game 1 winners took the series 76.7% of the time when
 they also outshot their opponent from three, and 76.8% when they did not.
-In the WNBA the difference is +7.7 points, with an interval from −7.0 to
-+22.5 across 167 series.
+In the WNBA the difference is +7.9 points, with an interval from −6.8 to
++22.7 across 168 series.
 
 {{svg:dg3_outshoot|Where the better Game 1 shooter's series record comes from. In most series that team also won Game 1, and Game 1 winners take the series 76.7% of the time when they also outshot the other team and 76.8% when they did not. Split by the Game 1 result, the shooting edge adds nothing.}}
 
@@ -204,8 +204,9 @@ Box scores record what happened, not why. A difference between Game 1 and
 later games mixes scouting adjustments, officiating, rest, and game script,
 and this design compares them without separating them. Three-point attempts
 are missing from most NBA box scores before 1984-85, so earlier seasons are
-left out. The 2026 WNBA Finals was in progress when the data were gathered
-and is excluded until it ends.
+left out. The 2026 WNBA Finals was in progress when the data were first
+gathered; it was added after it ended, so the data now run through Game 7 of
+that series.
 
 The game logs come from stats.nba.com and stay local; this page and its
 repository publish only summaries, never the game-by-game records.

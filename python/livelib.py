@@ -9,8 +9,10 @@ compact tables the study reads:
   the team box-score counts, read by the box-score gate (15_live_gate.py).
 
 The boxes were fetched by an audit on October 19, 2026 from the NBA's
-liveData feed and cannot be re-fetched from this machine (403), so the raw
-files are the only copy; both tables are rebuilt from them, never edited.
+liveData feed, which refused this machine later that day (403); the seven
+2026 WNBA Finals boxes were fetched from the same S3 host on November 1,
+2026, when it answered again (URL in DATA_SOURCES.md). The raw files are
+the only copy; both tables are rebuilt from them, never edited.
 """
 
 from __future__ import annotations
